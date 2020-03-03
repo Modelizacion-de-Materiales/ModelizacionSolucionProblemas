@@ -1,0 +1,16 @@
+set terminal pdf enhanced
+set output 'allcurve.pdf'
+
+medidas='ListaXY.dat'
+midata='listasalida.dat'
+miotradata='otralistasalida.dat'
+
+set xlabel 'Z (m)'
+set ylabel ' T ( C'.degree.' ) '
+plot medidas w p ti 'Datos' , midata w l  ti 'Spline Naturales'
+
+set output 'allotracurve.pdf'
+plot medidas w p ti 'Datos' , miotradata w l  ti 'Spline Naturales'
+
+
+
