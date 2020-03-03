@@ -1,0 +1,44 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%% Maestría En Materiales 2012 %%%%%%%%%%%%%%%%%%%%%%%
+%%%%                          Chapa                                    %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% function [xx,yy,Qx,Qy]=flujos(Nx,Ny,x,y,Tmat)
+% 
+% Esta función calcula los flujos de calor para el resultado de resolver
+% la ecuacion de calor en la chapa con las condiciones de contorno dadas. 
+%
+% INPUT ---
+% Nx, Ny : tamaño de la grilla.
+% x , y  : posiciones de los nodos dentro de la chapa.
+% Tmat   : Matriz de temperaturas T(i,j).
+% 
+% OUTPUT ---
+% xx , yy : grilla de interconección x,y
+% Qx, Qy  : Vectores de flujo.
+%
+
+%%% function [xx,yy,Qx,Qy]=flujos(Nx,Ny,x,y,Tmat)
+function [ Qx, Qy] = flujos(Nx,Ny,x,y,Tmat)
+
+
+%%%k=1;
+%%%for i = 2:(fix(Nx/6)+1):Nx-1          % solo quiero calcular para 5 puntos 
+%%%    for j=2:(fix(Ny/6)+1):Ny-1       % en toda la chapa. 
+Qx = zeros(Nx,Ny);
+Qy = zeros(Nx,Ny);
+for j=2:Nx-1
+    for i=2:Ny-1
+       %xx(k)=x(i);
+       %yy(k)=y(j);
+       Qx(i,j)=-(Tmat(i+1,j)-Tmat(i-1,j))/(x(i+1)-x(i-1));
+       Qy(i,j)=-(Tmat(i,j+1)-Tmat(i,j-1))/(y(j+1)-y(j-1));
+    end 
+end
+Qx(1,:)=-(Tmat(2,:)-Tmat(1,:))/(x(2)-x(1));
+Qx(Nx,:)=-(Tmat(Nx,:)-Tmat(Nx-1,:))/(x(Nx)-x(Nx-1));
+Qy(:,1)=-(Tmat(:,2)-Tmat(:,1))/(y(2)-y(1));
+Qy(:,Ny)=-(Tmat(:,Ny)-Tmat(:,Ny-1))/(y(Ny)-y(Ny-1));
+
+
+       
