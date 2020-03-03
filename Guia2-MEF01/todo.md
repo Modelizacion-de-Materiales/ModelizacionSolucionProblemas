@@ -3,3 +3,6 @@
 cinco ejercicios - matlab y python
 
 resumen
+
+# en fortran
+solo esta hecho en fortran
