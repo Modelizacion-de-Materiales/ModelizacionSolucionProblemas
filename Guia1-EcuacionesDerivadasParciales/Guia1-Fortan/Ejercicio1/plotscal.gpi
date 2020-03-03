@@ -1,0 +1,31 @@
+set terminal pdf enhanced color
+set output 'escaleofit.pdf'
+
+set xtics font 'Arial,8'
+set ytics font 'Arial,8'
+set xlabel font 'Arial,10'
+set ylabel font 'Arial,10'
+set title font 'Arial,12'
+set bmargin 5
+set tmargin 5
+set lmargin 6
+set rmargin 6
+
+
+input = 'tiempos.dat'
+
+
+f(x) = a*x + b
+a=6
+b=-10
+
+fit f(x) input u (log($1*$2)):($3>0?log($3):1/0) via a,b
+
+set xlabel 'log(Nx*Ny)'
+set ylabel 'log(t)'
+set key top left
+milabel="log(t) = a*log(Nx*Ny)+b \na = ".gprintf("%4.2f \n" ,a)."b = ".gprintf("%4.2f" ,b)
+set label 1 milabel at graph 0.6, graph 0.5
+plot input u (log($1*$2)):($3>0?log($3):1/0) title 'datos',\
+       f(x) w l title 'Ajuste lineal' ls 1
+
