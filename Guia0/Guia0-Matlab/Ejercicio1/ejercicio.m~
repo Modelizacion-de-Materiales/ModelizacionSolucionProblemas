@@ -1,0 +1,69 @@
+% abrir los datos
+hold off
+close all
+
+XY=load('datos.dat');
+n=size(XY,1);
+
+% Para encontrar las derivadas numéricas necesito esta matriz:
+
+D = zeros(n,n);
+D(1,1:2)=[ -1  , 1 ];
+for i = 2:n-1
+    D(i,i-1:i+1)=[-1 0 1 ];
+end
+D(n,n-1:n)=[-1 1];
+
+% luego calculo los deltas
+dx=D*XY(:,1);
+dy=D*XY(:,2);
+ddy=D*dy;
+%y las derivadas:
+DY = dy./dx;
+dDY= D*DY; 
+DDY=dDY./dx;
+
+
+
+
+%calular los coeficientes del spline.
+[P,xy]=misplines(XY(:,1),XY(:,2));
+
+% calcular la interpolación de las derivadas
+[DP,dxy]=misplines(XY(:,1),DY);
+[DDP,ddxy]=misplines(XY(:,1),DDY);
+
+plot(XY(:,1),XY(:,2),'ok','markersize',5 );
+hold on
+plot(xy(:,1),xy(:,2),'k','DisplayName','Interpolacion');
+plot(XY(:,1),DY,'ro',dxy(:,1),dxy(:,2),'r','DisplayName','Primera Derivada');
+plot(XY(:,1),DDY,'bo',ddxy(:,1),ddxy(:,2),'b','DisplayName','Segunda Derivada');
+legend('location','NorthEast');
+title('Derivadas halladas numericamente de los datos');
+saveas(gcf,'curvas.pdf','pdf');
+%legend();
+% ahora quiero encontrar el lugar donde la derivada primera tiene un
+% extremo.
+% es aquel lugar donde la derivada segunda tiene un cambio de signo.
+%%
+[zo,err]=findzero(ddxy(:,[1,2]));
+
+
+%% voy a graficar las derivadas como vienen dadas por la interpolación
+fig2=figure(2);
+plot(XY(:,1),XY(:,2),'ok','markersize',5 );
+hold on
+plot(xy(:,1),xy(:,2),'k','DisplayName','Interpolacion');
+plot(xy(:,1),xy(:,3),'r','DisplayName','primera derivada');
+plot(xy(:,1),xy(:,4),'b','DisplayName','segunda derivada');
+title('Derivadas de la interpolacion');
+legend('location','NorthEast');
+saveas(fig2,'curvas2.pdf','pdf');
+
+
+%% corrección.
+
+% se puede ver que esto da problemas. hay que calcular las derivadas
+% numericamente. 
+
+
