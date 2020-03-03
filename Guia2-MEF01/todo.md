@@ -6,3 +6,7 @@ resumen
 
 # en fortran
 solo esta hecho en fortran
+
+
+# en Python . 
+no hay nada hecho
