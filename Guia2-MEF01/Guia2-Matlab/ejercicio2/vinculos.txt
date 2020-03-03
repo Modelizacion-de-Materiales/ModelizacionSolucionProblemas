@@ -1,0 +1,8 @@
+# Esto es para el ejercicio de los resortes
+# x y z  gl(+:desp,-:fuerza)   valor_vin
+#0 0 0 1 0
+#3 0 0 1 0.2
+# Problema del Puente
+0 0 0 1 2 0 0
+8 0 0 -1 -2 0 -20e3
+16 0 0 2 -1 0 0
