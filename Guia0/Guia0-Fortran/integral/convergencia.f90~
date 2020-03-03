@@ -1,0 +1,85 @@
+program convergencia
+implicit none
+
+integer::i,j,eof
+real(8)::h,dh,x,fx
+real(8)::a,b
+real(8)::f
+real(8)::IS,IT,ISn,ITn,AvS,AvT
+real(8)::eS,eT
+
+
+print*,"Ingrese los límites de integración"
+print*, "a="
+read(*,*), a
+print*, "b = "
+read(*,*), b
+
+print*, "Aguarde un momento, se calculará el valor de la integral en función del tamaño de paso. "
+
+open(1,file="IvsErr.dat")
+write(1,*) "h	IS	eS	IT	eT"		!Ingreso en el archivo de salida
+							!los nombres de los datos a guardar.
+h=abs(a-b)						!Inicio el espaciado entre valores de 
+							!x para la primera iteración
+
+!--------Tengo que hacer la lista del valor de la integral vs el tamaño de paso.
+
+							!Inicio los valores de las integrales
+IS=(b-a)*(f(a)+4*f((a+b)/2.)+f(b))/6.			!Según el método de Simpson
+IT=30*f(b)/2						!y según el método de los trapecios
+
+do 
+	x=a						!Inicio desde el comienzo del intervalo
+	ISn=IS						!guardo los valores anteriores 
+	ITn=IT						! de las integrales
+
+	open(2,file="f_x.dat")				!y abro un archivo donde voy a guardar
+	do while(x<=b)					!los valores x; f(x)
+		fx=f(x)					!los x están espaciados por el paso
+		write(2,*),x,fx				!h, que va a ser el parámetro que me 
+		x=x+h					!interesa
+	end do						!
+	close(2)					!cierro el archivo.
+
+	call integrarSimpson(IS,"f_x.dat")		!Calculo la integral para el conjunto
+	call integrarTrapecios(IT,"f_x.dat")		!datos actual, por ambos métodos.
+	eS=abs((IS-ISn)/IS)				!y calculo el error respecto al paso
+	eT=abs((IT-ITn)/IT)				!anterior.
+
+	write(1,*),h,IS,eS,IT,eT			!Guardo toda esta info en un archivo
+	if(eS<1e-5.and.eT<1e-5) exit			!Si el paso es menor quelo que
+							!me interesa, salgo.
+	
+	dh=h*(10.**0.1 - 1.)/(10.**0.1)			!Modifico el espaciado en sentido decreciente
+	h=h-dh						!de manera de tener 10 puntos por década
+end do
+
+!--------------------------------------------------Ahora me queda calcular el punto de aplicación
+
+open(2,file="f_x.dat")
+open(3,file="xfx.dat")
+
+do							!
+	read(2,*,iostat=eof), x, fx			!Para esto, me hago un archivo donde
+	write(3,*),x,x*fx				!guardo los valores de x y de
+	if(eof/=0) exit					! x*fx
+end do
+close(2)
+close(3)
+
+call integrarSimpson(AvS,"xfx.dat")			!Luego solo me queda integrar estos
+call integrarTrapecios(AvT,"xfx.dat")			!datos, y esa integral la divido 
+AvS=AvS/IS						!por el valor anterior, para tener el 
+AvT=AvT/IT						!promedio que busco
+
+!---------------------------------Imprimo en pantalla los resultados
+
+print*, "Gracias por aguardar."
+print*, " "
+print*, "		Método de Simpson		Método de los trapecios"
+print*, "------------------------------------------------------------------------"
+write(*,*) "Fuerza (lbs)   |", IS, IT
+print*, "Punto de       |"
+write(*,*) "aplicación (ft)|", AvS, AvT
+end program

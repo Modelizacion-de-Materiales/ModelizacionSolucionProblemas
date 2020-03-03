@@ -1,0 +1,76 @@
+program main
+implicit none
+real(8)::a,b,h
+real(8)::f,x,IS,IT
+real(8)::xn,fn
+integer::N,j
+open(1,file="f_x.dat")
+
+print*, "Ingrese los límites de la integral."
+print*, "a= "
+read(*,*), a
+print*, "b= "
+read(*,*) ,b
+
+print*, "Ingrese el valor del paso para la integración numérica."
+print*, "h = "
+read(*,*), h
+
+N=abs(b-a)/h
+
+x=a
+
+do j=0,N
+	write(1,*), x, f(x)
+	x=x+h
+end do
+
+close(1)
+
+call integrar(IS,IT,"f_x.dat","I_x.dat")
+
+print*, "El valor de la integral por el método de Simpson es "
+write(*,*), IS
+print*, "El valor de la integral por el método de los trapecios es "
+write(*,*), IT
+
+end program main
+
+
+function f(x)
+implicit none
+real(8)::x,f
+
+f=200*(x/(5.+x))*exp(-2.*x/300.)
+
+end function
+
+subroutine integrar(IS,IT,funcion,integral)
+implicit none
+
+real(8)::IS,IT,fx,x,xn,fn
+character(len=7)::funcion,integral
+integer::eof
+
+open(2,file=funcion)
+open(3,file=integral)
+read(2,*),xn,fn
+IS=0
+IT=0
+write(3,*),xn,fn,IS,IT
+
+
+do 
+	read(2,*,iostat=eof),x,fx
+	IS=IS+.5*(x-xn)*(fx+fn)
+	IT=IT+fx*(x-xn)
+	write(3,*),x,fx,IS,IT
+	xn=x
+	fn=fx
+	if(eof/=0) exit
+end do
+
+close(2)
+close(3)
+
+end subroutine
