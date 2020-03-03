@@ -1,0 +1,39 @@
+# primero cargo los datos externos
+# el nombre del archivo 
+input='TEMP.dat'
+# necesio el numero de pasos temporales que hice
+nblocks=system(" awk 'BEGIN{RS=\"\\n\\n\"};END{print NR}'  ".input)
+# Necesito el método aplicado
+metod=system("grep -i method DATIN | awk '{ print $NF }' ")
+# necesito el valor del paso temporal
+dt=system("grep -i dt DATIN | awk '{ print $NF }' ")
+# el valor de dx
+dx=system("grep -i dx DATIN | awk '{ print $NF }' ")
+kx=system("grep -i kx DATIN | awk '{print $NF}' ")
+lambda= kx*dt/(dx**2)
+lambtitle=gprintf("%6.3f",lambda)
+metitle=gprintf("%2.0f",metod)
+if (metod == "1") metodlabel = " explicito " 
+if (metod == "2") metodlabel = " implicito " 
+if (metod == "3") metodlabel = " C-N "
+
+set terminal gif animate enhanced
+set output 'tmps_met'.metitle.'_LAM'.lambtitle.'.gif'
+
+set xtics font 'Arial,10'
+set ytics font 'Arial,10'
+set xlabel font 'Arial,14'
+set ylabel font 'Arial,14'
+
+
+unset key
+set xlabel ' X (cm) ' 
+set ylabel ' T (C) ' 
+set border lw 2
+set yrange [0:110]  # esto lo tendria que agarrar del archivo de entrada tambien
+ind = 0
+
+
+load 'animate.gpi'
+
+

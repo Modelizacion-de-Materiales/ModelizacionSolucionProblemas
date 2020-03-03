@@ -1,0 +1,41 @@
+set terminal postscript enhanced color
+set output 'testplot2.ps'
+input='listaT.dat'
+
+NX=system("grep NX DATIN | awk '{print $NF}' ")
+NY=system("grep NY DATIN | awk '{print $NF}' ")
+
+stats input u 3
+
+tmin=STATS_min
+tmax=STATS_max
+nlevels=15
+narrowx=6
+narrowy=6
+inc=(tmax-tmin)/nlevels
+arrstepx=int(NX/(narrowx-1))
+arrstepy=int(NY/(narrowy-1))
+set for [ i=1:(nlevels+1) ] style line i lc rgb 'black' lt 1 lw 2
+
+set view map 
+unset xtics
+unset ytics
+unset key
+unset border
+set border 4095 lw 2
+#set origin 0.2,0.2
+set size 0.6,0.7
+set xrange [0:1]
+set yrange [0:1]
+# genero los contornos
+set pm3d interpolate 10,10 
+set isosample 100, 100
+set contour surf
+set cntrparam levels incremental tmin,inc,tmax
+set palette defined ( 0 "blue", 3 "green", 6 "yellow", 10 "red" )
+set palette maxcolors nlevels
+#set colorbox horizontal
+set colorbox bdefault
+set title ' Nx = '.gprintf("%f",NX).", Ny = ".gprintf("%f",NY)
+splot input u 1:2:3 w pm3d , input u 1:2:(tmax):($4/500):($5/500):(0) every arrstepx-3:arrstepy-3 w vectors ls 1
+

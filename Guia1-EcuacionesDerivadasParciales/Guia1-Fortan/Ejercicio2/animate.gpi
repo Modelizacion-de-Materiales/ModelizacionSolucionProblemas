@@ -1,0 +1,7 @@
+  
+  set title "Método".metodlabel.", {/Symbol l} = ".gprintf("%4.3f",lambda).", t = ".gprintf("%8.3E",ind*dt)
+  plot 'TEMP.dat' index ind u (($2-1)*dx):3 w lp ti gprintf("%.0f",ind)
+
+  ind=ind +1 
+
+  if ( ind < nblocks-1 ) reread
