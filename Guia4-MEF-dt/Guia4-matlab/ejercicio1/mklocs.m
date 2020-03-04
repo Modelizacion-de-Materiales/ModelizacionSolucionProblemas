@@ -51,8 +51,11 @@ elseif type == 3    %% elementos para barras en flección (solo con 2 grados de 
         n(nod)=MC(nod);
         r(nod,:)=NOD(nod,:);
     end
+
+    disp('L desde matriz de rigidez')
     
     [L,R]=geom(r(1,:), r(2,:)) ;
+    disp(L)
     
     modulo = varargin{1};
     inercia = varargin{3};

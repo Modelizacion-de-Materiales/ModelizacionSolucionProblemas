@@ -27,7 +27,8 @@ M=zeros(nnod*gl);
     r1 = NODOS(1,:);
 %    r2 = nodlocal(2,:);
     r2 = NODOS(2,:);
-    L  = norm(r2-r1);
+    disp('L desde matriz de masa:')
+    L  = norm(r2-r1)
     
     if caso==1 && gl==1
         Mloc=[2 1 ; 1 2]*rho*A*L/6; % matriz de masa consistente

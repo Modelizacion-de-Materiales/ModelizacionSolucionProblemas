@@ -40,7 +40,7 @@ K = zeros(nnod*gl,nnod*gl);
 
 % me guardo el numero de módulos pasados
 nmods=size(varargin,2);
-
+[nnod,dummy]=size(NOD)
 % main loop.
 for i = 1:nels   % recorro todos los elementos
     
@@ -53,6 +53,10 @@ for i = 1:nels   % recorro todos los elementos
     % llamo a mklocs para generar la matriz del elemento actual
     mloc = mkmasa(problem,MC(i,:),NOD(MC(i,:),:),gl,i,modulo{1:nmods});
     
+    if  (nnod==3)&&(problem==3)
+    thiscase=['masa3-',num2str(i),'.dat'];
+    save(thiscase,'mloc','-ascii');
+    end
     % y la ensamblo
     K=ensamble2(MC(i,:),NOD(MC(i,:),:),gl,mloc,K);
     

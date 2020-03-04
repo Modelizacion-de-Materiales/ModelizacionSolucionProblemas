@@ -41,6 +41,8 @@ K = zeros(nnod*gl,nnod*gl);
 nmods=size(varargin,2);
 
 % main loop.
+[nnod,dumy]=size(NOD);
+
 for i = 1:nels   % recorro todos los elementos
     
     % le voy a pasar a mklocs todos los modulos necesarios para el elemento
@@ -51,6 +53,10 @@ for i = 1:nels   % recorro todos los elementos
     
     % llamo a mklocs para generar la matriz del elemento actual
     kloc = mklocs(problem,MC(i,:),NOD(MC(i,:),:),gl,i,modulo{1:nmods});
+    if  nnod==3
+    thiscase=['matriz3-',num2str(i),'.dat'];
+    save(thiscase,'kloc','-ascii');
+    end
     
     % y la ensamblo
     K=ensamble2(MC(i,:),NOD(MC(i,:),:),gl,kloc,K);
