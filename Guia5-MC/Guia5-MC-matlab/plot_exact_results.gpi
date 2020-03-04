@@ -1,0 +1,41 @@
+Z(J,kT) = 2*exp(8*J/kT)+12+2*exp(-8*J/kT)
+
+Emean(J,kT) = -( 1 / Z(J,kT) ) * ( 2 * 8 *exp(8 / kT ) + 2*(-8)*exp(-8/kT) )
+
+E2mean(J,kT) = ( 1 / Z(J,kT)) * ( 2 * (64)* exp(8 / kT ) + 2*(64)*exp(-8/kT) ) 
+
+Mmean(J,kT)  =  (1 / Z(J,kT))*( 2*(4)* exp(8/kT) + 8*2)
+
+CV(J,kT)=((E2mean(J,kT) - Emean(J,kT)**2))/(kT**2)/4
+
+#set terminal pdf enhanced color
+#set output 'exacact.pdf'
+#input1='./output002x002-0010000mcs.dat'
+#input2='./output002x002-0100000mcs.dat'
+#input3='./output002x002-0500000mcs.dat'
+#input4='./output002x002-1000000mcs.dat'
+#input5='./output032x032-1000000mcs.dat'
+#set xrange [0.5:5]
+#
+#set title ' Energy per spin'
+#set ylabel ' <E> '
+#plot Emean(1,x)/4 ti 'exact solution',\
+#     input1 u 1:($2/4) w lp ps 1 ti '10kmcs',\
+#     input2 u 1:($2/4) w lp ps 1 ti '100kmcs',\
+#     input3 u 1:($2/4) w lp ps 1 ti '500kmcs',\
+#     input4 u 1:($2/4) w lp ps 1 ti '1Mmcs',\
+#     input5 u 1:($2/32**2) w lp ps 1 ti '32x32,Mmcs'
+#
+#set title " specific heat capacty per spin "
+#J=1
+#set ylabel '$(<E^2> - <E>^2)/kT^2$'
+#plot ((E2mean(1,x)-Emean(1,x)**2)/x**2/4) ti 'exact solution',\
+#      input1 u 1:((($3-$2**2)/$1**2) ) w p ps 1  ti '10kmcs',\
+#      input2 u 1:((($3-$2**2)/$1**2) ) w p ps 1  ti '100kmcs',\
+#      input3 u 1:((($3-$2**2)/$1**2) ) w p ps 1  ti '500kmcs',\
+#      input5 u  1:((($3-$2**2)/$1**2) ) w lp ps 1 ti '32x32, 1Mmcs' 
+
+#input u 1:((($3-$2**2)/$1**2)/1e6) w p ps 2  ti ' monte carlo'
+
+ 
+
