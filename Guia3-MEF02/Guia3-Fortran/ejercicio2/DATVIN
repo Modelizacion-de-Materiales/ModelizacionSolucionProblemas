@@ -1,0 +1,8 @@
+NVIN = 4 Numero de Vinculos
+NPXE=2 Propiedades por elemento
+Vinculos
+1   1   0.  0.  0.
+2   2   0.  0.  0.
+3   2   16. 0.  0.
+4  -2   8.  0. -20E3
+Fin Vinculos
