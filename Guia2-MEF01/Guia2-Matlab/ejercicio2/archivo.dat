@@ -1,0 +1,23 @@
+5 Elementos
+4 Nodos
+2 Grados de Libertad por nodo
+2 Nodos Por Elemento (barras)
+Elementos
+# Elemento n1 n2 A(m^2)  E (Pa)
+%
+      1    1  2  10.e-4     210.e9
+      2    4  1  10.e-4     210.e9
+      3    4  2  20.e-4     210.e9
+      4    2  3  10.e-4     210.e9
+      5    3  4  10.e-4     210.e9
+Fin Elementos
+Nodos
+# n   X   Y   vins      Ux   Uy(m)   Fx   Fy (N)
+  1   0.  0.  1  2      0    0        0    0
+  2   8.  4. -1 -2      0    0        0    0
+  3   16. 0.  2 -1      0    0        0    0
+  4   8.  0. -1 -2      0    0        0   -20e3  
+Fin Nodods
+
+
+

@@ -1,0 +1,18 @@
+5 Elementos
+4 Nodos
+2 Grados de Livertad por nodo
+Elementos
+# Elemento n1 n2 A(m^2)  E (Pa)
+      1    1  2  10.e-4     210.e9
+      2    2  3  10.e-4     210.e9
+      3    1  3  20.e-4     210.e9
+      4    1  4  10.e-4     210.e9
+      5    3  4  10.3-4     210.e9
+Fin Elementos
+Nodos
+# n   X   Y   vins      Ux   Uy(m)   Fx   Fy (N)
+  1   8.  4. -1 -2      0    0        0    0
+  2   0.  0.  1  2      0    0        0    0
+  3   8.  0. -1 -2      0    0        0   -20e3
+  4   16. 0.  2 -1      0    0        0    0
+Fin Nodods
