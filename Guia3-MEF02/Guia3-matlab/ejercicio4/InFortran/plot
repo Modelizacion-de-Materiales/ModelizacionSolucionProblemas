@@ -1,0 +1,19 @@
+set terminal postscript enhanced #colour 
+set output "desplazamientos.ps"
+
+set key bottom center
+set key title "{/Arial=20 nodos}"
+set key spacing 2
+
+set xlabel "Posicion, m" font "Arial,20"
+set ylabel "Deflexion, m" font "Arial,20"
+set xtics font "Arial,15"	
+set xzeroaxis
+
+#plot "desplazamientos" w l lt 1 lw 6 title "metodo general", "resultados" u 1:2 w points pt 7 ,\
+#	"../desplazamientos" w p ps 3 title "metodo particular"
+plot "3nodos" w linespoints pt 7 ps 2 title "{/Arial=20 3}", \
+	"5nodos" w linespoints pt 12 ps 2 title "{/Arial=20 5}",\
+	 "9nodos" w linespoints pt 8 ps 1 title "{/Arial=20 9}"
+system("ps2pdf desplazamientos.ps desplazamientos.pdf")
+system("rm *.ps")
