@@ -20,7 +20,7 @@ while ~feof(fid);
     elseif regexpi(linea,'[0-9]+ Nodos por Elemento')
         nnxel=strread(linea,'%d',1);
     elseif strcmpi(linea,'Nodos')
-        NODOS=zeros(nnodo,2);
+        NODOS=zeros(nnodo,gl);
         i=0;
         while i<nnodo
             estenodo=strtrim(fgetl(fid));

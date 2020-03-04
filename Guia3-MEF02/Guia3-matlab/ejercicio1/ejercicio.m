@@ -1,58 +1,45 @@
-%thismsh='Resortes.msh';
-filein='archivo.dat';
 
-[NODOS,ELEM,seccion,modulo,gl,us,fr,r,s]=readata(filein);
-nels=size(ELEM,1);
-nnod=size(NODOS,1);
-% [NOD,MC]=readmsh(filein)
-%[seccion,modulo,gl,us,fr,r,s]=mkvin(NOD,MC);
-%% Ensamble de la matriz
-K=zeros(gl*nnod,gl*nnod);
-for i = 1:nels;
-    Kelem(:,:,i)=mkel(NODOS(ELEM(i,:),:),gl,modulo(i));
-    K=ensamble(ELEM,NODOS,gl,Kelem(:,:,i),K,i);
-end
-%% Resolución
-Fs=fr'-K(r,s)*us';
-ur=K(r,r)\Fs;
-U(s)=us;
+thismsh='chapa-sym';
+system(['rm ',thismsh,'-out.msh']);
+gl=2;
+E=30e6; %psi
+nu=0.3;
+t=1; %inch
+sigma_ext=1000; % tension remota, psi
+
+[NOD,MC]=readmsh([thismsh,'.msh']);
+[us,fr,r,s]=mkvin(NOD,MC,gl,t,sigma_ext);
+K=mkrigid(MC,NOD,gl,E,nu,t);
+%%
+Kred=K(r,r);
+ur=Kred\fr;
+ngl=size(NOD,1)*gl;
+%%
+U=zeros(ngl,1);
 U(r)=ur;
-F(s)=K(s,:)*U';
+U(s)=us;
+F(r)=fr;
+F(s)=K(s,:)*U;
+%%
+nnodo=size(NOD,1);
+[nels nnxel]=size(MC);
+Ux=U(1:gl:ngl);
+Uy=U(2:gl:ngl);
+Fx=F(1:gl:ngl);
+Fy=F(2:gl:ngl);
 
-%% Calculo de esfuerzos
-for i=1:nels
-    locx=( ELEM(i,:) -1)*gl+1;
-    Uloc(i,:) = U( locx )
-    Floc(i,:) =Kelem(:,:,i)*Uloc(i,:)';
-end
+% calcular tensiones
+tensiones=getsigma(U,NOD,MC,E,nu,t);
+A=(tensiones(:,1)+tensiones(:,2))/2;
+B=sqrt( (tensiones(:,1)-tensiones(:,2) ).^2/4 + tensiones(:,3).^2 );
+principales=[ A+B , A-B , tensiones(:,3) ];
+sigmax_nod=tennod(nnodo,MC,principales(:,1));
+sigmash_nod=tennod(nnodo,MC,principales(:,3));
 
-
-close all;
-hold on;
-
-factor=10;
-plot(NODOS(:,1),NODOS(:,2),'ko-','linewidth',2);
-plot(NODOS(:,1)+factor*U',NODOS(:,2),'ro','linewidth',2);
-quiver(NODOS(:,1),NODOS(:,2),factor*U',zeros(nnod,1),'Color','r','linewidth',2,'autoscale','off' );
-legend('Posiciones Iniciales','Posiciones Finales',['Desplazamientos (x',num2str(factor),')']);
-set(gca,'ytick',[]);
-ylim([-2,2]);
-box on;
-saveas(gca,'resultado.pdf','pdf');
-% for i=1:nels
-%     n=ELEM(i,:);
-%     plot(NODOS(n,1),NODOS(n,2),'ko-','linewidth',2);
-%     legend('Posiciones Iniciales');
-%     plot(NODOS(n,1)+10*U(n)',NODOS(n,2),'ro','linewidth',2);
-%     legend('Posiciones Finales');
-% end
-
-box on;
-ylim([-0.5,0.5]);
-
-
-
-
-
-%gl=1;
-%modulo=[200 200 200];
+% Escribir msh
+fid=writemsh(NOD,MC,[thismsh,'-out.msh']);
+nodedatablock([thismsh,'-out.msh'],nnodo,'"Displacement (m) " ',3,0,0.0,[Ux Uy zeros(nnodo,1)] );
+nodedatablock([thismsh,'-out.msh'],nnodo,'"Forces (N) " ',3,0,0.0,[Fx' Fy' zeros(nnodo,1)] );
+elementdatablock([thismsh,'-out.msh'],nels,'" sigma x (Pa)"',1,0,0.0,principales(:,1));
+nodedatablock([thismsh,'-out.msh'],nnodo,'"sigma x (Pa,av) " ',1,0,0.0,sigmax_nod);
+nodedatablock([thismsh,'-out.msh'],nnodo,'"shear (Pa,av) " ',1,0,0.0,sigmash_nod);

@@ -3,6 +3,7 @@
 % type   =1 : resortes, debe agregar modulo (k)
 %        =2 : barras, debe agregar modulo y sección (E, A)
 %        =3 : barras a flección, debe agregar modulo, momento de inercia,
+%        =4 : triangulos lineales
 %        seccion (E, I, A)
 %
 % MC: Matriz de Conectividad (local).
@@ -61,11 +62,36 @@ elseif type == 3    %% elementos para barras en flección (solo con 2 grados de 
         6*L 4*L^2 -6*L 2*L^2 ; ...
         -12 -6*L 12 - 6*L ; ...
         6*L 2*L^2 -6*L 4*L^2 ];
+
     
+%%% triangulos lineales
+elseif type == 4
+    % tomo variables auxiliares:
+    modulo=varargin{1};
+    pois=varargin{2};
+    espe=varargin{3};
+
+    [nnxel dim]=size(NOD);
     
-    
+    X=NOD(:,1); Y=NOD(:,2);
+    if dim==2 ; Z=zeros(nnxel,1);elseif dim==3 ; Z=nodlocal(:,3); end
+    %alfa
+    ai=X(2)*Y(3)-Y(2)*X(3); aj=X(1)*Y(3)-Y(1)*X(3);am=X(1)*Y(2)-Y(1)*X(2);
+    %beta
+    bi=Y(2)-Y(3);bj=Y(3)-Y(1);bm=Y(1)-Y(2);
+    %gama
+    gi=X(3)-X(2);gj=X(1)-X(3);gm=X(2)-X(1);
+    % Area con signo
+    A=0.5*det([ones(3,1) X Y] );
+    % matriz B, finalmente:
+    B=[ bi 0 bj 0 bm 0 ; 0 gi 0 gj 0 gm ; gi bi gj bj gm bm ]/(2*A);
+    % Matriz de elasticidad tensiones planas
+    D = [ 1 pois 0 ; pois 1 0 ; 0 0 0.5*(1-pois) ]*modulo/(1-pois^2);
+    %area:
+    seccion=abs(A);
+    %matriz local
+    kloc= espe*seccion*B'*(D*B);
 end
-kloc;
 
 for i=1:size(kloc,1);
     for j =1:size(kloc,2);
@@ -74,7 +100,7 @@ for i=1:size(kloc,1);
         end
     end
 end
-   
+
 kloc;
 
 end
