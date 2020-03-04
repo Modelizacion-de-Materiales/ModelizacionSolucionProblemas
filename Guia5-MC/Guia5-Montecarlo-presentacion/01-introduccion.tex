@@ -1,0 +1,35 @@
+\mode*
+
+\begin{frame}<presentation>[label=FrameModeloIsing]
+  \frametitle{Modelo de Ising}
+
+  se trata de un modelo de las interacciones magnéticas entre átomos. 
+    $$ E = \frac{J}{2}  \sum _i s_i \sum _{j=1} ^z  s_j $$
+  donde 
+  \begin{itemize}
+     \item $s_i =  \pm 1$
+     \item $J$ es la constante de interacción. digamos $J=1$.
+     \item $z$ es el numero de primeros vecinos. 
+     \item solo consideramos interacción a primeros vecinos.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameRed2D]
+  \frametitle{Red 2D de átomos}
+  \centering \includegraphics[height=0.7\textheight]{DRAWINGS/RED2d.pdf}
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameProblema]
+  \frametitle{Problema a resolver}
+  \begin{itemize}
+      \item<+-> predecir la evolución de un sistema de muchos átomos implica conocer valores medios del
+	conjunto
+      \item<+-> $ \displaystyle \langle A \rangle =
+	  \frac{ \displaystyle \sum _i A_i \exp\bigl(-E_i /kT\bigr) }
+	  {\displaystyle \sum_i \exp \bigl( -E_i / kT \bigr) } $
+	  , implica conocer todos los estados posibles !
+  \end{itemize}
+
+\end{frame}
+
+\mode<all>
