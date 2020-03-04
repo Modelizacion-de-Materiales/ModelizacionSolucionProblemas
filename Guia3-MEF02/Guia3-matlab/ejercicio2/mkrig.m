@@ -8,6 +8,8 @@
 %           =2 : barras, debe agregar modulo y sección (E, A)
 %           =3 : barras a flección, debe agregar modulo, momento de inercia,
 %           seccion (E, I, A)
+%           =4: triangulos lineales, deben darse los modules de elasticidad y
+%           Poisson, y los espesores. 
 % gl:  grados de libertad.
 % NOD: matriz de nodos
 % MC : Matriz de conectividad
@@ -24,20 +26,20 @@ function K = mkrig(problem,gl,NOD,MC,varargin)
 K = zeros(nnod*gl,nnod*gl);
 
 %para guardar las matrices en archivos, uso encabezados
-file1=['MatrizGlobal-',num2str(nels),'els.dat']; % nombre del archivo donde guardo la matriz global
-heading1='Matriz Global \n ============== \n';   % encabezado del mismo
-fmt1=[];for col=1:nels*gl ; fmt1=[fmt1,' %6.4e ']; end ; fmt1=[fmt1,'\n']; % guardo el numero de columnas y un formato adecuado.
-
-file2=['MatricesElementales-',num2str(nels),'els.dat' ]; % archivo de las matrices elementales.
-heading2='\n Matriz elemental elemento %d \n =================== \n '; % encabezado particular un elemento
-heading3='Matrices Elementales \n '; % encabezado general
-fmt2=[];for col=1:nnxel*gl ; fmt2=[fmt2,' %6.4e ']; end ; fmt2=[fmt2,'\n']; % formato de cada línea (num cols)
-
-% archivo de las matrices elementales, 
-fid=fopen(file2,'w'); %abro.
-fprintf(fid,heading3); % imprimo encabezado.
-
-% me guardo el numero de módulos pasados
+% file1=['MatrizGlobal-',num2str(nels),'els.dat']; % nombre del archivo donde guardo la matriz global
+% heading1='Matriz Global \n ============== \n';   % encabezado del mismo
+% fmt1=[];for col=1:nels*gl ; fmt1=[fmt1,' %6.4e ']; end ; fmt1=[fmt1,'\n']; % guardo el numero de columnas y un formato adecuado.
+% 
+% file2=['MatricesElementales-',num2str(nels),'els.dat' ]; % archivo de las matrices elementales.
+% heading2='\n Matriz elemental elemento %d \n =================== \n '; % encabezado particular un elemento
+% heading3='Matrices Elementales \n '; % encabezado general
+% fmt2=[];for col=1:nnxel*gl ; fmt2=[fmt2,' %6.4e ']; end ; fmt2=[fmt2,'\n']; % formato de cada línea (num cols)
+% 
+% % archivo de las matrices elementales, 
+% fid=fopen(file2,'w'); %abro.
+% fprintf(fid,heading3); % imprimo encabezado.
+% 
+% % me guardo el numero de módulos pasados
 nmods=size(varargin,2);
 
 % main loop.
@@ -57,8 +59,8 @@ for i = 1:nels   % recorro todos los elementos
     
     % En el archivo de salida guardo la matriz elemental actual, para
     % referencias. 
-    fprintf(fid,heading2,i); % titulo de la matriz actual
-    fprintf(fid,fmt2,kloc);  % matriz propiamente dicha. 
+%     fprintf(fid,heading2,i); % titulo de la matriz actual
+%     fprintf(fid,fmt2,kloc);  % matriz propiamente dicha. 
 end    
 
 % por último salvo la matriz global en un archivo, para referencias. 

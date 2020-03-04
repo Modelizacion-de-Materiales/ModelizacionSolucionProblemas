@@ -1,50 +1,64 @@
-function [vin,uvin,inc,fvin]=mkvin(nodos,gl)
+% function [us,fr,r,s]=mkvin(NODOS,MC,gl,{espesor_chapa, tension_remota})
+% Esta función setea las condiciones de vínculo para el problema de la chapa empotrada con una
+% tracción distribuida uniformemente en el lado derecho,
+%
+% NODOS : Posiciones de todos los Nodos
+% MC: Matriz de conectividad
+% gl: grados de libertad por nodo
+% Argumentos extras: para este problema, deben darse el espesor de la chapa y la tensión remota
+%         aplicada. 
 
-fid=fopen('vinculos.txt');
-nvin=0;
-ninc=0;
-nnod=size(nodos,1);
-tol=1e-2;
-inc=[];
-vin=[];
-incaux=[];
+function [us,fr,r,s]=mkvin(NODOS,MC,gl,varargin)
 
-while ~feof(fid)
-    line=strtrim(fgetl(fid));
-    if line(1)=='#'
-        continue
-    else
-        thisvin=strread(line);
-        rvin=thisvin(1:3);
-        for i=1:nnod
-            if norm(nodos(i,:)-rvin) <= tol              
-                for j=1:gl
-                    estegl=abs(thisvin(3+j));
-                    if thisvin(3+j) > 0
-                      nvin=nvin+1;
-                      vin(nvin)=estegl+(i-1)*gl;
-                      uvin(nvin)=thisvin(3+gl+j);
-                    elseif thisvin(3+j)<0
-                      ninc=ninc+1;
-                      inc(ninc)=estegl+(i-1)*gl;
-                      fvin(ninc)=thisvin(3+gl+j);
-                    end
-                end
-            %else
-            %    incaux(length(incaux)+1)=i;
-                
+% recupero las dimensiones de las matrices.
+[ nnod dim ]=size(NODOS);
+[nels,nnxel]=size(MC);
+
+% variables del problema
+esp=varargin{1};
+T=varargin{2};
+
+% inicializo variables. 
+r=[];
+s=[];
+us=[];
+fr=[];
+f=zeros(gl*nnod,1);
+
+% definiciones de los vínculos. 
+tol=1e-3; % tolerancia en la determinación del borde. 
+bd=20;    % posición del borde derecho.
+
+%fuerza distribuida
+% ?
+
+% voy a detectar el borde recorriendo todos los elementos. 
+for i=1:nels
+    brds=sum( abs(NODOS(MC(i,:))-bd)<=tol );  %detecto el número de nodos del elemento actual
+                                              % que estan en el borde. 
+    if brds==2                                % si tengo dos nodos en el borde para este elemento,
+        n=[];                                 
+        for j=1:nnxel                         % recorro todos los nodos del elemento
+            if ( abs( NODOS(MC(i,j))-bd )<=tol ) % si el nodo esta en el borde,
+                n=[n,MC(i,j)];                   % guardo el índice del nodo
             end
         end
+        l=abs( diff( NODOS(n,2) ));             % una vez que tengo los dos nodos,
+        f(gl*(n-1)+1)=f(gl*(n-1)+1)+0.5*esp*l*T;  % le sumo la contribucicón del elemento actual 
     end
 end
 
-for i=1:nnod*gl
-    if (~any(vin==i) && ~any(inc==i) )
-        ninc=ninc+1;
-        inc(ninc)=i;
-        fvin(ninc)=0;
+
+% empotramiento
+% recorro todos los nodos
+for i=1:nnod
+    if (NODOS(i,1)==0) % vínculo en empotrado
+        s=[s,gl*(i-1)+1:gl*i]; %guardo las coordenadas del nodo actual
+        us=[us;zeros(gl,1)];  % y aclaro que van fijas
+    else
+        r=[r,gl*(i-1)+1:gl*i];  % en cualquier otro caso los nodos estan libres. 
     end
 end
-AUX = sortrows([inc',fvin'],1);
-inc=AUX(:,1)';
-fvin=AUX(:,2)';
+
+fr=f(r); % guardo esta variable como fuerzas en los nodos libres. 
+    

@@ -1,84 +1,48 @@
+%% Inicializar variables generales
+gl=2; %grados de libertad
+E=30e6; %psi
+nu=0.3;
+t=1; %inch
+sigma_ext=1000; % tension remota, psi
 
-thismsh='archivo.dat';
+thiscase='chapa-1cuad';  %nombre del caso actual.
+writegeo(0,1,-10,10,-5,5,2,10,[thiscase,'.geo']);
+system(['gmsh ',thiscase,'.geo -2 -o ',thiscase,'.msh'])
+[NOD,MC]=readmsh([thiscase,'.msh']);  % obtener nodos y matriz de conectividad.
+ngl=size(NOD,1)*gl;   % numero totales de grados de libertad.
+nnodo=size(NOD,1);   % número de nodos total
+[nels nnxel]=size(MC);  % número de elementos, numero de nodos por elemento
+modulos=E*ones(nels,1); %%%%
+poisson=nu*ones(nels,1);   %  Modulos. 
+espesores=t*ones(nels,1);%%%
 
-[NOD,MC,seccion,modulo,gl,us,fr,r,s]=readata(thismsh);
-K = mkrig(2,gl,NOD,MC,modulo,seccion);
+%% Resolución
+[us,fr,r,s]=mkvin(NOD,MC,gl,t,sigma_ext,-10,10,5,-5); % hacer vínculos.
+K=mkrig(4,gl,NOD,MC,modulos,poisson,espesores); %Hacer matríz para triangulos lineales.
+fs=fr-K(r,s)*us;
+ur=K(r,r)\fs; % Resolver propiamente.
 
-nnodo=size(NOD,1);
-[nels nnxel]=size(MC);
-
-%%
-Kred=K(r,r);
-ur=Kred\fr';
-ngl=size(NOD,1)*gl;
-%%
-U=zeros(ngl,1);
-U(r)=ur;
-U(s)=us;
+%% levantar resultado y calcular cosas.
+U=zeros(ngl,1); U(r)=ur; U(s)=us; Ux=U(1:gl:ngl); Uy=U(2:gl:ngl);% desplazamientos.
 F(r)=fr;
-F(s)=K(s,:)*U;
-%%
-hold on;
-fx=1000;  %% escalas para graficar las fuerzas
-fy=100;
-Ux=U(1:gl:ngl);
-Uy=U(2:gl:ngl);
-Fx=F(1:gl:ngl);
-Fy=F(2:gl:ngl);
+Ft=F';
+save('fuerzas-mariano.dat','Ft','-ascii')
+F(s)=K(s,:)*U; Fx=F(1:gl:ngl);Fy=F(2:gl:ngl);% todas las fuerzas.
+tensiones=getsigma(U,NOD,MC,E,nu,t);
+% tensiones principales:
+A=(tensiones(:,1)+tensiones(:,2))/2;
+B=sqrt( (tensiones(:,1)-tensiones(:,2) ).^2/4 + tensiones(:,3).^2 );
+principales=[ A+B , A-B , tensiones(:,3) ];
+%calcular las tensiones promedio en los nodos.
+sigmax_nod=tennod(nnodo,MC,principales(:,1));
+sigmay_nod=tennod(nnodo,MC,principales(:,2));
+shear_nod=tennod(nnodo,MC,principales(:,3));
 
-close all
-hold all
-box on
-
-% me falta sacar las tensiones. 
-
-%%
-for el=1:nels
-    nod=MC(el,:);
-    for nn=1:nnxel
-        Uloc(nn,:)=U( (nod(nn)-1)*gl+1:nod(nn)*gl );
-    end
-    L=norm( NOD(nod(2),:)-NOD(nod(1),:) );
-    dir=NOD(nod(2),:) - NOD(nod(1),:);
-    ldir=dir/norm(dir);
-    DU(el,:)=diff(Uloc,1);
-    eps(el) =  DU(el,:) * ldir'  / L;
-    sigma(el)=modulo(el)*eps(el);
-end
-    
-%%    
-for i=1:nels
-    n=MC(i,:);
-    plot(NOD(n,1),NOD(n,2),'ko-','linewidth',2);
-    plot(NOD(n,1)+fx*Ux(n),NOD(n,2)+fy*Uy(n),'ro-','linewidth',2);
-end
-%%
-quiver(NOD(:,1),NOD(:,2),fx*Ux,fy*Uy,'Color','b','linewidth',2,'autoscale','off');
-quiver(NOD(:,1)+fx*Ux,NOD(:,2)+fy*Uy,1e-4*Fx',1e-4*Fy','Color','k','linewidth',2,'autoscale','off');
-saveas(gcf,'resultado.pdf','pdf');
-
-fid=fopen('resultados.dat','w');
-fprintf(fid,'\n Resultados por nodo \n');
-fprintf(fid,'# n X Y Ux Uy Fx Fy \n');
-
-for i=1:nnodo
-    fprintf(fid,'%d  %4.2f  %4.2f  %6.4e  %6.4e  %6.4e  %6.4e \n',...
-        i,  NOD(i,1), NOD(i,2), Ux(i), Uy(i), Fx(i), Fy(i) );
-end
-
-fprintf(fid,'\n Resultados por elemento \n');
-fprintf(fid,'# n nodo2  nodo 2 sigma \n');
-for i = 1:nels
-    fprintf( fid,'%d   %d   %d   %6.4e  \n',i,MC(i,1), MC(i,2), sigma(i) );
-end
-
-fclose(fid);
-
-
-%% Guardo un msh para ver en gmsh con los resultados.
-fileout='puente-out.msh';
-writemsh(NOD,MC,fileout);
-nodedatablock(fileout,nnodo,0,0.0,'"Desplazamientos (m)"',3,[Ux,Uy,zeros(nnodo,1)]);
-nodedatablock(fileout,nnodo,0,0.0,'"Fuerzas (N)"',3,[Fx',Fy',zeros(nnodo,1)]);
-elementdatablock(fileout,nels,0,0.0,'"Tensiones (Pa)"',1,sigma');
-    
+%% Escribir msh base, sobreescribe el generado anteriormente.
+thiscaseout=[thiscase,'-out.msh'];
+fid=writemsh(NOD,MC,thiscaseout);
+nodedatablock(thiscaseout,nnodo,'"sigma x (Pa,av) " ',1,0,0.0,sigmax_nod);
+nodedatablock(thiscaseout,nnodo,'"shear (Pa,av) " ',1,0,0.0,shear_nod);
+nodedatablock(thiscaseout,nnodo,'"Desplazamiento (m) " ',3,0,0.0,[Ux Uy zeros(nnodo,1)] );
+nodedatablock(thiscaseout,nnodo,'"Fuerzas (N) " ',3,0,0.0,[Fx' Fy' zeros(nnodo,1)] );
+elementdatablock(thiscaseout,nels,'"Tensiones 1(Pa)"',1,0,0.0,principales(:,1))
