@@ -1,0 +1,29 @@
+FILES=system('/bin/ls output2x2*.dat | sort -V ')
+N=system('/bin/ls output2x2*.dat | sort -V | sed "s/output//g ; s/x.*//g"')
+MCS=system('/bin/ls output2x2*.dat | sort -V |sed "s/output.*-//;s/mcs.dat//"')
+do for[i=1:words(FILES) ] { 
+  x=word(N,i)**2
+  print word(FILES,i)."  ".word(N,i)."  ".word(MCS,i)
+}
+load './plot_exact_results.gpi'
+set terminal epslatex input
+set output 'scale_2x2.tex'
+set title 'cálculos 2x2 vs teoria'
+set ylabel '$ <E^2> - <E>^2  / kT^2 $'
+plot for [i=1:words(FILES)] \
+      word(FILES,i) u 1:(($3 - $2**2)/$1**2/word(N,i)**2) w p pt i ti word(N,i)."x".word(N,i).", ".word(MCS,i),\
+      CV(1,x) w l ls -1 ti 'resultado teorico'
+set out
+
+set output 'scale_16x16.tex'
+FILES=system('/bin/ls output16x16*.dat | sort -V ')
+N=system('/bin/ls output16x16*.dat | sort -V | sed "s/output//g ; s/x.*//g"')
+MCS=system('/bin/ls output16x16*.dat | sort -V |sed "s/output.*-//;s/mcs.dat//"')
+do for[i=1:words(FILES) ] { 
+  x=word(N,i)**2
+  print word(FILES,i)."  ".word(N,i)."  ".word(MCS,i)
+}
+set title 'cálculos 16x16'
+plot for [i=1:words(FILES)] \
+      word(FILES,i) u 1:(($3 - $2**2)/($1**2/word(N,i)**2)) w p pt i ti word(N,i)."x".word(N,i).", ".word(MCS,i)
+set out
