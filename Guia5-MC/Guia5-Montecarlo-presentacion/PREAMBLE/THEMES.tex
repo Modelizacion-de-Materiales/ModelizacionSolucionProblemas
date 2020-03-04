@@ -1,0 +1,74 @@
+  \titlegraphic{\includegraphics[width=0.25\textwidth]{./PREAMBLE/logo-isabt25.png}
+  		\hfill
+		\includegraphics[width=0.25\textwidth]{./PREAMBLE/ISOLOGOCNEA.png}
+		\hfill
+  		\includegraphics[width=0.25\textwidth]{./PREAMBLE/unsam-horizontal.png}}
+
+\mode<presentation>{
+\setbeamertemplate{title page}[center]
+{
+  %\includegraphics[width=0.25\textwidth]{./PREAMBLE/ISOLOGOCNEA.png}
+  \inserttitle
+  \insertsubtitle
+  \insertauthor
+  \insertinstitute
+%  \inserttitlegraphic
+}
+}
+
+
+% defino el template para las dapositivas con los titulos de las secciones. 
+%es una recetita que saqué de algun lado. 
+\setbeamertemplate{section page}{
+  \begin{beamercolorbox}[ht=5ex,dp=1ex,wd=\paperwidth,center]{sectionbox}
+    \begin{centering}
+     \usebeamerfont{section  title} \insertsection 
+    \end{centering}
+  \end{beamercolorbox}
+}
+\AtBeginSection[]{
+  \begin{frame}[plain]
+    \begin{center}
+    \quad \inserttitle \quad  
+    \end{center}
+    \sectionpage
+  \end{frame}
+}
+
+% remover los simbolos de navegacion
+% porque sacan espacio 
+\mode<presentation>{
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[page number]
+% me gustan los titulos a la derecha
+\setbeamertemplate{frametitle}[default][right]%{
+}
+\mode<handout>{
+ \setbeamertemplate{headline}{}
+ \setbeamertemplate{frametitle}{}
+ \setbeamertemplate{background}{
+   \tikz\node [rectangle,minimum width=0.995\paperwidth,
+   minimum height=0.995\paperheight,draw,anchor=south west,
+   line width=2pt]  {};
+ }
+ \setbeamertemplate{footline}{}
+}
+% aparentemente el siguiente beamertemplate
+%se ejecuta en modo artículo. habría que ver
+%la forma de sacale probecho. 
+% notar que vale solo para las framesque se incluyen 
+% directamente en el artículo y no vale para 
+% \includeslide.
+% \setbeamertemplate{frame begin}
+% \setbeamertemplate{frame end}
+
+
+% no se si es el mejor lugar para definirlo, 
+% pero las \includeslides deben quedar fijas al
+% tamaño de la página:
+
+%\mode<article>{
+%\renewcommand\includeslide[1]{
+%  \includeslide[width=\textwidth]{#1}
+%}
+%}

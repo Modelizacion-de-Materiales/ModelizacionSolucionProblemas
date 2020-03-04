@@ -1,0 +1,27 @@
+\mode*
+
+\begin{frame}<presentation>{label=FrameMétodoMontecarlo}
+  \frametitle{Método Montecarlo - Metrópolis}
+  \begin{itemize}
+     \item La idea es generar una evolución de la distribución en fomra azarosa
+     y hacer estadística sobre la evolución de los obserbables.
+     \item La evolución de la distribución se permite con una probabilidad de transición.
+     \item La Probabilidad de transición entre dos estados se define de manera \emph{ ad-hoc}
+     \item 
+       $P( W1 \longrightarrow W2 ) = 
+       \left\{ 
+       \begin{array}{ll}
+	 1 & \Delta E _{ W1 \rightarrow W2 } <0 \\
+	 \exp \{- \beta \Delta E_{ W1 \rightarrow W2 }\} & \Delta E _{ W1 \rightarrow W2 } >0
+       \end{array}
+       \right.
+       $
+      
+  \end{itemize}
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameMonteCarloAlgorithm]
+  \frametitle{Algoritmo}
+     
+
+\end{frame}

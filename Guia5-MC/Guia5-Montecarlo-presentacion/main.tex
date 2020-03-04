@@ -1,0 +1,59 @@
+\mode<all>
+% Incluyo los paquetes necesarios.
+\include{./PREAMBLE/PACKS}
+%\mode<presentation>{
+% para ver las notas con la presentacion.  
+%\setbeameroption{hide notes}
+%para dejar las notas en la segunda patnalla
+%}
+
+% incluyo los beamercolors
+\include{./PREAMBLE/BEAMERCOLORS}
+
+%incluyo el tema y modificaciones
+\include{./PREAMBLE/BEAMERTHEME}
+
+% modifico los temas
+\include{./PREAMBLE/THEMES}
+% defino el template para la diapositiva del título
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defino la Clase
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{./PREAMBLE/MATERIA}
+\title[Modelo de Ising - Monte Carlo]{
+  \mode<article>{
+\includegraphics[height=1cm]{./PREAMBLE/logo-isabt25.png}
+\hfill
+\includegraphics[height=1cm]{./PREAMBLE/ISOLOGOCNEA.png}
+\hfill
+\includegraphics[height=1cm]{./PREAMBLE/logo-unsam.png}
+\\} Solución del Modelo de Ising por el Método Monte Carlo }
+\subject{Modelo de Ising por el método Montecarlo}
+\keywords{Modelo de Ising, Método Montecarlo, Ising}
+
+% Inicia el documento.
+\begin{document}
+
+% Título de la clase. 
+\mode<presentation>{
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+}
+
+\mode<article>{
+\maketitle
+}
+
+
+\mode<all>
+
+\section{Introducción}
+\subsection{Modelo de Ising}
+\input{01-introduccion}
+\subsection{Método Monte Carlo - Metrópolis}
+\input{./02-MetodoMontecarlo}
+
+\end{document}
+
