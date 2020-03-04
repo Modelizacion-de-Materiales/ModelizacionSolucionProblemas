@@ -1,0 +1,17 @@
+3 Nodos 
+2 Elementos 
+2 Nodos por elemento 
+2 grados de libertad por nodo 
+Elementos 
+ #Elemento n1 n2 A(m^2)  E (Pa) 
+ 1  1  2  2.0000e-04  2.1000e+11  
+ 2  2  3  2.0000e-04  2.1000e+11  
+ 3  3  4  0.0000e+00  2.0000e+05  
+Fin Elementos 
+Nodos 
+ #nodo X Y  vins  Uy  Q  Fy  M 
+1  0.0000  0.0  1  2  0.0000  0.0000  0.0000  0.0000 
+2  3.0000  0.0  1  -2  0.0000  0.0000  0.0000  0.0000 
+3  6.0000  0.0  -1  2  0.0000  0.0000  50000.0000  0.0000 
+3  6.0000  0.0  1 -2  0.0000  0.0000  0.0000  0.0000 
+Fin Nodos 

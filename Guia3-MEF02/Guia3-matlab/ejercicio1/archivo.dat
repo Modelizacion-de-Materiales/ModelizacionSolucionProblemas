@@ -1,0 +1,17 @@
+3 Elementos
+4 Nodos
+1 Grados de Libertad por nodo
+2 nodos por elemento
+Elementos
+# Elemento n1 n2  A  k (Pa)
+      1    1  2   0 2e5
+      2    2  3   0 2e5
+      3    3  4   0 2e5
+Fin Elementos
+Nodos
+# n   X   Y   vins    Ux (m)    Fx (N)
+  1   0.0  0.  1       0            0   
+  2   1.0  0. -1       0            0   
+  3   2.0  0. -1       0            0   
+  4   3.0  0.  1       0.02        0           
+Fin Nodods
