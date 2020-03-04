@@ -1,0 +1,21 @@
+NEL=5 Elementos
+NNOD=4 Nodos
+NPXE=2 Propiedades por elemento
+GL=2 Grados de Libertad por nodo
+NNXE=2 Nodos Por Elemento (barras)
+Nodos
+# n   X   Y 
+ 1   0.  0. 
+ 2   8.  0. 
+ 3   8.  4. 
+ 4   16. 0. 
+Fin Nodods
+Elementos
+# Elemento n1 n2 A(m^2)  E (Pa)
+%
+      1    1  2  10.e-4     210.e9
+      2    2  3  20.e-4     210.e9
+      3    1  3  10.e-4     210.e9
+      4    3  4  10.e-4     210.e9
+      5    2  4  10.e-4     210.e9
+Fin Elementos
