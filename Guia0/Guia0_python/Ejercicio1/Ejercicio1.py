@@ -37,6 +37,9 @@ def misplines(XSPLINE,YSPLINE,fun_name_spline):
         A[i,[i-1,i,i+1]]=+np.array([h[i-1],2*(h[i]+h[i-1]),h[i]]) # Los rangos no incluyen el limite superior.
                                                                # por eso i-1:i+1 no funciona!
         YY[i]=+3.0*( ( YSPLINE[i+1]-YSPLINE[i])/h[i] - (YSPLINE[i]-YSPLINE[i-1])/h[i-1] ) 
+
+    np.savetxt('MatrizA.txt', A)
+    np.savetxt('YY.txt', YY)
                                   
  
     B=np.linalg.solve(A,YY)  # linalg se importa de numpy. linalg.solve resuelve el sistema lineal AA*B=YY.
