@@ -1,0 +1,64 @@
+\section{Problema de Algebra Lineal}
+
+\mode<article>
+
+Aquí tenemos un muy simple problema de álgebra lineal. 
+El objetivo del mismo es simplemente introducir las herramientas
+que nos permitiran resolverlo. De nunguna manera se 
+prentende que el alumno programe la solución . 
+
+Nuestro problema es sencillo, 
+
+\mode*
+
+\begin{frame}[label=FrameEquationAlgebraLineal]
+  \frametitle<presentation>{Problema de Algebra Lineal}
+
+  \begin{equation}
+    \left\{
+      \begin{aligned}
+	x - 3y -z &= 6 \\
+	2 x -4 y -3 z &= 8 \\
+	-3 x + 6 y + 8z &= -5
+      \end{aligned}
+    \right.
+  \end{equation}
+  Matricialmente:
+  \begin{equation}
+    \underbrace{
+    \begin{pmatrix}
+      1 & -3 & -1 \\
+      2 & -4 & -3 \\
+      -3 & 6 & 8 
+    \end{pmatrix}
+  }_A
+    \underbrace{
+    \begin{pmatrix}
+      x \\ y \\ x
+    \end{pmatrix}
+  }_X
+    =
+    \underbrace{
+    \begin{pmatrix}
+      6 \\8 \\ -5
+    \end{pmatrix}
+  }_B
+  \end{equation}
+
+  La solución es inmediata:
+
+  \begin{equation}
+    X = A^{-1} B
+  \end{equation}
+\end{frame}
+
+\mode<article>
+
+La implementación implica usar las funciones disponibles
+en nuestras herramientas. Como vimos en el apunte 
+de \emph{introducción a la programación}, disponemos de
+la funcion \texttt{numpy.linalg.solve} en \emph{Python}
+o del operador barra invertida  ( \texttt{\textbackslash} ) en \emph{matlab}.
+
+\mode*
+\mode<all>
