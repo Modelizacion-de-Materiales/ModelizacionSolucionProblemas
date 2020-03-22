@@ -1,0 +1,31 @@
+%%% BEAMER THEME
+% el tema 'boxes' es igual al default pero permite definir boxes de estructura 
+% a mano. 
+\mode<presentation>{
+  \usetheme{boxes}
+  % los boxes que identifican lo que se esta leyendo
+    % box de la izquierda: la materia (subtitulo)
+    \addheadbox{structure2}{\quad \tiny \insertshortsubtitle}
+  %  box del medio en cabecera, el titulo de la clase
+    \addheadbox{structure0}{\quad \tiny  \inserttitle \quad } 
+  % box en a la derecha , eltítulo de la sección. 
+    \addheadbox{structure1}{\quad \tiny \insertsection}
+}
+% tema interno y de colores para las diapositivas normales. 
+\useinnertheme{rectangles}
+\usecolortheme{dove}
+% la fuente de las ecuaciones
+\usefonttheme[onlymath]{serif}
+
+% entorno codeblock para meter piezas de código.
+% el color se definió en BEAMERCOLORS
+
+\newenvironment{codeblock}
+{
+  \begin{beamercolorbox}{codeblock}
+    \usebeamerfont{codeblock}
+}
+{
+  \end{beamercolorbox}
+}
+
