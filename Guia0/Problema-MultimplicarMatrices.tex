@@ -11,6 +11,7 @@ los cimientos de nuestra materia.
 Recordemos simplemente, 
 
 \mode*
+
 \begin{frame}[label=FrameEquationMatMul]
   \frametitle<presentation>{Multiplicación Matriz $\times$ Vector Columna}
 
@@ -32,19 +33,17 @@ Recordemos simplemente,
       a_{n,1} x_1 +  a_{n,2} x_2 +  a_{n,n} x_n 
     \end{pmatrix}
   \end{equation}
-%
-%
-%
-%    =
-
-%    \begin{pmatrix}
-%      a_{1,1} \x_1 +  a_{1,2} \x_2 & \cdots & a_{1,n} x_n  \\
-%      a_{2,1} \x_1 +  a_{2,2} \x_2 & \cdots & a_{2,n} x_n  \\
-%      \vdots \\
-%      a_{n,1} \x_1 +  a_{n,2} \x_2 & \cdots & a_{n,n} x_n 
-%    \end{pmatrix}
-
 
 \end{frame}
 
+\mode<article>
+
+Sin embargo, cuando implementemos una multiplicación de matrices, no
+vamos a usar un programa casero. Por el contrario, usaremos
+las herramientas disponibles. por ejemplo, en \emph{Matlab} tenemos
+el operador \texttt{*}, en \emph{python} usaremos la funcuón
+\texttt{np.matmul}. Sin embargo, debemos ser cuidadosos 
+con la construcción del problema, las matrices y vectores deben
+tener tamaños correctos para participaren la operación.
+\mode*
 \mode<all>

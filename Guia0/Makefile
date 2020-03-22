@@ -1,4 +1,4 @@
-ResumenGuia0: notes.pdf beamer.pdf
+ResumenGuia0: notes.pdf beamer.pdf OldResumen
 
 notes.pdf: notes.aux Guia0
 	pdflatex notes.tex
@@ -12,6 +12,8 @@ beamer.pdf: beamer.tex main.tex Guia0
 handout.pdf: handout.tex main.tex Guia0
 	pdflatex handout.tex
 
+OldResumen: Resumen/GUIA1-Resumen-2018.odp
+	make -C Resumen
 
 Guia0: ./Guia0_python
 Guia0_python:
