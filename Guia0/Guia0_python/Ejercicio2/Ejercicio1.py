@@ -1,48 +1,72 @@
 #!/usr/bin/python3
+# np necesito para algebra lineal y matematica
 import numpy as np
-from math import factorial 
-# 
+# para calcular los factoriales
+from math import factorial
+# plot de matplotlin.pyplot
 from matplotlib import pyplot as plt
+# para medir el tiempo de ejecución
+import time
+# para embellecerel gráfico
 from matplotlib import rc
-#import pdb
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text',usetex=True)
+# pdb es un modulo para debug
+import pdb
+rc('font', **{'family': 'sans-serif', 'sans-serif': ['Helvetica']})
+rc('text', usetex=True)
 
-def miexp(x,n):
+
+def miexp(x, n):
     serie = 0
-    for i in range (n+1):
-        #pdb.set_trace()
+
+    to = time.time()
+
+    for i in range(n+1):
+        # si quiciera parar aca y 'debuguear', lo hago con este comando.
+        # pdb.set_trace()
         serie = serie + (x**i)/factorial(i)
 
-    return serie
+    dt = time.time() - to
+
+    return serie, dt
 
 
-def error(x, intn):
+def error(xo, intn):
 
-    return abs(miexp(x, intn) - np.exp(0.5))/abs(np.exp(0.5))
+    return abs(miexp(xo, intn) - np.exp(0.5))/abs(np.exp(0.5))
 
-then=1
-ERR = []; ERR.append(np.array(error(0.5, then)))
+
+then = 1
+ERR = []
+times = []
+e , t = error(0.5, then)
+ERR.append(e)
+times.append(t)
+
+# pdb.set_trace()
 while ERR[-1] >= 1e-4:
     then = then+1
-    ERR.append(error(0.5, then))
+    e, t = error(0.5, then)
+    times.append(t)
+    ERR.append(e)
 
 print(len(ERR))
 
-fig=plt.figure(figsize=(6, 4))
-axes=fig.add_axes([0.2, 0.2, 0.7, 0.6])
-axes.semilogy(ERR,'-o')
-plt.xlabel(r' n ')
-plt.xticks(fontsize=14)
-plt.yticks(fontsize=14)
-plt.ylabel(r' $$  ERR(x,n) = \Bigl \vert \frac{ f(x) - S_n (x)}{f(x)} \Bigr \vert $$ ' )
+fig, ax1 = plt.subplots(figsize=(6, 4))
+ax1.set_position([0.15, 0.15, 0.8, 0.7])
+# axes = fig.add_axes([0.2, 0.2, 0.7, 0.6])
+ax1.semilogy(ERR, '-o')
+ax1.set_xlabel(r' n ')
+ax1.tick_params(axis='x', labelsize=14)
+ax1.tick_params(axis='y', labelsize=14)
+ax1.grid(True)
+ax1.set_ylabel(r' $$  ERR(x,n) = \Bigl \vert \frac{ f(x) - S_n (x)}{f(x)} \Bigr \vert $$ ')
 plt.title(r'$$ S_n (x) = \sum_{i=1} ^n \frac{ x^i }{i !} $$  ', y=1.0)
 
-#x = np.linspace(-1,1,1000)
-#y = miexp(x,3)
-#plt.plot(x, y,'o')
-#plt.plot(x, np.exp(x))
-#plt.show()
-plt.savefig('figura.pdf',format='pdf') 
+# x = np.linspace(-1,1,1000)
+# y = miexp(x,3)
+# plt.plot(x, y,'o')
+# plt.plot(x, np.exp(x))
+# plt.show()
+plt.savefig('Figura2.pdf',format='pdf')
 
 

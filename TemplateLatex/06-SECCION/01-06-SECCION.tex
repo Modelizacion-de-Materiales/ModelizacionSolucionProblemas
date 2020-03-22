@@ -1,0 +1,29 @@
+\begin{frame}{Una diapositiva con tikz}
+\centering
+%    \tikz[baseline] \node[anchor=base] (points) {\includegraphics[height=0.4\textheight]{./04-AJUSTE/FIG-DOTS.png}};
+%    \tikz[baseline] \node[anchor=base] (interp) {\includegraphics[height=0.4\textheight]{./04-AJUSTE/FIG_SPLINE.png} };
+%    \tikz \draw[->,thick,draw=blue] (points.west) -- (interp.east);
+  \begin{tikzpicture}
+    \node (points) at (-3,0) {\includegraphics[height=0.4\textheight]{./06-SECCION/FIG-DOTS.png}};
+    \node (interp) at (3,0) {\includegraphics[height=0.4\textheight]{./06-SECCION/FIG_SPLINE.png} };
+    \draw [->,>=latex,fill=blue!40!black,thick,draw=blue,line width=5pt] (points) -- (interp);
+  \end{tikzpicture}
+\vspace{1cm}
+  \note con el paquete tikz es posible hacer graficas en la diapositiva, siendo posible evitar el uso de 
+  imagenes externas. 
+  \note problema es que cosas tan sencillas como la flecha pueden ser algo complicado de hacer. 
+%    \tikz[baseline] \node[anchor=base] (points1) {\includegraphics[height=0.4\textheight]{./04-AJUSTE/FIG-DOTS.png}};
+%    \tikz[baseline] \node[anchor=base] (interp1) {\includegraphics[height=0.4\textheight]{./04-AJUSTE/FIG_SPLINE.png} };
+%    \begin{tikzpicture}[overlay,>=latex]
+%      \path[blue,->] (points1) -- (interp);
+%    \end{tikzpicture}
+
+Existen muchos tipos de formas funcionales útiles para interpolar:
+\begin{center}
+\begin{itemize}
+\item Polinomios
+\item Funciones Trigonométricas
+\item Exponenciales
+\end{itemize}
+\end{center}
+\end{frame}

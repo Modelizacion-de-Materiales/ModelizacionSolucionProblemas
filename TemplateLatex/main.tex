@@ -1,0 +1,88 @@
+% modo presentación. si se cambia a modo notas se imprimen las notas (creo)
+\documentclass[xcolor={dvipsnames,x11names,svgnames},aspectratio=169,notes]{beamer}
+\mode<presentation>
+%handout de las diapositivas, comentar arriva!
+% handout de la presentacion
+%\documentclass[handout,xcolor={dvipsnames,x11names,svgnames},aspectratio=169,notes]{beamer}
+%\mode<handout>
+
+% paquete beamer, opciones para nombres de colores y aspect ratio de panatalla grande.
+%\documentclass[a4paper,12pt]{article}
+%\usepackage{beamerarticle}
+
+\include{./PREAMBLE/PACKS}
+% para mostrar las notas en modo presentacion. 
+\setbeameroption{show notes}
+%para ocultar las notas
+%\setbeameroption{hide notes}
+%para dejar las notas en la segunda patnalla
+\setbeameroption{show notes on second screen}
+%incluyo los paquetes necesarios
+
+% en caso de handouts, ver 2 en 1 o 4 en 
+
+
+% en forma arbitraria decid que los parrafos no llevan indentación.
+\setlength{\parindent}{0cm}
+
+% incluyo los beamercolors
+\include{./PREAMBLE/BEAMERCOLORS}
+
+%incluyo el tema y modificaciones
+\include{./PREAMBLE/BEAMERTHEME}
+
+% modifico los temas
+\include{./PREAMBLE/THEMES}
+
+% defino el template para la diapositiva del título
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defino la presentación
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Clase de modelización de Materiales}
+\subtitle[Modelización 2019]{ Modelización de Propiedades y Procesos 2019 }
+\author{Ruben Weht\inst{1}\inst{2} \and Mariano Forti\inst{1}\inst{3} }
+\institute{
+  \inst{1}Instituto de Tecnología Prof. Jorge Sabato
+  \and
+  \inst{2}Fisica del Sólido, Edificio TANDAR, \url{weht@cnea.gov.ar},
+  interno 7104
+  \and
+  \inst{3}División Aleaciones Especiales, Edificio 47 (microscopía),
+  \url{mforti@cnea.gov.ar}, interno 7832
+}
+\subject{Tema de la clase}
+\keywords{Tema 1, Tema 2, Tema 3}
+\date{}
+
+% Inicia el documento.
+\begin{document}
+
+% Título de la clase. 
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+\section{Contenido Sencillo}
+\include{./01-SECCION/01-01-SECCION}
+
+\section{Imágenes y multimedia}
+\include{./02-SECCION/01-02-SECCION}
+\include{./02-SECCION/02-02-SECCION}
+%\include{./02-SECCION/03-02-SECCION}
+
+\section{Diapositivas con Slides}
+\include{./03-SECCION/01-03-SECCION}
+
+\section{Diapositivas con Notas}
+\include{./04-SECCION/01-04-SECCION}
+
+\section{El Uso de recuadros}
+\include{./05-SECCION/01-05-SECCION}
+
+\section{Diapositivas con tikz}
+\include{./06-SECCION/01-06-SECCION.tex} 
+%\section{Conclusiones}
+%\include{./10-CONCLUS/01-10-CONCLUS}
+
+\end{document}
