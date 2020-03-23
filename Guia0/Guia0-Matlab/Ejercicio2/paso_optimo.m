@@ -69,19 +69,23 @@ DG = DG/FG(end);
 
 %% Gráfico de convergenca
 % valor de la integral
+%%
 close all
-I = num2str(FG(end),'I_{gauss} = %4.7e ');
-D = num2str(DG(end),'d_{gauss} = %4.7e ' );
+I = num2str(FG(end),'$I_{gauss} = %4.5g$');
+D = num2str(DG(end),'$d_{gauss} = %4.5g$' );
 figerrs=figure(1);
 loglog(N,err(:,1),'ko-','displayname','trapecios','linewidth',2);
 hold on
 loglog(N,err(:,2),'ro-','displayname','Simpson','linewidth',2);
 loglog(N,err(:,3),'bo-','displayname','Cuadratura Gauss-legendre','linewidth',2);
-title(['errores en la integral, ',I,'  ',D],'fontsize',16)
+title(['errores en la integral, ',I,'  ',D],'fontsize',14)
 legend('location','east');
 xlabel('numero de intervalos considerados','fontsize',14);
-ylabel('abs((I_N - I_{N-1})/I_N )','fontsize',14);
-saveas(figerrs,'Errores.pdf','pdf');
+ylabel('$\Bigl \vert \dfrac{ I_N - I_{N-1}}{I_N} \Bigr \vert $','fontsize',14) 
+set(gca,'position',[0.2,0.15,0.7,0.7])
+set(gca,'fontsize',12)
+%saveas(figerrs,'Errores.pdf','pdf');
+print 'Errores.pdf' -dpdflatex
 
 
 
