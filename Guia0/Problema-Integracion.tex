@@ -1,0 +1,81 @@
+\section{Integración Numérica}
+
+\mode<article>
+
+Este problema esta incluido principalmente por razones históricas, 
+pero sirve para ilustrar algunos conceptos. Como se ha visto en
+la teórica, la integral de una función $f(x)$ en el intervalo 
+$[a, b]$ puede aproximarse por distintos métodos, resumidos en la
+\autoref{FiguraResumenMetodosIntegracion}. 
+
+Los métodos de Trapecios y Simpson dividen el intervalo de integración 
+en $N$ intervalos de igual tamaño. \emph{Trapecios} aproxima el 
+área bajo la curva por un trapecio, mientras que \emph{Simpson}
+aproxima la integral en dos intervalos consecutivos como la 
+integral bajo un polinomio que pasa por los los puntos 
+definidos por la función. De ahí surge que para aplicar
+este método es necesario definir un número de intervalos con
+una paridad definida. 
+
+El método más novedoso para nosotros es el de cuadraturas de gauss.
+En lugar de definir un intervalos regulares para subdividir el 
+intervalo de integración, la idea es definir un conjunto de puntos
+$t_i$ con $i \in [ 1 , N ]$ elegidos de manera que para cualquier 
+polinomio $p_N (t)$ de grado $N$  se tiene la mejor aproximación a 
+la integral 
+\begin{equation}
+ \int_a^b  p_N(t) dt = \sum_i^N W_i p_N (t_i) 
+\end{equation}
+
+\begin{figure}
+  
+  \includeslide[width=\textwidth]{FrameResumenMetodosIntegracion}
+  \caption{\protect\label{FiguraResumenMetodosIntegracion}}
+
+\end{figure}
+
+La condición de minimizar el error conduce a un sistema de ecuaciones sobre los 
+factores $ W_i $ que pueden entenderse de la siguiente manera: se han definido 
+pesos $W_i$ y puntos $t_i$ que aproximan a cualquier función $f(t)$ minimizando
+el error en la integral. Otra ventaja es que una vez resuelto el sistema de 
+ecuaciones de la \autoref{FiguraResumenMetodosIntegracion} los 
+valores obtenidos valen para cualquier función $f$ . Los 
+métodos de Simpson y Trapecios requerían hacer numerosas evaluaciones de la
+función. Las cuadraturas de Gauss minimizan también la cantidad de evaluaciones. 
+
+Una última cosa a tener en cuenta, es que el sistema de ecuaciones
+para los $W_i, t_i$ es única e independiente de la función a 
+integrar. La solución de ese sistema de ecuacionies se alcanza 
+con los polinomios de Chebyshev-Gauss-Lobatto y existen 
+scripts donde se resuelven paravarios lenguajes.
+
+En la \autoref{FiguraErroresMetodosIntegracion} se observa el comportamiento del
+error para los distintos métodos de integración en función del 
+número de intervalos , que corresponde con el número de evaluaciones 
+de la función.Se ve claramente que las cuadraturas de Gauss 
+alcanzan rápidamente errores muy pequeños. 
+
+De hecho, para las cuadraturas de gauss el error satura en el 
+épsilon de la máquina cuando para los otros métodos apenas se alcanzó
+un error razonablemente bajo. 
+
+\mode*
+
+%\begin{figure}
+%  \includeslide[width=\textwidth]{FiguraErroresMetodosIntegracion}
+%  \caption{\label{FiguraErroresMetodosIntegracion}}
+%\end{figure}
+
+\begin{frame}<presentation>[label=FrameResumenMetodosIntegracion]
+  \frametitle{Métodos de Integración}
+  \center
+  \includegraphics[width=0.8\textwidth,page=9,trim=0cm 0cm 0cm 4.2cm,clip]{./Resumen/GUIA1-Resumen-2018.pdf}
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameResumenMetodosIntegracion]
+  \frametitle{Métodos de Integración}
+  \center
+  \includegraphics[height=0.9\textheight]{./Guia0-Matlab/Ejercicio2/plot-errores.pdf}
+\end{frame}
+
+\mode<all>

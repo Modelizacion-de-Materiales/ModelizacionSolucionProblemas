@@ -28,7 +28,12 @@ clean:
 	  -o -iname \*.snm\
 	  -o -iname \*.toc\
 	  -o -iname \*.aux\
-	  | xargs rm
+	  -not \( -name plot-errores.pdf \) \
+	  -not \( -name \*-inc.pdf       \)  \
+	  -not \( -name allcurve.pdf     \)  \
+	  -not \( -name allotracurve.pdf \)
+
+#	  | xargs rm
 
 
 .PHONY: Guia0 Guia0_python
