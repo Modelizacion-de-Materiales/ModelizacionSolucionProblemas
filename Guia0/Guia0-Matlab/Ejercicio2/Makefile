@@ -12,6 +12,8 @@ clean:
 	  -o -iname \*.out\
 	  -o -iname \*.log\
 	  -o -iname \*.toc\
-	  | xargs rm
+	  -not -name plot-errores.pdf\
+	  -not -name \*-inc.pdf
+#	  | xargs rm
 
 .PHONY: plot-errores.pdf

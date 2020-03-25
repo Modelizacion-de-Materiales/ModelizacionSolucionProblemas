@@ -13,11 +13,11 @@ handout.pdf: handout.tex main.tex Guia0
 	pdflatex handout.tex
 
 OldResumen: Resumen/GUIA1-Resumen-2018.odp
-	make -C Resumen
+	make -C Resumen/
 
-Guia0: ./Guia0_python
+Guia0: ./Guia0_python/ ./Guia0-Matlab/ ./Guia0-Fortran/Ejercicio1/
 Guia0_python:
-	make -C Guia0_python
+	make -C $@
 
 clean:
 	find -iname \*.aux   \
@@ -28,7 +28,12 @@ clean:
 	  -o -iname \*.snm\
 	  -o -iname \*.toc\
 	  -o -iname \*.aux\
-	  | xargs rm
+	  -not \( -name plot-errores.pdf \) \
+	  -not \( -name \*-inc.pdf       \)  \
+	  -not \( -name allcurve.pdf     \)  \
+	  -not \( -name allotracurve.pdf \)
+
+#	  | xargs rm
 
 
 .PHONY: Guia0 Guia0_python

@@ -81,10 +81,93 @@ $b_i$
 
 \end{frame}
 \mode<article>
+<<<<<<< HEAD
 Con estos datos podemos completar la escritura de los $N-1$ polinomios
 necesarios. De esta manera, podemos graficar en cada intervalo 
 el tramo correspondiente de la función.
+=======
+
+Con estos datos podemos completar la escritura de los $N-1$ polinomios
+necesarios. De esta manera, podemos graficar en cada intervalo 
+el tramo correspondiente de la función como se muestra en la
+\autoref{FiguraSplinesArmadas}. Debe notarse que cada polinomio vale solo
+en su intervalo de definición, como se observa en la \autoref{FiguraSplinesExtendidos}.
+Fuera de su propio intervalo, cada polinomio constituye una aproximación pobre
+a los datos originales. 
 
 \mode*
+\begin{frame}[label=FrameFiguraSplinesArmadas]
+  \frametitle<presentation>{Resultado Splines}
+  \begin{figure}
+    \center
+    \includegraphics[width=0.8\textwidth]{./Guia0-Fortran/Ejercicio1/allcurve.pdf}
+    \caption{\label{FiguraSplinesArmadas}Función de Interpolación Definida a Tramos}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[label=FrameFiguraSplinesExtendidos]
+  \frametitle<presentation>{Splines en todo el intervalo}
+  \begin{figure}
+    \center
+    \includegraphics[width=0.6\textwidth,trim=1cm 7cm 1cm 6cm]{./scplines.pdf}
+    \caption{\label{FiguraSplinesExtendidos} Cada polinomio vale solo en su intervalo}
+  \end{figure}
+\end{frame}
+
+\mode<article>
+El problema no ha terminado aún. El Enunciado pide, en pocas palabras,
+encontrar la profundidad a la que se minimiza la derivada primera
+de la función, que será cuando la derivada segunda se anule.
+Hay varias maneras de resolver esto. 
+
+En primera instancia, uno podría pensar que la derivada estara bien
+representada por la derivada de los polinomios. Esta hipótesis se 
+maneja en la \autoref{FiguraDerivPoli}. El problema es que los
+polinomios son a lo sumo dos veces derivables, pero lasegunda derivada
+si bien es continua es ``aserrada'' de manera que la aproximación
+a su cero puede ser tan buena o mala como nuestra tolerancia a
+los errores.
+
+\begin{figure}
+  \includeslide[width=\textwidth]{FrameFigDerivPoli}
+  \caption{\protect\label{FiguraDerivPoli}}
+\end{figure}
+
+\mode*
+\begin{frame}<presentation>[label=FrameFigDerivPoli]
+  \frametitle{Derivar polinomios}
+  \center
+  \includegraphics[width=0.8\textwidth,page=6,trim=0cm 0cm 0cm 4.1cm,clip]{./Resumen/GUIA1-Resumen-2018.pdf}
+
+\end{frame}
+
+\mode<article>
+Otra forma de resolver el problema seria derivar numéricamente los datos
+como  se muestra en la \autoref{FigureDerivarDatos}. Notar que con 
+este truco se obtienen derivadas suaves, pero las derivadas 
+numéricas tienen su error intrínseco y nuevamente es nuestra
+tolerancia a los errores la que determinará la confianza que le 
+tengamos al resultado. 
+
+no lo hemos dicho, pero el lugar donde se anula la derivada 
+segunda podemos encontrarlo usando algún algoritmo 
+de optimización. Por ejemplo el método de bisección. 
+
+\begin{figure}
+  \includeslide[width=\textwidth]{FrameFigureDerivarDatos}
+  \caption{\protect\label{FigureDerivarDatos} Solucion del problema al
+  derivar numéricamente los datos}
+\end{figure}
+
+\mode*
+\begin{frame}<presentation>[label=FrameFigureDerivarDatos]
+  \frametitle{Interpolar la derivada numérica de los datos}
+  \center
+  \includegraphics[width=0.8\textwidth,page=7,trim=0cm 0cm 0cm 4.2cm,clip]{./Resumen/GUIA1-Resumen-2018.pdf}
+\end{frame}
+>>>>>>> Guia0-Repaso
+
+\mode*
+ 
 \mode<all>
 
