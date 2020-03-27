@@ -1,10 +1,11 @@
 from numpy import *
+# import numpy as np
 
 def makeA( KA, KB, KC, KD ,GEO, TYCC, VALCC ):
 
    allnods = linspace(0,GEO.Nx*GEO.Ny-1, GEO.Nx*GEO.Ny).astype(int) 
    vertices=(0,GEO.Nx-1,GEO.Nx*(GEO.Ny-1),GEO.Nx*GEO.Ny-1)
-   A=zeros([GEO.Nx*GEO.Ny,GEO.Nx*GEO.Ny])
+   A=np.zeros([GEO.Nx*GEO.Ny,GEO.Nx*GEO.Ny])
    B=zeros([GEO.Nx*GEO.Ny,1])
    beta = GEO.Lx / GEO.Ly
 
@@ -123,7 +124,7 @@ def makeA( KA, KB, KC, KD ,GEO, TYCC, VALCC ):
 def migrad(MAT):
     
     N,M = shape(MAT)
-    print N,M
+    #print ( N,M )
 
 # 1 es la derivada en x
     D1 = zeros([N,M])
