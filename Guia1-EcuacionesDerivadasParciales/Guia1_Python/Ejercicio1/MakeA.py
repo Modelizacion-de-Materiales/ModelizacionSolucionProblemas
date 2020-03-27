@@ -123,7 +123,7 @@ def makeA( KA, KB, KC, KD ,GEO, TYCC, VALCC ):
 def migrad(MAT):
     
     N,M = shape(MAT)
-    print N,M
+    print ( N,M )
 
 # 1 es la derivada en x
     D1 = zeros([N,M])

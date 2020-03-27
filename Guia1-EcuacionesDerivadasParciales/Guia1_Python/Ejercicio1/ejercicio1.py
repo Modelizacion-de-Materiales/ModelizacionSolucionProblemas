@@ -1,53 +1,58 @@
-from numpy import *
-from matplotlib.pyplot import *
+import numpy as np
+import matplotlib.pyplot as plt
 import tycc
 import valcc
 import geo
-from MakeA import *
+import MakeA as lib
 
 
-vertices=(0,geo.Nx-1,geo.Nx*(geo.Ny-1),geo.Nx*geo.Ny-1)
-#borde de abajo
-kc=linspace(vertices[0], vertices[1],geo.Nx ).astype(int)
-#borde de arriba
-kd=linspace(vertices[2], vertices[3],geo.Nx ).astype(int)
-#borde de la izquierda
-ka=linspace(vertices[0], vertices[2],geo.Ny ).astype(int)
-#borde de la derecha
-kb=linspace(vertices[1], vertices[3],geo.Ny ).astype(int)
+vertices = (0,  geo.Nx-1,  geo.Nx*(geo.Ny-1),  geo.Nx*geo.Ny-1)
+#  borde de abajo
+kc = np.linspace(vertices[0],  vertices[1], geo.Nx).astype(int)
+# borde de arriba
+kd = np.linspace(vertices[2],  vertices[3], geo.Nx).astype(int)
+# borde de la izquierda
+ka = np.linspace(vertices[0],  vertices[2], geo.Ny).astype(int)
+# borde de la derecha
+kb = np.linspace(vertices[1],  vertices[3], geo.Ny).astype(int)
 
-# Solucion
-A,B = makeA(ka,kb,kc,kd,geo,tycc,valcc)
+#  Solucion
+A, B = lib.makeA(ka, kb, kc, kd, geo, tycc, valcc)
 
-T=linalg.solve(A,B)
-Tmat=zeros([geo.Nx,geo.Ny])
-for i in linspace(0,geo.Nx-1,geo.Nx).astype(int):
-    for j in linspace(0,geo.Ny-1,geo.Ny).astype(int):
-        k=i+j*geo.Nx
-        Tmat[j,i]=T[k]
+T = np.linalg.solve(A, B)
+Tmat = np.zeros([geo.Nx, geo.Ny])
+for i in np.linspace(0, geo.Nx-1, geo.Nx).astype(int):
+    for j in np.linspace(0, geo.Ny-1, geo.Ny).astype(int):
+        k = i+j*geo.Nx
+        Tmat[j, i] = T[k]
 
-# solo para graficar
-x=linspace(0,geo.Lx,geo.Nx).astype(float)
-y=linspace(0,geo.Ly,geo.Ny).astype(float)
-X,Y=meshgrid(x,y)
+#  solo para graficar
+x = np.linspace(0, geo.Lx, geo.Nx).astype(float)
+y = np.linspace(0, geo.Ly, geo.Ny).astype(float)
+X, Y = np.meshgrid(x, y)
 
-CS=contourf(X,Y,Tmat)
-CS2=contour(CS,levels=CS.levels,colors='k',linewidth=5)
-xlabel('X')
-ylabel('Y')
-cbar=colorbar(CS,ticks=linspace(min(T),max(T),10),boundaries=[min(T),max(T)])
+CS = plt.contourf(X, Y, Tmat)
+CS2 = plt.contour(CS, levels=CS.levels, colors='k', linewidth=5)
+plt.xlabel('X')
+plt.ylabel('Y')
+cbar = plt.colorbar(CS, ticks=np.linspace(min(T), max(T), 10), boundaries=[min(T), max(T)])
 cbar.ax.set_ylabel('Temperature')
 
-savetxt('Temps.dat',T)
-savetxt('Temp_mat.dat',Tmat)
+plt.show()
+plt.savefig('Temperaturas-'+tycc.abajo+'.pdf')
+#plt.show()
+#plt.savefig('Temperaturas.pdf','pdf')
+
+np.savetxt('Temps-'+tycc.abajo+'.dat', T)
+np.savetxt('Temp_mat-'+tycc.abajo+'.dat', Tmat)
 
 
-# Ahora tengo que calcular los flujos. 
-# dTx, dTy= gradient(Tmat)
-dTy, dTx = migrad(Tmat)
-print dTx , dTy
-# VX,VY = meshgrid(which_plot_x,which_plot_y)
-streamplot(X,Y,-dTx,-dTy,color='k',linewidth=3,density=1)
+#  Ahora tengo que calcular los flujos. 
+#  dTx,  dTy =  gradient(Tmat)
+dTy,  dTx = lib.migrad(Tmat)
+print(dTx, dTy)
+#  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
+plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
 
-show()
-
+plt.show()
+plt.savefig('Temperaturas-'+tycc.abajo+'-Flujos.pdf')

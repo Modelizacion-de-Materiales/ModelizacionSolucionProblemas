@@ -2,5 +2,5 @@
 
 derecha = 'temperatura'
 izquierda = 'temperatura'
-abajo = 'temperatura'
+abajo = 'flujo'
 arriba = 'temperatura'
