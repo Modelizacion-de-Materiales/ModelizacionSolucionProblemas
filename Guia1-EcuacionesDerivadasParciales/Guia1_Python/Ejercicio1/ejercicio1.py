@@ -46,8 +46,10 @@ def makeplots(myTmat, mygeo, case):
     plt.ylabel('Y')
     cbar = plt.colorbar(
             CS,
-            ticks=np.linspace(min(min(myTmat)), max(max(myTmat)), 10),
-            boundaries=[min(min(myTmat)), max(max(myTmat))]
+            ticks=np.linspace(np.min(np.min(myTmat)),
+                np.max(np.max(myTmat)),
+                10),
+            boundaries=[np.min(np.min(myTmat)), np.max(np.max(myTmat))]
             )
     cbar.ax.set_ylabel('Temperature')
 
@@ -59,8 +61,7 @@ def makeplots(myTmat, mygeo, case):
 
 def makeFlujos(myTmat, myx, myy, case):
     dTy,  dTx = lib.migrad(myTmat)
-# print(dTx, dTy)
-#  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
+    X, Y = np.meshgrid(myx, myy)
     plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
 
     plt.show()
@@ -70,47 +71,28 @@ def makeFlujos(myTmat, myx, myy, case):
 
 
 def main():
+    """
+    Este módulo Python resuelve el problema 1 de la guia.
+    Funciones:
+
+    main() : llamado a las funciones de los distintos pasos ,
+    con opciones por omisión
+
+    makeFlujos(myTmat, myx, myy, case)
+    construye los flujos, retorna  dTx, dTy
+
+    maketmat(T, mygeo)
+    pasa del vector temp a la matriz temp, devuelve mtTmat
+
+    makeplots():
+    como su nombre lo indica, construye los gráfcos con el nombre de 'case'
+    indicado
+    """
     T, dt = makensolve(geo, tycc, valcc)
-#    Tmat = np.zeros([geo.Nx, geo.Ny])
-#
-#    for i in np.linspace(0, geo.Nx-1, geo.Nx).astype(int):
-#        for j in np.linspace(0, geo.Ny-1, geo.Ny).astype(int):
-#            k = i+j*geo.Nx
-#            Tmat[j, i] = T[k]
     Tmat = maketmat(T, geo)
 
     x, y = makeplots(Tmat, geo, tycc.abajo)
-
-#  solo para graficar
-#     x = np.linspace(0, geo.Lx, geo.Nx).astype(float)
-#     y = np.linspace(0, geo.Ly, geo.Ny).astype(float)
-#     X, Y = np.meshgrid(x, y)
-# 
-#     CS = plt.contourf(X, Y, Tmat)
-#     CS2 = plt.contour(CS, levels=CS.levels, colors='k', linewidth=5)
-#     plt.xlabel('X')
-#     plt.ylabel('Y')
-#     cbar = plt.colorbar(CS, ticks=np.linspace(min(T), max(T), 10), boundaries=[min(T), max(T)])
-#     cbar.ax.set_ylabel('Temperature')
-# 
-#     plt.show()
-#     plt.savefig('Temperaturas-'+tycc.abajo+'.pdf')
-# # plt.show()
-# # plt.savefig('Temperaturas.pdf','pdf')
-# 
-#     np.savetxt('Temps-'+tycc.abajo+'.dat', T)
-#     np.savetxt('Temp_mat-'+tycc.abajo+'.dat', Tmat)
-# 
-# 
-# #  Ahora tengo que calcular los flujos.
-# #  dTx,  dTy =  gradient(Tmat)
-#     dTy,  dTx = lib.migrad(Tmat)
-# # print(dTx, dTy)
-# #  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
-#     plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
-# 
-#     plt.show()
-#     plt.savefig('Temperaturas-'+tycc.abajo+'-Flujos.pdf')
+    dTy, dTx = makeFlujos(Tmat, x, y, tycc.abajo)
 
 
 if __name__ == "__main__":
