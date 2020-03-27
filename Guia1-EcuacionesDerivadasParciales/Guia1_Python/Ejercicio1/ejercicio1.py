@@ -26,14 +26,24 @@ def makensolve(mygeo,  mytycc, myvalcc):
     return T, dt
 
 
+def maketmat(T, mygeo):
+    myTmat = np.zeros([geo.Nx, geo.Ny])
+    for i in np.linspace(0, mygeo.Nx-1, mygeo.Nx).astype(int):
+        for j in np.linspace(0, mygeo.Ny-1, mygeo.Ny).astype(int):
+            k = i+j*mygeo.Nx
+            myTmat[j, i] = T[k]
+    return myTmat
+
+
 def main():
     T, dt = makensolve(geo, tycc, valcc)
-    Tmat = np.zeros([geo.Nx, geo.Ny])
-
-    for i in np.linspace(0, geo.Nx-1, geo.Nx).astype(int):
-        for j in np.linspace(0, geo.Ny-1, geo.Ny).astype(int):
-            k = i+j*geo.Nx
-            Tmat[j, i] = T[k]
+#    Tmat = np.zeros([geo.Nx, geo.Ny])
+#
+#    for i in np.linspace(0, geo.Nx-1, geo.Nx).astype(int):
+#        for j in np.linspace(0, geo.Ny-1, geo.Ny).astype(int):
+#            k = i+j*geo.Nx
+#            Tmat[j, i] = T[k]
+    Tmat = maketmat(T, geo)
 
 #  solo para graficar
     x = np.linspace(0, geo.Lx, geo.Nx).astype(float)
