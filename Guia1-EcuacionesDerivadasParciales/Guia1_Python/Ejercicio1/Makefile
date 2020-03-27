@@ -21,4 +21,8 @@ clean:
 	  -o -iname .*.swp\
 	  |xargs rm 
 
+clean-results: 
+	find -iname \*.pdf\
+	  -o -iname \*.dat\
+	  | xargs rm
 
