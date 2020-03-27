@@ -1,5 +1,8 @@
-escaleo: escaleo.py ejercicio1.py MakeA.py
-	python3 escaleo.py
+escaleo.pdf: tabla-tiempos.dat
+	python3 -c "from ejercicio1 import plotescaleo; plotescaleo('tabla-tiempos.dat')"
+	
+tabla-tiempos.dat: ejercicio1.py MakeA.py 
+	python3 -c 'from ejercicio1 import escaleo; escaleo()'
 
 Graficos:  ./Temperaturas-Flujos-1.pdf ./Temperaturas-Flujos-2.pdf
 
@@ -30,3 +33,4 @@ clean-results:
 	  -o -iname \*.dat\
 	  | xargs rm
 
+.PHONY: escaleo.pdf
