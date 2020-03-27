@@ -35,6 +35,40 @@ def maketmat(T, mygeo):
     return myTmat
 
 
+def makeplots(myTmat, mygeo, case):
+    x = np.linspace(0, mygeo.Lx, geo.Nx).astype(float)
+    y = np.linspace(0, mygeo.Ly, geo.Ny).astype(float)
+    X, Y = np.meshgrid(x, y)
+
+    CS = plt.contourf(X, Y, myTmat)
+    CS2 = plt.contour(CS, levels=CS.levels, colors='k', linewidth=5)
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    cbar = plt.colorbar(
+            CS,
+            ticks=np.linspace(min(min(myTmat)), max(max(myTmat)), 10),
+            boundaries=[min(min(myTmat)), max(max(myTmat))]
+            )
+    cbar.ax.set_ylabel('Temperature')
+
+    plt.show()
+    plt.savefig('Temperaturas-'+case+'.pdf')
+
+    return x, y
+
+
+def makeFlujos(myTmat, myx, myy, case):
+    dTy,  dTx = lib.migrad(myTmat)
+# print(dTx, dTy)
+#  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
+    plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
+
+    plt.show()
+    plt.savefig('Temperaturas-'+case+'-Flujos.pdf')
+
+    return dTx, dTy
+
+
 def main():
     T, dt = makensolve(geo, tycc, valcc)
 #    Tmat = np.zeros([geo.Nx, geo.Ny])
@@ -45,36 +79,38 @@ def main():
 #            Tmat[j, i] = T[k]
     Tmat = maketmat(T, geo)
 
+    x, y = makeplots(Tmat, geo, tycc.abajo)
+
 #  solo para graficar
-    x = np.linspace(0, geo.Lx, geo.Nx).astype(float)
-    y = np.linspace(0, geo.Ly, geo.Ny).astype(float)
-    X, Y = np.meshgrid(x, y)
-
-    CS = plt.contourf(X, Y, Tmat)
-    CS2 = plt.contour(CS, levels=CS.levels, colors='k', linewidth=5)
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    cbar = plt.colorbar(CS, ticks=np.linspace(min(T), max(T), 10), boundaries=[min(T), max(T)])
-    cbar.ax.set_ylabel('Temperature')
-
-    plt.show()
-    plt.savefig('Temperaturas-'+tycc.abajo+'.pdf')
-# plt.show()
-# plt.savefig('Temperaturas.pdf','pdf')
-
-    np.savetxt('Temps-'+tycc.abajo+'.dat', T)
-    np.savetxt('Temp_mat-'+tycc.abajo+'.dat', Tmat)
-
-
-#  Ahora tengo que calcular los flujos.
-#  dTx,  dTy =  gradient(Tmat)
-    dTy,  dTx = lib.migrad(Tmat)
-# print(dTx, dTy)
-#  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
-    plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
-
-    plt.show()
-    plt.savefig('Temperaturas-'+tycc.abajo+'-Flujos.pdf')
+#     x = np.linspace(0, geo.Lx, geo.Nx).astype(float)
+#     y = np.linspace(0, geo.Ly, geo.Ny).astype(float)
+#     X, Y = np.meshgrid(x, y)
+# 
+#     CS = plt.contourf(X, Y, Tmat)
+#     CS2 = plt.contour(CS, levels=CS.levels, colors='k', linewidth=5)
+#     plt.xlabel('X')
+#     plt.ylabel('Y')
+#     cbar = plt.colorbar(CS, ticks=np.linspace(min(T), max(T), 10), boundaries=[min(T), max(T)])
+#     cbar.ax.set_ylabel('Temperature')
+# 
+#     plt.show()
+#     plt.savefig('Temperaturas-'+tycc.abajo+'.pdf')
+# # plt.show()
+# # plt.savefig('Temperaturas.pdf','pdf')
+# 
+#     np.savetxt('Temps-'+tycc.abajo+'.dat', T)
+#     np.savetxt('Temp_mat-'+tycc.abajo+'.dat', Tmat)
+# 
+# 
+# #  Ahora tengo que calcular los flujos.
+# #  dTx,  dTy =  gradient(Tmat)
+#     dTy,  dTx = lib.migrad(Tmat)
+# # print(dTx, dTy)
+# #  VX, VY  =  meshgrid(which_plot_x, which_plot_y)
+#     plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
+# 
+#     plt.show()
+#     plt.savefig('Temperaturas-'+tycc.abajo+'-Flujos.pdf')
 
 
 if __name__ == "__main__":
