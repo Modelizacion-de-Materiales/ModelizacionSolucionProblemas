@@ -1,5 +1,5 @@
 from numpy import *
-# import numpy as np
+import numpy as np
 
 def makeA( KA, KB, KC, KD ,GEO, TYCC, VALCC ):
 

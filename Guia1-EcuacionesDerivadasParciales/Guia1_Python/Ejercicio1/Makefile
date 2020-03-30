@@ -1,5 +1,6 @@
 escaleo.pdf: tabla-tiempos.dat
 	python3 -c "from ejercicio1 import plotescaleo; plotescaleo('tabla-tiempos.dat')"
+	pdftk Temperaturas-???.pdf cat output PlotsNxN.pdf ; rm Temperaturas-???.pdf
 	
 tabla-tiempos.dat: ejercicio1.py MakeA.py 
 	python3 -c 'from ejercicio1 import escaleo; escaleo()'

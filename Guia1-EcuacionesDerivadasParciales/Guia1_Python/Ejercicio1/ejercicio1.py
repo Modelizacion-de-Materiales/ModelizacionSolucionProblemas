@@ -52,6 +52,7 @@ def makeplots(myTmat, mygeo, case):
             boundaries=[np.min(np.min(myTmat)), np.max(np.max(myTmat))]
             )
     cbar.ax.set_ylabel('Temperature')
+    plt.title(case)
 
     plt.show()
     plt.savefig('Temperaturas-'+case+'.pdf')
@@ -101,9 +102,8 @@ if __name__ == "__main__":
 
 
 def escaleo():
-    Nx = 3**np.linspace(1, 4.5, 10)
+    Nx = 3**np.linspace(1, 3.5, 10)
     Nx = Nx.astype(int)
-    print('Hello World')
 
     t = []
     filetiempos = open('tabla-tiempos.dat','w')
@@ -116,14 +116,16 @@ def escaleo():
         t.append(dt)
         print(case, dt)
         Tmat = maketmat(T, geo)
+        np.savetxt('Temps-'+case+'.dat', Tmat)
         x, y = makeplots(Tmat, geo, case)
         filetiempos.write('{:d}  {:10e} \n'.format(size, dt))
-
     filetiempos.close()
 
 
 def plotescaleo(datafile):
     n, dt = np.loadtxt(datafile, unpack=True)
-    plt.plot(np.log(n[3:]), np.log(dt[3:]),'ok')
+    plt.plot(np.log(n[3:]), np.log(dt[3:]), 'ok')
+    plt.xlabel(r'$log(N)$')
+    plt.ylabel(r'$log(t)$')
     plt.show()
     plt.savefig('escaleo.pdf')
