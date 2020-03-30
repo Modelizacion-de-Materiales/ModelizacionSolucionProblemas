@@ -55,7 +55,7 @@ def makeplots(myTmat, mygeo, case):
     plt.title(case)
 
     plt.show()
-    plt.savefig('Temperaturas-'+case+'.pdf')
+    plt.savefig('Temps-'+case+'.pdf')
     plt.close()
 
     return x, y
@@ -67,7 +67,7 @@ def makeFlujos(myTmat, myx, myy, case):
     plt.streamplot(X, Y, -dTx, -dTy, color='k', linewidth=3, density=1)
 
     plt.show()
-    plt.savefig('Temperaturas-'+case+'-Flujos.pdf')
+    plt.savefig('Temps-'+case+'-Flujos.pdf')
 
     return dTx, dTy
 
@@ -97,11 +97,13 @@ def main():
     dTy, dTx = makeFlujos(Tmat, x, y, tycc.abajo)
 
 
-if __name__ == "__main__":
-    main()
-
-
 def escaleo():
+    """
+    esta función calcula los tiempos para resolver el problema 
+    ( para invertir la matriz )
+    llama a makemat y makeplot
+    guarda Temps-case.dat
+    """
     Nx = 3**np.linspace(1, 3.5, 10)
     Nx = Nx.astype(int)
 
@@ -122,10 +124,23 @@ def escaleo():
     filetiempos.close()
 
 
-def plotescaleo(datafile):
+def fitescaleo(datafile):
     n, dt = np.loadtxt(datafile, unpack=True)
     plt.plot(np.log(n[3:]), np.log(dt[3:]), 'ok')
     plt.xlabel(r'$log(N)$')
     plt.ylabel(r'$log(t)$')
     plt.show()
-    plt.savefig('escaleo.pdf')
+    plt.savefig('fitescaleo.pdf')
+
+
+def plotchapa(tempsfile):
+    Tmat = np.loadtxt(tempsfile)
+    geo.Nx, geo.Ny = np.shape(Tmat)
+    case = '{:03d}x{:03d}'.format(geo.Nx, geo.Ny)
+    makeplots(Tmat, geo, case)
+
+
+
+
+if __name__ == "__main__":
+    main()
