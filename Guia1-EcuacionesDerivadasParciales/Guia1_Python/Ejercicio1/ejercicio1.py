@@ -103,7 +103,7 @@ def escaleo():
     llama a makemat y makeplot
     guarda Temps-case.dat
     """
-    Nx = 3**np.linspace(1, 3.5, 10)
+    Nx = 3**np.linspace(2.5, 4, 10)
     Nx = Nx.astype(int)
     t = []
     filetiempos = open('tabla-tiempos.dat','w')
@@ -123,7 +123,11 @@ def escaleo():
 
 def fitescaleo(datafile):
     n, dt = np.loadtxt(datafile, unpack=True)
-    plt.plot(np.log(n[3:]), np.log(dt[3:]), 'ok')
+    x = np.log(n)
+    y = np.log(dt)
+    m, b = np.polyfit(x, y, 1)
+    plt.plot(x, y, 'ok')
+    plt.plot(x, m*x+b, '--k')
     plt.xlabel(r'$log(N)$')
     plt.ylabel(r'$log(t)$')
     plt.show()
