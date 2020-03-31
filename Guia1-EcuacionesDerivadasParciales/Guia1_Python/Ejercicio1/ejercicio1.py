@@ -53,7 +53,6 @@ def makeplots(myTmat, mygeo, case):
             )
     cbar.ax.set_ylabel('Temperature')
     plt.title(case)
-
     plt.show()
     plt.savefig('Temps-'+case+'.pdf')
     plt.close()
@@ -106,10 +105,8 @@ def escaleo():
     """
     Nx = 3**np.linspace(1, 3.5, 10)
     Nx = Nx.astype(int)
-
     t = []
     filetiempos = open('tabla-tiempos.dat','w')
-
     for size in Nx:
         geo.Nx = size
         geo.Ny = size
@@ -138,8 +135,6 @@ def plotchapa(tempsfile):
     geo.Nx, geo.Ny = np.shape(Tmat)
     case = '{:03d}x{:03d}'.format(geo.Nx, geo.Ny)
     makeplots(Tmat, geo, case)
-
-
 
 
 if __name__ == "__main__":

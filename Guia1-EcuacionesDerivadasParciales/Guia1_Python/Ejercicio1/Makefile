@@ -1,13 +1,17 @@
 # revisar ! anda pero tengo quearreglar el makefile para que respete orden
-#escaleo.pdf: plotsNxN.pdf
-#	python3 -c "from ejercicio1 import fitescaleo; fitescaleo('tabla-tiempos.dat')"
-#	
-#plotsNxN.pdf: fitescaleo.pdf
-#	pdftk fitescaleo.pdf PlotsNxN.pdf cat output escaleo.pdf
-#
-#tabla-tiempos.dat: ejercicio1.py MakeA.py 
-#	python3 -c 'from ejercicio1 import escaleo; escaleo()' # tambien sale fitescaleo.pdf
-#
+#escaleo.pdf: tabla-tiempos.dat
+#	python3 -c 'from ejercicio1 import escaleo; escaleo("tabla-tiempos.dat")'
+fitescaleo.pdf: plotsNxN.pdf
+	python3 -c "from ejercicio1 import fitescaleo; fitescaleo('tabla-tiempos.dat')"
+
+
+plotsNxN.pdf: tabla-tiempos.dat 
+	pdftk Temps-???.pdf  cat output plotsNxN.pdf; rm Temps-???.pdf
+
+
+tabla-tiempos.dat: ejercicio1.py MakeA.py 
+	python3 -c 'from ejercicio1 import escaleo; escaleo()'
+	# tambien sale fitescaleo.pdf
 
 Graficos:  ./Temperaturas-Flujos-1.pdf ./Temperaturas-Flujos-2.pdf
 
