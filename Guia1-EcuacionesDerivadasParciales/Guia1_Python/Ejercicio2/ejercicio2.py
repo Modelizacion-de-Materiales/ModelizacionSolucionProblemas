@@ -64,7 +64,7 @@ def MAKET(miA, miT0, TOL, case):
     # defino una flag y un contador para controlar la propagacion
     flag = True
     i = 0
-    ERR = np.zeros((1,200))
+    ERR = np.zeros((1, 200))
     while flag:
         i = i + 1
 # recupero la ultima lista de temperaturas
@@ -73,7 +73,7 @@ def MAKET(miA, miT0, TOL, case):
         NEWT = miA.dot(miT0)
         # calculo el nuevo flujo        #
         NEWF = np.gradient(NEWT, axis=0)
-        ALLT = np.append(ALLT, NEWT, axis=1)
+        ALLT = np.append(ALLT, NEWT, axis=1)  #  
         ALLF = np.append(ALLF, NEWF, axis=1)
         # tengo que calcular el error de alguna manera.
         # El Error lo mido con el cambio de flujo
@@ -97,7 +97,7 @@ def init(midt, midx):
     setN = np.int(L / midx + 1 )
     T0 = np.zeros((setN, 1))
     T0[0] = 50
-    T0[-1] = 100
+    T0[-1] = 100   
     return lam, T0
 
 
@@ -135,6 +135,10 @@ def plotlistT(theTlist, dt):
     plt.show()
     figfile = theTlist.replace('.dat', '.pdf')
     plt.savefig(figfile)
+
+
+def plotlisF(thelist, dt):
+    pass
 
 
 def resolv_explicito(midt, midx):
