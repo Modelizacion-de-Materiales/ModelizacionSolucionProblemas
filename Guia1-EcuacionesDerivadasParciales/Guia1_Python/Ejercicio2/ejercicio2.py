@@ -64,6 +64,7 @@ def MAKET(miA, miT0, TOL, case):
     # defino una flag y un contador para controlar la propagacion
     flag = True
     i = 0
+    ERR = np.zeros((1,200))
     while flag:
 # recupero la ultima lista de temperaturas
         miT0 = ALLT[:, -1].reshape(miN, 1)
@@ -73,15 +74,17 @@ def MAKET(miA, miT0, TOL, case):
         NEWF = np.gradient(NEWT, axis=0)
         ALLT = np.append(ALLT, NEWT, axis=1)
         ALLF = np.append(ALLF, NEWF, axis=1)
-
+        # tengo que calcular el error de alguna manera.
+        # El Error lo mido con el cambio de flujo
+        ERR[0, i] = np.diff(ALLF[-1, -2:])/ALLF[-1, -1]
         i = i + 1
-        if i > 200:
-            # propago solo 100 pasos. 
+        if (i > 200) | (ERR[0,i] < TOL):
+            # propago solo 100 pasos.
             # la idea es medirlo con un error
             flag = False
 
 
-    return ALLT, ALLF
+    return ALLT, ALLF, ERR[0, :i]
 
 
 # inicio como matriz identidad para que me queden guardados
@@ -140,7 +143,7 @@ def resolv_explicito(midt, midx):
     # x = np.linspace(0, L, N)  # vector de posiciones
     case = 'explicito-lam='+('{:.3f}'.format(lam))
     A = EXPLICITO(len(T0), lam)
-    T, F = MAKET(A, T0, 1e-3, case)
+    T, F, E = MAKET(A, T0, 1e-3, case)
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
