@@ -13,6 +13,8 @@ Tb = 50   # temperatura borde derecho
 
 import pdb
 import numpy as np
+#import matplotlib
+#matplotlib.use('Qt5agg')
 import matplotlib.pyplot as plt
 
 
@@ -32,7 +34,7 @@ def EXPLICITO(miN, milam):
     """
     A = np.identity(miN)
     for i in range(1, miN-1):
-        A[i, [i-1, i, i+1]] = [-milam, 1.+2.*milam, -milam]
+        A[i, [i-1, i, i+1]] = [milam, 1.-2.*milam, milam]
     return A
 
 def MAKET(miA, miT0, TOL, case):
@@ -56,8 +58,8 @@ def MAKET(miA, miT0, TOL, case):
     """
     miN = len(miA)
     # las temperaturas y flujos van a ir en matrices
-    ALLT = np.zeros((miN, 1), order='C')
-    ALLT = np.matmul(miA, miT0)
+    ALLT = miT0
+#    ALLT = np.matmul(miA, miT0)
     ALLF = np.gradient(ALLT, axis=0)
     # defino una flag y un contador para controlar la propagacion
     flag = True
@@ -71,11 +73,13 @@ def MAKET(miA, miT0, TOL, case):
         NEWF = np.gradient(NEWT, axis=0)
         ALLT = np.append(ALLT, NEWT, axis=1)
         ALLF = np.append(ALLF, NEWF, axis=1)
+
         i = i + 1
-        if i > 100:
+        if i > 200:
             # propago solo 100 pasos. 
             # la idea es medirlo con un error
             flag = False
+
 
     return ALLT, ALLF
 
@@ -94,15 +98,57 @@ def init(midt, midx):
     return lam, T0
 
 
+def plotlistT(theTlist, dt):
+    TS = np.loadtxt(theTlist).transpose()
+    N, NT = np.shape(TS)
+    losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
+    # losTs2 = np.linspace((NT-1)/3+1, NT-1, 3).astype(int)
+    losTags1 = [r'$t =$ {:.1f}'.format(val*dt) for val in losTs1]
+    losTs1 = np.append(losTs1, NT-1)
+    losTags1.append(r'$t = ${:.1f}'.format(NT*dt))
+    lostagsy = [y+1 for y in TS[np.int(N/2)-1, losTs1]]
+    lostagsy.append(TS[np.int(N/2-1), NT-1])  # el ultimo tag
+    lostagsx = [np.int(N/2) for i in range(len(lostagsy))]
+    plt.plot(TS[:, losTs1], '--k')
+    for i in range(len(losTags1)):
+    #    pdb.set_trace()
+        segmentoy = np.array([
+            TS[lostagsx[i], losTs1[i]],
+            TS[lostagsx[i]+1, losTs1[i]]
+            ])
+        rot = np.array(
+                [(180/np.pi)*np.arctan2(TS[5, losTs1[i]] - TS[4, losTs1[i]],
+                    1), ]
+                )
+        textloc = np.array([lostagsx[i], segmentoy[1]])
+        realrot = plt.gca().transData.transform_angles(
+                rot, textloc.reshape((1, 2))
+                )[0]
+        plt.text(lostagsx[i]-1, lostagsy[i], losTags1[i], rotation=realrot)  # rot*45/(np.pi/4.))
+    plt.xlabel('X')
+    plt.title(r'$\delta t = {:.2f}$'.format(dt)) 
+    plt.ylabel(r'T ($^{o}C$)')
+    plt.xlim(0, N-1)
+    plt.show()
+    figfile = theTlist.replace('.dat', '.pdf')
+    plt.savefig(figfile)
+
+
 def resolv_explicito(midt, midx):
     # Main variables
     lam, T0 = init(midt, midx)
     # x = np.linspace(0, L, N)  # vector de posiciones
     case = 'explicito-lam='+('{:.3f}'.format(lam))
     A = EXPLICITO(len(T0), lam)
-
-    T, FI = MAKET(A, T0, 1e-3, case)
+    T, F = MAKET(A, T0, 1e-3, case)
+    tempfile = 'T-'+case+'.dat'
+    fluxfile = 'F-'+case+'.dat'
+    np.savetxt(tempfile, T.transpose(), fmt='%.6e')
+    np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
+    return tempfile, fluxfile
 
 
 if __name__ == "__main__":
-    resolv_explicito(0.5, 1)
+    file1, file2 = resolv_explicito(0.5, 1)
+    plotlistT(file1,0.5)
+
