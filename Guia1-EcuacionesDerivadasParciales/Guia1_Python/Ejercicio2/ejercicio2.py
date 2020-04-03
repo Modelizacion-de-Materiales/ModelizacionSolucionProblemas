@@ -66,6 +66,7 @@ def MAKET(miA, miT0, TOL, case):
     i = 0
     ERR = np.zeros((1,200))
     while flag:
+        i = i + 1
 # recupero la ultima lista de temperaturas
         miT0 = ALLT[:, -1].reshape(miN, 1)
 # calculo la nueva temperatura
@@ -76,9 +77,8 @@ def MAKET(miA, miT0, TOL, case):
         ALLF = np.append(ALLF, NEWF, axis=1)
         # tengo que calcular el error de alguna manera.
         # El Error lo mido con el cambio de flujo
-        ERR[0, i] = np.diff(ALLF[-1, -2:])/ALLF[-1, -1]
-        i = i + 1
-        if (i > 200) | (ERR[0,i] < TOL):
+        ERR[0, i-1] = np.abs(np.diff(ALLF[-1, -2:])/ALLF[-1, -1])
+        if (i > 200) | (ERR[0, i-1] < TOL):
             # propago solo 100 pasos.
             # la idea es medirlo con un error
             flag = False
@@ -142,16 +142,19 @@ def resolv_explicito(midt, midx):
     lam, T0 = init(midt, midx)
     # x = np.linspace(0, L, N)  # vector de posiciones
     case = 'explicito-lam='+('{:.3f}'.format(lam))
-    A = EXPLICITO(len(T0), lam)
-    T, F, E = MAKET(A, T0, 1e-3, case)
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
+    errfile = 'E-'+case+'.dat'
+    A = EXPLICITO(len(T0), lam)
+    T, F, E = MAKET(A, T0, 1e-3, case)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
-    return tempfile, fluxfile
+    np.savetxt(errfile, E.transpose(), fmt='%.6e')
+
+    return tempfile, fluxfile, errfile
 
 
 if __name__ == "__main__":
-    file1, file2 = resolv_explicito(0.5, 1)
+    file1, file2, file3 = resolv_explicito(0.5, 1)
     plotlistT(file1,0.5)
 
