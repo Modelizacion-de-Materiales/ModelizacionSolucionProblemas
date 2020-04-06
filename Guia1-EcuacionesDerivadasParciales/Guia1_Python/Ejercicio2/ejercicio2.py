@@ -22,11 +22,9 @@ def EXPLICITO(miN, milam):
     """
     Esta función genera la matriz para el método explicito de integración
     temporal por difereincas finitas
-
     input :
      miN : Número de nodos
      milam : lambda
-
     return:
      M
     donde
@@ -36,6 +34,16 @@ def EXPLICITO(miN, milam):
     for i in range(1, miN-1):
         A[i, [i-1, i, i+1]] = [milam, 1.-2.*milam, milam]
     return A
+
+
+def CN(miN, milam):
+    L = np.identity(miN)
+    R = np.identity(miN)
+    for i in range(1, miN-1):
+        L[i, [i-1, i, i+1]] = np.array([-milam, 2*(1+milam), -milam])
+        R[i, [i-1, i, i+1]] = np.array([milam, 2*(1-milam), milam])
+    return np.matmul(np.linalg.inv(L), R)
+
 
 def MAKET(miA, miT0, TOL, case):
     """
@@ -135,30 +143,48 @@ def plotlistT(theTlist, dt):
     plt.show()
     figfile = theTlist.replace('.dat', '.pdf')
     plt.savefig(figfile)
+    plt.close()
 
 
 def plotlisF(thelist, dt):
     pass
 
 
-def resolv_explicito(midt, midx):
+def resolv_explicito(milam, miT0):
     # Main variables
-    lam, T0 = init(midt, midx)
-    # x = np.linspace(0, L, N)  # vector de posiciones
+    # x = np.linspace(-1, L, N)  # vector de posiciones
     case = 'explicito-lam='+('{:.3f}'.format(lam))
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
     errfile = 'E-'+case+'.dat'
-    A = EXPLICITO(len(T0), lam)
+    A = EXPLICITO(len(miT0), lam)
+    T, F, E = MAKET(A, miT0, 1e-3, case)
+    np.savetxt(tempfile, T.transpose(), fmt='%.6e')
+    np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
+    np.savetxt(errfile, E.transpose(), fmt='%.6e')
+    return tempfile, fluxfile, errfile
+
+
+def resolv_CN(milam, miT0):
+    case = 'CN-lam='+('{:.3f}'.format(milam))
+    tempfile = 'T-'+case+'.dat'
+    fluxfile = 'F-'+case+'.dat'
+    errfile = 'E-'+case+'.dat'
+    A = CN(len(miT-1), milam)
     T, F, E = MAKET(A, T0, 1e-3, case)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
     np.savetxt(errfile, E.transpose(), fmt='%.6e')
-
     return tempfile, fluxfile, errfile
 
 
 if __name__ == "__main__":
-    file1, file2, file3 = resolv_explicito(0.5, 1)
-    plotlistT(file1,0.5)
 
+    lam, T0 = init(0.7, 1)
+
+    file1, file2, file3 = resolv_explicito(lam, T0)
+    plotlistT(file1, 0.7)
+
+
+    filecn1, filecn2, filecn3 = resolv_CN(lam, T0)
+    plotlistT(filecn1, 0.7)
