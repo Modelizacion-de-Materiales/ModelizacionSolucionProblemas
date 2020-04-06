@@ -81,17 +81,16 @@ def MAKET(miA, miT0, TOL, case):
         NEWT = miA.dot(miT0)
         # calculo el nuevo flujo        #
         NEWF = np.gradient(NEWT, axis=0)
-        ALLT = np.append(ALLT, NEWT, axis=1)  #  
+        ALLT = np.append(ALLT, NEWT, axis=1)
         ALLF = np.append(ALLF, NEWF, axis=1)
         # tengo que calcular el error de alguna manera.
         # El Error lo mido con el cambio de flujo
         ERR[0, i-1] = np.abs(np.diff(ALLF[-1, -2:])/ALLF[-1, -1])
-        if (i > 200) | (ERR[0, i-1] < TOL):
+        if (i >= 200) | (ERR[0, i-1] < TOL) | (ERR[0, i-1] > 100):
             # propago solo 100 pasos.
             # la idea es medirlo con un error
             flag = False
-
-
+            print("se detiene propagacion temporal en i = {:d}".format(i))
     return ALLT, ALLF, ERR[0, :i]
 
 
@@ -109,7 +108,7 @@ def init(midt, midx):
     return lam, T0
 
 
-def plotlistT(theTlist, dt):
+def plotlistT(theTlist, dt, milam):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
     losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
@@ -120,9 +119,8 @@ def plotlistT(theTlist, dt):
     lostagsy = [y+1 for y in TS[np.int(N/2)-1, losTs1]]
     lostagsy.append(TS[np.int(N/2-1), NT-1])  # el ultimo tag
     lostagsx = [np.int(N/2) for i in range(len(lostagsy))]
-    plt.plot(TS[:, losTs1], '--k')
+    plt.plot(TS[:, losTs1], '--ok')
     for i in range(len(losTags1)):
-    #    pdb.set_trace()
         segmentoy = np.array([
             TS[lostagsx[i], losTs1[i]],
             TS[lostagsx[i]+1, losTs1[i]]
@@ -137,7 +135,7 @@ def plotlistT(theTlist, dt):
                 )[0]
         plt.text(lostagsx[i]-1, lostagsy[i], losTags1[i], rotation=realrot)  # rot*45/(np.pi/4.))
     plt.xlabel('X')
-    plt.title(r'$\delta t = {:.2f}$'.format(dt)) 
+    plt.title(r'$\delta t = {:.2f}, \lambda = {:.3f}$'.format(dt, milam))
     plt.ylabel(r'T ($^{o}C$)')
     plt.xlim(0, N-1)
     plt.show()
@@ -170,7 +168,7 @@ def resolv_CN(milam, miT0):
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
     errfile = 'E-'+case+'.dat'
-    A = CN(len(miT-1), milam)
+    A = CN(len(miT0), milam)
     T, F, E = MAKET(A, T0, 1e-3, case)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
@@ -179,12 +177,24 @@ def resolv_CN(milam, miT0):
 
 
 if __name__ == "__main__":
+    """
 
-    lam, T0 = init(0.7, 1)
+    dt = 0.61379 #seg
+    dt = 0.6 # comportamiento estable
+    dt  =  0.65 comportamiento inestable.
+    Ta = 100  # temperatura borde izquierdo
+    Tb = 50   # temperatura borde derecho
+
+
+    """
+    dt = 0.65
+    dx = 1
+
+    lam, T0 = init(dt, dx)
 
     file1, file2, file3 = resolv_explicito(lam, T0)
-    plotlistT(file1, 0.7)
+    plotlistT(file1, dt, lam)
 
 
     filecn1, filecn2, filecn3 = resolv_CN(lam, T0)
-    plotlistT(filecn1, 0.7)
+    plotlistT(filecn1, dt, lam)
