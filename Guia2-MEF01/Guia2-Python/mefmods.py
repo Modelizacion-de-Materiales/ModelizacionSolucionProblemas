@@ -25,7 +25,7 @@ def resolvermef(r, s, K, us, fr, case):
 
     case es un string para identificar el caso
     """
-    N = len (K)
+    N = len(K)
     nvin = len(s)
     ninc = len(r)
     ur = np.zeros([ninc, 1])
@@ -43,6 +43,49 @@ def resolvermef(r, s, K, us, fr, case):
     fs = Kf.dot(U)
     F[r] = copy.copy(fr)
     F[s] = copy.copy(fs)
-    np.savetxt(case+'Forces.dat',F)
-    np.savetxt(case+'Displace.dat',F)
+    np.savetxt(case+'Forces.dat', F)
+    np.savetxt(case+'Displace.dat', F)
     return U, F
+
+
+def ensamble(MC, MN, gl, etype):
+    """ 
+    esta función ensambla los elementos indicados por el argumento etype.
+
+    """
+    pdb.set_trace()
+    kel = kelemental(etype)
+    # numero de nodos
+    N = len(MN)*gl
+    # inicio la matriz global de rigidez
+    Kglob = np.zeros([N, N])
+    # numero de elementos y de nodos por elemento
+    ne, nnxe = np.shape(MC)
+    # esta linea es necesaria porque en python los indicesvan desde cero
+    MCinds = MC - 1
+    for e in range(ne):
+        kele = kel
+        for i in range(nnxe):
+            ni = MCinds[e, i]
+            rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
+            rangeni = np.linspace(ni*gl, (ni+1)*gl-1, gl).astype(int)
+            for j in range(nnxe):
+                nj = MCinds[e, j]
+                rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
+                rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
+                # atención ahora:
+                # ver formulas de apunte de ensamble de matrices
+                print(e, rangeni, rangenj)
+                # print(e, rangei, rangej)
+                # pdb.set_trace()
+                pdb.set_trace()
+                Kglob[np.ix_(rangeni, rangenj)] += kele[np.ix_(rangei, rangej)]
+    return Kglob
+
+
+def kelemental(etype):
+    """ arma la matriz elemental segun etype
+
+    etype == 1: resortes unimensionales [ 1 -1 , -1 1]
+    """
+    return np.array([[1, -1],[-1, 1]], dtype=float)
