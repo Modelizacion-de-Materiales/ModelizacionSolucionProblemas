@@ -6,6 +6,7 @@ Este es el módulo python de funciones específicas para MEF
 import numpy as np
 import copy
 import pdb
+from math import atan2, sin, cos
 
 
 def resolvermef(r, s, K, us, fr, case):
@@ -46,11 +47,10 @@ def resolvermef(r, s, K, us, fr, case):
     return U, F
 
 
-def ensamble(MC, MN, gl, etype):
+def ensamble(MC, MN, props, gl, etype):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
-    kel = kelemental(etype)
     # numero de nodos
     N = len(MN)*gl
     # inicio la matriz global de rigidez
@@ -60,13 +60,16 @@ def ensamble(MC, MN, gl, etype):
     # esta linea es necesaria porque en python los indicesvan desde cero
     MCinds = MC - 1
     for e in range(ne):
-        kele = kel
+        MCloc = MC[e,:]-1 # el -1 va parapasar a indices
+        MNloc = MN[MCloc,:]
+        kele = kelemental(etype, props[e], MNloc, MCloc )
+        pdb.set_trace()
         for i in range(nnxe):
-            ni = MCinds[e, i]
+            ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
             rangeni = np.linspace(ni*gl, (ni+1)*gl-1, gl).astype(int)
             for j in range(nnxe):
-                nj = MCinds[e, j]
+                nj = MCloc[e, j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 # atención ahora:
@@ -77,12 +80,32 @@ def ensamble(MC, MN, gl, etype):
     return Kglob
 
 
-def kelemental(etype):
+def kelemental(etype, k, NODES = None, CONEC = None ):
     """ arma la matriz elemental segun etype
 
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
     """
-    return np.array([[1, -1],[-1, 1]], dtype=float)
+    if etype == 1:  # caso etype =resortes
+        kel = np.array([[1, -1],[-1, 1]], dtype=float)
+    elif etype == 2: # caso etipe = barras 
+        """
+        En este caso voy a necesitar la matriz de nodos local
+        y la matriz de conectividad local.
+        """
+        kel = np.zeros((4, 4))
+        X = NODES[:, 0]
+        Y = NODES[:, 1]
+        THETA = np.arctan2(np.diff(X), np.diff(Y))
+        c2 = cos(THETA)**2
+        cs = cos(THETA)*sin(THETA)
+        s2 = sin(THETA)**2
+
+        kel = [
+            [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
+            [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
+        ]
+
+    return kel
 
 
 def getgeo(filename):
@@ -102,7 +125,7 @@ def getgeo(filename):
                         )
                 NELEM = DIMELEM[0]
                 NNXEL = DIMELEM[1]
-                MC = np.zeros((NELEM, NNXEL)) # inicio a 2 nodos por elemento, luego corrijo
+                MC = np.zeros((NELEM, NNXEL), dtype=int) # inicio a 2 nodos por elemento, luego corrijo
                 for i in range(  NELEM ):
                     thiselem = np.fromstring(
                             fi.readline().strip(),dtype=int, sep=' '
