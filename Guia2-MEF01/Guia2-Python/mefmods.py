@@ -35,7 +35,6 @@ def resolvermef(r, s, K, us, fr, case):
     Kvin = K[np.ix_(r, s)]
     Kf = K[s, :]
     B = fr - Kvin.dot(us)
-    # pdb.set_trace()
     Ur = np.linalg.solve(Kred, B)
     U[r] = copy.copy(Ur)
     U[s] = copy.copy(us)
@@ -58,29 +57,26 @@ def ensamble(MC, MN, props, gl, etype):
     # numero de elementos y de nodos por elemento
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    MCinds = MC - 1
     for e in range(ne):
-        MCloc = MC[e,:]-1 # el -1 va parapasar a indices
-        MNloc = MN[MCloc,:]
-        kele = kelemental(etype, props[e], MNloc, MCloc )
-        pdb.set_trace()
+        MCloc = MC[e, :]-1  # el -1 va parapasar a indices
+        MNloc = MN[MCloc, :]-1
+        kele = kelemental(etype, props[e], MNloc, MCloc)
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
             rangeni = np.linspace(ni*gl, (ni+1)*gl-1, gl).astype(int)
             for j in range(nnxe):
-                nj = MCloc[e, j]
+                nj = MCloc[j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 # atención ahora:
                 # ver formulas de apunte de ensamble de matrices
                 # print(e, rangei, rangej)
-                # pdb.set_trace()
                 Kglob[np.ix_(rangeni, rangenj)] += kele[np.ix_(rangei, rangej)]
     return Kglob
 
 
-def kelemental(etype, k, NODES = None, CONEC = None ):
+def kelemental(etype, k, NODES=None, CONEC=None ):
     """ arma la matriz elemental segun etype
 
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
@@ -100,10 +96,15 @@ def kelemental(etype, k, NODES = None, CONEC = None ):
         cs = cos(THETA)*sin(THETA)
         s2 = sin(THETA)**2
 
-        kel = [
-            [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
-            [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
-        ]
+        kel = np.array( 
+                [
+                    [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
+                    [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
+                    ]
+                )
+        # algunas veces los cos y sin dan valores muy bajos. entonces:
+        tol = 1e-16
+        kel[abs(kel) < tol] = 0.0
 
     return kel
 
@@ -132,7 +133,8 @@ def getgeo(filename):
                             )
                     MC[i,:] = thiselem[1:] # notar que falta generalizar para nnxel
             if line.strip() == 'GL':
-                GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
+                # GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
+                GL = int(fi.readline())
 
     return GL, MC, MN
 
