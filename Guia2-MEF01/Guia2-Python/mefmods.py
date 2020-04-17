@@ -6,6 +6,7 @@ Este es el módulo python de funciones específicas para MEF
 import numpy as np
 import copy
 import pdb
+from math import atan2, sin, cos
 
 
 def resolvermef(r, s, K, us, fr, case):
@@ -34,7 +35,6 @@ def resolvermef(r, s, K, us, fr, case):
     Kvin = K[np.ix_(r, s)]
     Kf = K[s, :]
     B = fr - Kvin.dot(us)
-    # pdb.set_trace()
     Ur = np.linalg.solve(Kred, B)
     U[r] = copy.copy(Ur)
     U[s] = copy.copy(us)
@@ -42,27 +42,14 @@ def resolvermef(r, s, K, us, fr, case):
     F[r] = copy.copy(fr)
     F[s] = copy.copy(fs)
     np.savetxt(case+'Forces.dat', F)
-<<<<<<< HEAD
-    np.savetxt(case+'Displace.dat', F)
-=======
     np.savetxt(case+'Displace.dat', U)
->>>>>>> Guia2-MEF01
     return U, F
 
 
-def ensamble(MC, MN, gl, etype):
-<<<<<<< HEAD
-    """ 
-    esta función ensambla los elementos indicados por el argumento etype.
-
-    """
-    pdb.set_trace()
-=======
+def ensamble(MC, MN, props, gl, etype):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
->>>>>>> Guia2-MEF01
-    kel = kelemental(etype)
     # numero de nodos
     N = len(MN)*gl
     # inicio la matriz global de rigidez
@@ -70,38 +57,56 @@ def ensamble(MC, MN, gl, etype):
     # numero de elementos y de nodos por elemento
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    MCinds = MC - 1
     for e in range(ne):
-        kele = kel
+        MCloc = MC[e, :]-1  # el -1 va parapasar a indices
+        MNloc = MN[MCloc, :]-1
+        kele = kelemental(etype, props[e], MNloc, MCloc)
         for i in range(nnxe):
-            ni = MCinds[e, i]
+            ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
             rangeni = np.linspace(ni*gl, (ni+1)*gl-1, gl).astype(int)
             for j in range(nnxe):
-                nj = MCinds[e, j]
+                nj = MCloc[j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 # atención ahora:
                 # ver formulas de apunte de ensamble de matrices
-<<<<<<< HEAD
-                print(e, rangeni, rangenj)
                 # print(e, rangei, rangej)
-                # pdb.set_trace()
-                pdb.set_trace()
-=======
-                # print(e, rangei, rangej)
-                # pdb.set_trace()
->>>>>>> Guia2-MEF01
                 Kglob[np.ix_(rangeni, rangenj)] += kele[np.ix_(rangei, rangej)]
     return Kglob
 
 
-def kelemental(etype):
+def kelemental(etype, k, NODES=None, CONEC=None ):
     """ arma la matriz elemental segun etype
 
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
     """
-    return np.array([[1, -1],[-1, 1]], dtype=float)
+    if etype == 1:  # caso etype =resortes
+        kel = np.array([[1, -1],[-1, 1]], dtype=float)
+    elif etype == 2: # caso etipe = barras 
+        """
+        En este caso voy a necesitar la matriz de nodos local
+        y la matriz de conectividad local.
+        """
+        kel = np.zeros((4, 4))
+        X = NODES[:, 0]
+        Y = NODES[:, 1]
+        THETA = np.arctan2(np.diff(X), np.diff(Y))
+        c2 = cos(THETA)**2
+        cs = cos(THETA)*sin(THETA)
+        s2 = sin(THETA)**2
+
+        kel = np.array( 
+                [
+                    [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
+                    [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
+                    ]
+                )
+        # algunas veces los cos y sin dan valores muy bajos. entonces:
+        tol = 1e-16
+        kel[abs(kel) < tol] = 0.0
+
+    return kel
 
 
 def getgeo(filename):
@@ -121,13 +126,18 @@ def getgeo(filename):
                         )
                 NELEM = DIMELEM[0]
                 NNXEL = DIMELEM[1]
-                MC = np.zeros((NELEM, NNXEL)) # inicio a 2 nodos por elemento, luego corrijo
+                MC = np.zeros((NELEM, NNXEL), dtype=int) # inicio a 2 nodos por elemento, luego corrijo
                 for i in range(  NELEM ):
                     thiselem = np.fromstring(
                             fi.readline().strip(),dtype=int, sep=' '
                             )
                     MC[i,:] = thiselem[1:] # notar que falta generalizar para nnxel
             if line.strip() == 'GL':
-                GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
+                # GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
+                GL = int(fi.readline())
 
     return GL, MC, MN
+
+
+
+
