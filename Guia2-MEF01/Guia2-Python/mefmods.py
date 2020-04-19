@@ -25,22 +25,13 @@ def resolvermef(r, s, K, us, fr, case):
     case es un string para identificar el caso
     """
     N = len(K)
-    nvin = len(s)
-    ninc = len(r)
-    Ur = np.zeros([ninc, 1])
-    fs = np.zeros([nvin, 1])
     U = np.zeros([N, 1])
     F = np.zeros([N, 1])
-    Kred = K[np.ix_(r, r)]
-    Kvin = K[np.ix_(r, s)]
-    Kf = K[s, :]
-    B = fr - Kvin.dot(us)
-    Ur = np.linalg.solve(Kred, B)
-    U[r] = copy.copy(Ur)
-    U[s] = copy.copy(us)
-    fs = Kf.dot(U)
-    F[r] = copy.copy(fr)
-    F[s] = copy.copy(fs)
+    pdb.set_trace()
+    U[r] = np.linalg.solve(K(np.ix_(r, r)), fr - K(np.ix_(r, s)).dot(us))
+    U[s] = us
+    F[s] = K[s, :].dot(U)
+    F[r] = fr
     np.savetxt(case+'Forces.dat', F)
     np.savetxt(case+'Displace.dat', U)
     return U, F
@@ -76,13 +67,13 @@ def ensamble(MC, MN, props, gl, etype):
     return Kglob
 
 
-def kelemental(etype, k, NODES=None, CONEC=None ):
+def kelemental(etype, k, NODES=None, CONEC=None):
     """ arma la matriz elemental segun etype
 
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
     """
     if etype == 1:  # caso etype =resortes
-        kel = np.array([[1, -1],[-1, 1]], dtype=float)
+        kel = k*np.array([[1, -1], [-1, 1]], dtype=float)
     elif etype == 2: # caso etipe = barras 
         """
         En este caso voy a necesitar la matriz de nodos local
@@ -105,7 +96,6 @@ def kelemental(etype, k, NODES=None, CONEC=None ):
         # algunas veces los cos y sin dan valores muy bajos. entonces:
         tol = 1e-16
         kel[abs(kel) < tol] = 0.0
-
     return kel
 
 
@@ -114,30 +104,28 @@ def getgeo(filename):
         for line in fi:
             if line.strip() == 'NODES':
                 NNODES = np.int(fi.readline())
-                MN = np.zeros( (NNODES, 3) ,dtype=float )
+                MN = np.zeros((NNODES, 3), dtype=float)
                 for i in range(NNODES):
                     thisnode = np.fromstring(
                             fi.readline().strip(), dtype=float, sep=' '
                             )
-                    MN[i,:] = thisnode
+                    MN[i, :] = thisnode
             elif line.strip() == 'ELEMENTS':
                 DIMELEM = np.fromstring(
-                        fi.readline().strip(),dtype=int, sep=' '
+                        fi.readline().strip(), dtype=int, sep=' '
                         )
                 NELEM = DIMELEM[0]
                 NNXEL = DIMELEM[1]
-                MC = np.zeros((NELEM, NNXEL), dtype=int) # inicio a 2 nodos por elemento, luego corrijo
-                for i in range(  NELEM ):
+                MC = np.zeros((NELEM, NNXEL), dtype=int) 
+                # Matriz de propiedades, inicio para 2 propiedades, luego corrijo
+                MP = np.zeros(NELEM, 2)
+                for i in range(NELEM):
                     thiselem = np.fromstring(
                             fi.readline().strip(),dtype=int, sep=' '
                             )
-                    MC[i,:] = thiselem[1:] # notar que falta generalizar para nnxel
+                    MC[i, :] = thiselem[1:NNXEL]
+                    MP[i, :] = thiselem[NNXEL:]
             if line.strip() == 'GL':
                 # GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
                 GL = int(fi.readline())
-
-    return GL, MC, MN
-
-
-
-
+    return GL, MC, MN, MP
