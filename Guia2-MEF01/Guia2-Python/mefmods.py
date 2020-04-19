@@ -6,7 +6,8 @@ Este es el módulo python de funciones específicas para MEF
 import numpy as np
 import copy
 import pdb
-from math import atan2, sin, cos
+from math import atan2, sin, cos, sqrt
+import re
 
 
 def resolvermef(r, s, K, us, fr, case):
@@ -27,8 +28,7 @@ def resolvermef(r, s, K, us, fr, case):
     N = len(K)
     U = np.zeros([N, 1])
     F = np.zeros([N, 1])
-    pdb.set_trace()
-    U[r] = np.linalg.solve(K(np.ix_(r, r)), fr - K(np.ix_(r, s)).dot(us))
+    U[r] = np.linalg.solve(K[np.ix_(r, r)], fr - K[np.ix_(r, s)].dot(us))
     U[s] = us
     F[s] = K[s, :].dot(U)
     F[r] = fr
@@ -37,7 +37,7 @@ def resolvermef(r, s, K, us, fr, case):
     return U, F
 
 
-def ensamble(MC, MN, props, gl, etype):
+def ensamble(MC, MN, MP, gl, etype):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
@@ -50,8 +50,8 @@ def ensamble(MC, MN, props, gl, etype):
     # esta linea es necesaria porque en python los indicesvan desde cero
     for e in range(ne):
         MCloc = MC[e, :]-1  # el -1 va parapasar a indices
-        MNloc = MN[MCloc, :]-1
-        kele = kelemental(etype, props[e], MNloc, MCloc)
+        MNloc = MN[MCloc, :]
+        kele = kelemental(etype, MP[e,:], MNloc, MCloc)
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -67,13 +67,13 @@ def ensamble(MC, MN, props, gl, etype):
     return Kglob
 
 
-def kelemental(etype, k, NODES=None, CONEC=None):
+def kelemental(etype, MP, NODES=None, CONEC=None):
     """ arma la matriz elemental segun etype
 
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
     """
     if etype == 1:  # caso etype =resortes
-        kel = k*np.array([[1, -1], [-1, 1]], dtype=float)
+        kel = MP*np.array([[1, -1], [-1, 1]], dtype=float)
     elif etype == 2: # caso etipe = barras 
         """
         En este caso voy a necesitar la matriz de nodos local
@@ -82,12 +82,15 @@ def kelemental(etype, k, NODES=None, CONEC=None):
         kel = np.zeros((4, 4))
         X = NODES[:, 0]
         Y = NODES[:, 1]
-        THETA = np.arctan2(np.diff(X), np.diff(Y))
+        dx = np.diff(X)
+        dy = np.diff(Y)
+        THETA = atan2(dy, dx)
+        L = sqrt(dx**2 + dy**2)
         c2 = cos(THETA)**2
         cs = cos(THETA)*sin(THETA)
         s2 = sin(THETA)**2
-
-        kel = np.array( 
+        # pdb.set_trace()
+        kel = (MP[0]*MP[1]/L)*np.array(
                 [
                     [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
                     [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
@@ -102,6 +105,8 @@ def kelemental(etype, k, NODES=None, CONEC=None):
 def getgeo(filename):
     with open(filename) as fi:
         for line in fi:
+            if '#' in line.strip():
+                continue
             if line.strip() == 'NODES':
                 NNODES = np.int(fi.readline())
                 MN = np.zeros((NNODES, 3), dtype=float)
@@ -116,16 +121,55 @@ def getgeo(filename):
                         )
                 NELEM = DIMELEM[0]
                 NNXEL = DIMELEM[1]
-                MC = np.zeros((NELEM, NNXEL), dtype=int) 
+                MC = np.zeros((NELEM, NNXEL), dtype=int)
                 # Matriz de propiedades, inicio para 2 propiedades, luego corrijo
-                MP = np.zeros(NELEM, 2)
+                MP = np.zeros((NELEM, 2), dtype=float)
                 for i in range(NELEM):
                     thiselem = np.fromstring(
-                            fi.readline().strip(),dtype=int, sep=' '
+                            fi.readline().strip(), sep=' '
                             )
-                    MC[i, :] = thiselem[1:NNXEL]
-                    MP[i, :] = thiselem[NNXEL:]
+                    MC[i, :] = thiselem[1:NNXEL+1]
+                    MP[i, :] = thiselem[NNXEL+1:]
             if line.strip() == 'GL':
                 # GL = np.fromstring(fi.readline(), dtype=int, sep=' ')
                 GL = int(fi.readline())
-    return GL, MC, MN, MP
+            if line.strip() == 'VINS':
+                # voy a armar la matriz de vinculos
+                NVINS = np.int(fi.readline())
+                MVIN = np.zeros((NVINS, GL), dtype=float)
+                IVIN = np.zeros((NVINS, 1+GL), dtype=int)
+                # la matriz de vinculos siempre tiene la definicion de las fuerzas y de los
+                # desplazamientos
+                for v in range(NVINS):
+                    thisvin = np.fromstring(
+                            fi.readline().strip(), sep=' '
+                            )
+                    IVIN[v, :] = thisvin[:1+GL]
+                    MVIN[v, :] = thisvin[1+GL:]
+    return GL, MC, MN, MP, (IVIN, MVIN)
+
+def makevins(GL, NNODES, LVIN):
+    """
+    lee la lista de vinculos y lo transforma en los vectores r y s, us y fr
+    """
+    nvins = 0
+    nincs = 0
+    r = np.empty((0, 1), dtype=int)
+    fr = np.empty((0, 1), dtype=float)
+    s = np.empty((0, 1), dtype=int)
+    us = np.empty((0, 1), dtype=float)
+
+    IVIN, MVIN = LVIN
+    for i in range(len(IVIN)):
+        node, dir1, dir2 = IVIN[i, :]
+        if dir1 > 0:
+            np.append(s, node*gl)
+            np.append(us, MVIN[i, 0], axis=0)
+        
+
+
+        pdb.set_trace()
+        pass
+
+
+
