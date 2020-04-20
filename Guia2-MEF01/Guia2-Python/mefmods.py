@@ -8,10 +8,7 @@ import copy
 import pdb
 from math import atan2, sin, cos, sqrt
 import re
-<<<<<<< HEAD
-=======
 np.set_printoptions(precision=2, linewidth=100)
->>>>>>> Guia2-MEF01
 
 
 #U, F = mef.resolvermef(R, S, K, US, FR, 'puente')
@@ -33,6 +30,7 @@ def resolvermef(r, s, K, us, fr, case):
     N = len(K)
     U = np.zeros([N, 1])
     F = np.zeros([N, 1])
+    pdb.set_trace()
     U[r] = np.linalg.solve(K[np.ix_(r, r)], fr - K[np.ix_(r, s)].dot(us))
     U[s] = us
     F[s] = K[s, :].dot(U)
@@ -48,21 +46,16 @@ def ensamble(MC, MN, MP, gl, etype):
     """
     # numero de nodos
     N = len(MN)*gl
-    # inicio la matriz global de rigidez
     Kglob = np.zeros([N, N])
-    # numero de elementos y de nodos por elemento
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    fo = open('bloques.dat','w')
+    fo = open('MatricesElementales.dat', 'w')
     for e in range(ne):
         MCloc = MC[e, :]-1  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
-<<<<<<< HEAD
-        kele = kelemental(etype, MP[e,:], MNloc, MCloc)
-=======
         kele = kelemental(etype, MP[e, :], MNloc, MCloc)
-        fo.write('\n\nElemento {:d}\n=========\n'.format(e))
->>>>>>> Guia2-MEF01
+        fo.write('\nElemento {:d}\n========\n'.format(e))
+        fo.write('{}\n'.format(kele))
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -71,13 +64,7 @@ def ensamble(MC, MN, MP, gl, etype):
                 nj = MCloc[j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
-                # atención ahora:
-                # ver formulas de apunte de ensamble de matrices
-                # print(e, rangei, rangej)
-                # kij = copy.copy(kele[np.ix_(rangei, rangej)])
-                # kninj = copy.copy(Kglob[np.ix_(rangeni, rangenj)])
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
-                # Kglob[np.ix_(rangeni, rangenj)] = kninj+kij
     fo.close()
     return Kglob
 
@@ -101,18 +88,6 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         dy = np.diff(Y)
         THETA = atan2(dy, dx)
         L = sqrt(dx**2 + dy**2)
-<<<<<<< HEAD
-        c2 = cos(THETA)**2
-        cs = cos(THETA)*sin(THETA)
-        s2 = sin(THETA)**2
-        # pdb.set_trace()
-        kel = (MP[0]*MP[1]/L)*np.array(
-                [
-                    [c2, cs, -1*c2, -1*cs], [cs, s2, -1*cs, -1*s2],
-                    [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
-                    ]
-                )
-=======
         #pdb.set_trace()
         #c2 = cos(THETA)**2
         #cs = cos(THETA)*sin(THETA)
@@ -126,7 +101,6 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         T = np.vstack((T1, T2))
         k = np.array([[1., 0., -1., 0.], [0., 0., 0., 0.], [-1., 0., 1., 0.], [0., 0., 0., 0.]])
         kel = (MP[0]*MP[1]/L)*((T.T).dot(k)).dot(T)
->>>>>>> Guia2-MEF01
         # algunas veces los cos y sin dan valores muy bajos. entonces:
         tol = 1e-8
         kel[abs(kel) < tol] = 0.0
@@ -134,6 +108,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
 
 
 def getgeo(filename):
+    # fi = open(filename,'r')
     with open(filename) as fi:
         for line in fi:
             if '#' in line.strip():
@@ -178,33 +153,6 @@ def getgeo(filename):
                     IVIN[v, :] = thisvin[:1+GL]
                     MVIN[v, :] = thisvin[1+GL:]
     return GL, MC, MN, MP, (IVIN, MVIN)
-<<<<<<< HEAD
-
-def makevins(GL, NNODES, LVIN):
-    """
-    lee la lista de vinculos y lo transforma en los vectores r y s, us y fr
-    """
-    nvins = 0
-    nincs = 0
-    r = np.empty((0, 1), dtype=int)
-    fr = np.empty((0, 1), dtype=float)
-    s = np.empty((0, 1), dtype=int)
-    us = np.empty((0, 1), dtype=float)
-
-    IVIN, MVIN = LVIN
-    for i in range(len(IVIN)):
-        node, dir1, dir2 = IVIN[i, :]
-        if dir1 > 0:
-            np.append(s, node*gl)
-            np.append(us, MVIN[i, 0], axis=0)
-        
-
-
-        pdb.set_trace()
-        pass
-
-=======
->>>>>>> Guia2-MEF01
 
 
 def makevins(GL, NNODES, LVIN):

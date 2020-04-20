@@ -11,8 +11,8 @@ box on
 hold all
 for N=1:6 %barro en número de elementos
 
-[U,F,frame,R(N)]=loop(long,A,E,C,N+1);
-D(N)=U(1);
+  [U,F,frame,R(N)]=loop(long,A,E,C,N+1);
+  D(N)=U(1);
 
 end
 
