@@ -8,8 +8,13 @@ import copy
 import pdb
 from math import atan2, sin, cos, sqrt
 import re
+<<<<<<< HEAD
+=======
+np.set_printoptions(precision=2, linewidth=100)
+>>>>>>> Guia2-MEF01
 
 
+#U, F = mef.resolvermef(R, S, K, US, FR, 'puente')
 def resolvermef(r, s, K, us, fr, case):
     """
     U, F = resolvermef(r,s,K,us,fr)
@@ -48,10 +53,16 @@ def ensamble(MC, MN, MP, gl, etype):
     # numero de elementos y de nodos por elemento
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
+    fo = open('bloques.dat','w')
     for e in range(ne):
         MCloc = MC[e, :]-1  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
+<<<<<<< HEAD
         kele = kelemental(etype, MP[e,:], MNloc, MCloc)
+=======
+        kele = kelemental(etype, MP[e, :], MNloc, MCloc)
+        fo.write('\n\nElemento {:d}\n=========\n'.format(e))
+>>>>>>> Guia2-MEF01
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -63,7 +74,11 @@ def ensamble(MC, MN, MP, gl, etype):
                 # atención ahora:
                 # ver formulas de apunte de ensamble de matrices
                 # print(e, rangei, rangej)
-                Kglob[np.ix_(rangeni, rangenj)] += kele[np.ix_(rangei, rangej)]
+                # kij = copy.copy(kele[np.ix_(rangei, rangej)])
+                # kninj = copy.copy(Kglob[np.ix_(rangeni, rangenj)])
+                Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
+                # Kglob[np.ix_(rangeni, rangenj)] = kninj+kij
+    fo.close()
     return Kglob
 
 
@@ -86,6 +101,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         dy = np.diff(Y)
         THETA = atan2(dy, dx)
         L = sqrt(dx**2 + dy**2)
+<<<<<<< HEAD
         c2 = cos(THETA)**2
         cs = cos(THETA)*sin(THETA)
         s2 = sin(THETA)**2
@@ -96,8 +112,23 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [-1*c2, -1*cs, c2, cs], [-1*cs, -1*s2, cs, s2]
                     ]
                 )
+=======
+        #pdb.set_trace()
+        #c2 = cos(THETA)**2
+        #cs = cos(THETA)*sin(THETA)
+        #s2 = sin(THETA)**2
+        # pdb.set_trace()
+        c = cos(THETA)
+        s = sin(THETA)
+        R = np.array([[c, s], [-s, c]])
+        T1 = np.hstack((R, np.zeros((2, 2))))
+        T2 = np.hstack((np.zeros((2, 2)), R))
+        T = np.vstack((T1, T2))
+        k = np.array([[1., 0., -1., 0.], [0., 0., 0., 0.], [-1., 0., 1., 0.], [0., 0., 0., 0.]])
+        kel = (MP[0]*MP[1]/L)*((T.T).dot(k)).dot(T)
+>>>>>>> Guia2-MEF01
         # algunas veces los cos y sin dan valores muy bajos. entonces:
-        tol = 1e-16
+        tol = 1e-8
         kel[abs(kel) < tol] = 0.0
     return kel
 
@@ -147,6 +178,7 @@ def getgeo(filename):
                     IVIN[v, :] = thisvin[:1+GL]
                     MVIN[v, :] = thisvin[1+GL:]
     return GL, MC, MN, MP, (IVIN, MVIN)
+<<<<<<< HEAD
 
 def makevins(GL, NNODES, LVIN):
     """
@@ -171,5 +203,35 @@ def makevins(GL, NNODES, LVIN):
         pdb.set_trace()
         pass
 
+=======
+>>>>>>> Guia2-MEF01
 
 
+def makevins(GL, NNODES, LVIN):
+    """
+    lee la lista de vinculos y lo transforma en los vectores r y s, us y fr
+    """
+    r = np.empty((0, 1), dtype=int)
+    fr = np.empty((0, 1), dtype=float)
+    s = np.empty((0, 1), dtype=int)
+    us = np.empty((0, 1), dtype=float)
+    IVIN, MVIN = LVIN
+    for n in range(NNODES):
+        if n in (IVIN[:, 0]-1):
+            # el tema de usar np.where es que devuelve un array con todas las 
+            # coincidencias por fila. Yo se que la coincidencia va a ser única, por
+            # lo que puedo tomar el primer elemento del primer array
+            thevin = np.where(IVIN[:, 0]-1 == n)[0][0]
+            node, dirs = IVIN[thevin, 0]-1, IVIN[thevin, 1:]
+            for v in range(len(dirs)):
+                if dirs[v] > 0:
+                    s = np.append(s, node*GL+v)
+                    us = np.vstack((us, MVIN[thevin, v]))
+                else:
+                    r = np.append(r, [node*GL+v])
+                    fr = np.vstack((fr, MVIN[thevin, v]))
+        else:
+            r = np.append(r, np.linspace(n*GL, (n+1)*GL-1, GL, dtype=int))
+            fr = np.vstack((fr, np.zeros((GL, 1), dtype=float)))
+        pass
+    return r, s, us, fr
