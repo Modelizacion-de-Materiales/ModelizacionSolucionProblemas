@@ -13,13 +13,10 @@ import pdb
 #         si eje1 < 0 vin1 es fuerza
 GL, MC, MN, MP, LVIN = mef.getgeo('Puente.ge')
 R, S, US, FR = mef.makevins(GL, len(MN), LVIN)
-S = np.array([1, 2, 6])
-R = np.array([3, 4, 5, 7, 8])
-# falta armar las matrices elementales
 K = mef.ensamble(MC, MN, MP, GL, 2)
+K[abs(K) < 1e-9] = 0
 np.savetxt('Kglobal', K, fmt='%.4e')
-US = np.zeros((len(S), 1))
-FR = np.zeros((len(R), 1))
-FR[1] = -20e3
-U, F = mef.resolvermef(R-1, S-1, K, US, FR, 'puente')
-
+pdb.set_trace()
+U, F = mef.resolvermef(R, S, K, US, FR, 'puente')
+np.savetxt('Desplazamientos.dat', U)
+np.savetxt('Fuerzas.dat', F)
