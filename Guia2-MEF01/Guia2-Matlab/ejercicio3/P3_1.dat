@@ -1,0 +1,12 @@
+1 Nodos 
+0 Elementos 
+2 Nodos por elemento 
+2 grados de libertad por nodo 
+Elementos 
+ #Elemento n1 n2 A(m^2)  E (Pa) 
+Fin Elementos 
+Nodos 
+ #nodo X Y  vins  Ux Uy Fx Fy 
+ 1  0.0000  0.0  1  1  0.0  0.0  0.0  0.0 
+# F(nnod) =  0.0000 
+Fin Nodos 

@@ -30,6 +30,7 @@ def resolvermef(r, s, K, us, fr, case):
     N = len(K)
     U = np.zeros([N, 1])
     F = np.zeros([N, 1])
+    pdb.set_trace()
     U[r] = np.linalg.solve(K[np.ix_(r, r)], fr - K[np.ix_(r, s)].dot(us))
     U[s] = us
     F[s] = K[s, :].dot(U)
@@ -45,17 +46,16 @@ def ensamble(MC, MN, MP, gl, etype):
     """
     # numero de nodos
     N = len(MN)*gl
-    # inicio la matriz global de rigidez
     Kglob = np.zeros([N, N])
-    # numero de elementos y de nodos por elemento
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    fo = open('bloques.dat','w')
+    fo = open('MatricesElementales.dat', 'w')
     for e in range(ne):
         MCloc = MC[e, :]-1  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(etype, MP[e, :], MNloc, MCloc)
-        fo.write('\n\nElemento {:d}\n=========\n'.format(e))
+        fo.write('\nElemento {:d}\n========\n'.format(e))
+        fo.write('{}\n'.format(kele))
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -64,13 +64,7 @@ def ensamble(MC, MN, MP, gl, etype):
                 nj = MCloc[j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
-                # atención ahora:
-                # ver formulas de apunte de ensamble de matrices
-                # print(e, rangei, rangej)
-                # kij = copy.copy(kele[np.ix_(rangei, rangej)])
-                # kninj = copy.copy(Kglob[np.ix_(rangeni, rangenj)])
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
-                # Kglob[np.ix_(rangeni, rangenj)] = kninj+kij
     fo.close()
     return Kglob
 
@@ -114,6 +108,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
 
 
 def getgeo(filename):
+    # fi = open(filename,'r')
     with open(filename) as fi:
         for line in fi:
             if '#' in line.strip():
