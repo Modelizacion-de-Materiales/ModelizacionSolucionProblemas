@@ -1,4 +1,5 @@
-function [NODOS,ELEM,seccion,modulo,gl,uvin,fvin,inc,vin]=readata(filein)
+% function [NODOS,ELEM,seccion,modulo,gl,uvin,fvin,inc,vin]=readata(filein)
+ function [NODOS,ELEM,seccion,modulo,gl]=readata(filein)
 % [nodos,elementos,vin,uvin,inc,fvin]
 
 fid=fopen(filein);

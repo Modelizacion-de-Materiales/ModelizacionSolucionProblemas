@@ -47,6 +47,7 @@ end
 fprintf(fid,' %d  %6.4f  0.0  1  1  0.0  0.0  0.0  0.0 \n',nnod, Nodos(nnod,1) );
 fprintf(fid,'# F(nnod) =  %6.4f \n',F(nnod));
 fprintf(fid,'Fin Nodos \n');
+fclose(fid)
 
 
 
