@@ -30,7 +30,6 @@ def resolvermef(r, s, K, us, fr, case):
     N = len(K)
     U = np.zeros([N, 1])
     F = np.zeros([N, 1])
-    pdb.set_trace()
     U[r] = np.linalg.solve(K[np.ix_(r, r)], fr - K[np.ix_(r, s)].dot(us))
     U[s] = us
     F[s] = K[s, :].dot(U)
@@ -40,7 +39,7 @@ def resolvermef(r, s, K, us, fr, case):
     return U, F
 
 
-def ensamble(MC, MN, MP, gl, etype):
+def ensamble(MC, MN, MP, gl, etype, case=''):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
@@ -49,13 +48,14 @@ def ensamble(MC, MN, MP, gl, etype):
     Kglob = np.zeros([N, N])
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    fo = open('MatricesElementales.dat', 'w')
+    fo = open('MatricesElementales-'+case+'.dat', 'w')
     for e in range(ne):
-        MCloc = MC[e, :]-1  # el -1 va parapasar a indices
+        MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(etype, MP[e, :], MNloc, MCloc)
-        fo.write('\nElemento {:d}\n========\n'.format(e))
-        fo.write('{}\n'.format(kele))
+        fo.write('Elemento {:d}, [0,0] = {:e}\n'.format(e, kele[0, 0]))
+        fo.write('======\n')
+        fo.write('{}\n'.format(kele/kele[0][0]))
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -65,6 +65,9 @@ def ensamble(MC, MN, MP, gl, etype):
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
+    fo.write('\n\nMatriz Global , [0,0] = {:e}\n'.format(Kglob[0,0]))
+    fo.write('{}\n'.format(Kglob/Kglob[0, 0]))
+    fo.write('\n su determinante: {:e}'.format(np.linalg.det(Kglob/Kglob[0, 0])))
     fo.close()
     return Kglob
 
