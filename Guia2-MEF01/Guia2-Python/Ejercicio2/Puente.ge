@@ -8,15 +8,15 @@ NODES
  8.  0.  0
 ELEMENTS
 5 2
+2 0  1 10e-4  210e9
+2 3  0 10e-4  210e9
+2 3  1 10e-4  210e9
 2 1  2 10e-4  210e9
-2 4  1 10e-4  210e9
-2 4  2 10e-4  210e9
 2 2  3 10e-4  210e9
-2 3  4 10e-4  210e9
 VINS
 3
-1 1 1 0 0
-3 -1 1 0 0
-4 -1 -1 0 -20e3
+0 1 1 0 0
+2 -1 1 0 0
+3 -1 -1 0 -20e3
 # node  vin=1: desplazamiento, vin = -1: fuerza
 # node  vinx viny valvinx valviny
