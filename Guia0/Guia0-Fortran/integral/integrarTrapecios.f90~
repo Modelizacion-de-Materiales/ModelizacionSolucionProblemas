@@ -1,0 +1,21 @@
+subroutine integrarTrapecios(IT,funcion)
+implicit none
+
+real(8)::x,xn,fx,fn,IT
+character(len=7)::funcion
+integer::eof
+
+open(5,file=funcion)
+read(5,*),xn,fn
+IT=0
+
+do 
+	read(5,*,iostat=eof),x,fx
+	IT=IT+.5*(x-xn)*(fx+fn)
+	xn=x
+	fn=fx
+	if(eof/=0) exit
+end do
+close(5)
+
+end subroutine

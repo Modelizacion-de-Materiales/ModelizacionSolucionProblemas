@@ -1,0 +1,7 @@
+BARRER = .TRUE.
+N = 2
+TOLERA = 1e-3
+METODO = numerico
+x0 = 0.d0
+xF = 30.d0
+

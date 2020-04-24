@@ -1,0 +1,7 @@
+N 7
+D 2
+evalN 100
+filein datos.dat
+
+fileval curva_100.dat
+

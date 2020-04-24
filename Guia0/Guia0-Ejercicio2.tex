@@ -1,0 +1,66 @@
+\section{Expansión en serie, tolerancia y error}
+
+\mode<article>
+
+En este ejercicio pretenemos conocer qué tan bien
+podemos aproximarnos al valor de la función exponencial 
+con la expansión en serie alrededor de cero.
+La \autoref{EquationExponentialnError} define tanto la 
+serie hasta su \texttt{n-esimo} término como el error
+cometido por la serie truncada. 
+
+\mode*
+
+\begin{frame}[label=FrameEquationExponencial]
+  \frametitle<presentation>{Aproximación a la exponencial}
+
+  \begin{equation}\label{EquationExponentialnError}
+    \begin{split}
+      \exp{x} = \sum_{i=0} ^n \frac{x^i}{i!}+ ERR[n] \\
+	ERR [ n ] = \Bigl \vert 
+		\frac {exp(x_o) - \sum\limits_{i=0} ^n \frac{x_o^i}{i!} } { exp(x_o) } \Bigr \vert
+    \end{split}
+  \end{equation}
+
+\end{frame}
+
+\mode<article>
+
+El valor de \texttt{n} indica la cantidad de términos que tomamos en 
+nuestra expansión, la cual dependerá de que tan ``tolerantes''
+seamos con nuestro programa. Por ejemplo, una ``tolerancia'' 
+de $1 \cdot 10^{-4} $. En el código de la \autoref{FigFrameShowCodeSerie} 
+se observa cómo se va incrementando el valor de \texttt{n}
+hasta que el error es menor que dicha tolerancia. Si bien esta 
+medida no debe hacerse cada vez que se resuelve el problema, 
+sí es necesario indicar el último término de truncamiento 
+y una estimación del error cometido. 
+
+\begin{figure}
+  \includeslide[width=\textwidth]{FrameShowCodeSerie}
+  \caption{\protect\label{FigFrameShowCodeSerie}
+  Implementación en Python de la serie truncada 
+  y el cáclulo del error cometido respecto de 
+  $x_o = 0.5 $}
+\end{figure}
+\mode*
+
+\begin{frame}<presentation>[label=FrameShowCodeSerie]
+  \frametitle{Implementación de una expansion en serie truncada}
+
+  \begin{codeblock}
+    \verbatiminput{./Ejercicio2.py} 
+  \end{codeblock}
+
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameComportamientoErrorvsN]
+  \frametitle{Comportamiento del error con N}
+  \center
+%  \begin{figure}
+    \includegraphics[height=0.8\textheight]{Guia0_python/Ejercicio2/Figura2.pdf}
+%  \end{figure}
+
+\end{frame}
+
+\mode<all>
