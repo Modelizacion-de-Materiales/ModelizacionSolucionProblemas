@@ -53,9 +53,10 @@ def ensamble(MC, MN, MP, gl, etype, case=''):
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(etype, MP[e, :], MNloc, MCloc)
-        fo.write('Elemento {:d}, [0,0] = {:e}\n'.format(e, kele[0, 0]))
+        scale = np.max(np.max(kele))
+        fo.write('Elemento {:d}, scle = {:e}\n'.format(e, scale))
         fo.write('======\n')
-        fo.write('{}\n'.format(kele/kele[0][0]))
+        fo.write('{}\n'.format(kele/scale))
         for i in range(nnxe):
             ni = MCloc[i]
             rangei = np.linspace(i*gl, (i+1)*gl-1, gl).astype(int)
@@ -65,9 +66,11 @@ def ensamble(MC, MN, MP, gl, etype, case=''):
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
-    fo.write('\n\nMatriz Global , [0,0] = {:e}\n'.format(Kglob[0,0]))
-    fo.write('{}\n'.format(Kglob/Kglob[0, 0]))
-    fo.write('\n su determinante: {:e}'.format(np.linalg.det(Kglob/Kglob[0, 0])))
+    scale = np.max(np.max(Kglob))
+    Kglob[abs(Kglob/scale) < 1e-9] = 0
+    fo.write('\n\nMatriz Global , scale factor = {:e}\n'.format(scale))
+    fo.write('{}\n'.format(Kglob/scale))
+    fo.write('\n su determinante: {:e}'.format(np.linalg.det(Kglob/scale)))
     fo.close()
     return Kglob
 
@@ -168,12 +171,12 @@ def makevins(GL, NNODES, LVIN):
     us = np.empty((0, 1), dtype=float)
     IVIN, MVIN = LVIN
     for n in range(NNODES):
-        if n in (IVIN[:, 0]-1):
+        if n in (IVIN[:, 0]):
             # el tema de usar np.where es que devuelve un array con todas las 
             # coincidencias por fila. Yo se que la coincidencia va a ser única, por
             # lo que puedo tomar el primer elemento del primer array
-            thevin = np.where(IVIN[:, 0]-1 == n)[0][0]
-            node, dirs = IVIN[thevin, 0]-1, IVIN[thevin, 1:]
+            thevin = np.where(IVIN[:, 0] == n)[0][0]
+            node, dirs = IVIN[thevin, 0], IVIN[thevin, 1:]
             for v in range(len(dirs)):
                 if dirs[v] > 0:
                     s = np.append(s, node*GL+v)
