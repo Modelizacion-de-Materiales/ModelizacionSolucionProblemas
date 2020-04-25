@@ -12,11 +12,6 @@ import os.path
 #matplotlib.use('Qt5Agg')
 
 
-"""
-Tengo que definir primero la generación de las fuerzas!
-"""
-
-
 class barra:
 
     def __init__(self, NNODOS=2, C=20e5, L=1.5, A=10e-4, E=210E9):
@@ -138,6 +133,7 @@ class barra:
         plt.title('Solución Numérica para {:d} nodos'.format(self.NNODOS))
         plt.xlabel(r'$x$ (m)')
         plt.ylabel(r'$d(x)$ (m)')
+        plt.legend()
         plt.savefig(dresfile)
         plt.close()
         tresfile = 'ResultadoTensiones-'+self.case+'.pdf'
@@ -148,12 +144,12 @@ class barra:
         TENY = np.vstack( ([0.0], self.Sig) )
         plt.step(self.MN[:, 0], TENY, 'r',
                 where='pre', label='Solución Numérica')
+        plt.legend()
         plt.savefig(tresfile)
         plt.close()
 
 
-NODOS = [2, 3, 4, 5]
-for i in range(len(NODOS)):
-    B = barra(NODOS[i])
-    B.plot_results()
-    pdb.set_trace()
+# NODOS = [2, 3, 4, 5]
+# for i in range(len(NODOS)):
+#     B = barra(NODOS[i])
+#     B.plot_results()

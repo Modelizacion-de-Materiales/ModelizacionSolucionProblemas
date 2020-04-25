@@ -1,0 +1,56 @@
+\mode<article>
+
+Para resolver el Problema de los resortes nos remitimos a
+nuestro trabajo de resolución de sistemas mixtos. Aquí simplemente
+tomamos:
+
+\mode*
+
+\begin{frame}[label=FrameResortes]
+  \frametitle<presentation>{Problema 1 : Resortes}
+
+  \includegraphics[width=\textwidth, trim=5cm 6cm 5cm 8cm, clip=true, page=10]
+  {Resumen/003-MEF01-SistemasMixtos.pdf}
+
+\end{frame}
+
+\begin{frame}[label=FrameCodeSolvePy]
+  \frametitle<presentation>{Resolución (Python)}
+
+  \begin{codeblock}
+    \verbatiminput{./codesolve.txt}
+  \end{codeblock}
+
+\end{frame}
+
+
+\begin{frame}[label=FrameCodeSolve]
+  \frametitle<presentation>{Resolución (Matlab)}
+
+  \begin{codeblock}
+    \verbatiminput{./codesolve.m}
+  \end{codeblock}
+
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameResultResortes]
+  \frametitle{Resultado}
+
+  \begin{columns}
+    \column{0.5\textwidth}
+    Desplazamientos (por nodo)
+
+    \begin{codeblock}
+      \verbatiminput{./Guia2-Python/Ejercicio1/resortesDisplace.dat}
+    \end{codeblock}
+    \column{0.5\textwidth}
+    Fuerzas (por nodo)
+
+    \begin{codeblock}
+      \verbatiminput{./Guia2-Python/Ejercicio1/resortesForces.dat}
+    \end{codeblock}
+
+  \end{columns}
+
+\end{frame}
+\mode<all>

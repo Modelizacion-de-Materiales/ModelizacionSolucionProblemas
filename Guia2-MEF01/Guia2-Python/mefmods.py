@@ -34,8 +34,8 @@ def resolvermef(r, s, K, us, fr, case):
     U[s] = us
     F[s] = K[s, :].dot(U)
     F[r] = fr
-    np.savetxt(case+'Forces.dat', F)
-    np.savetxt(case+'Displace.dat', U)
+    np.savetxt(case+'Forces.dat', F, fmt='%.6e')
+    np.savetxt(case+'Displace.dat', U, fmt='%.6e')
     return U, F
 
 
@@ -54,8 +54,7 @@ def ensamble(MC, MN, MP, gl, etype, case=''):
         MNloc = MN[MCloc, :]
         kele = kelemental(etype, MP[e, :], MNloc, MCloc)
         scale = np.max(np.max(kele))
-        fo.write('Elemento {:d}, scle = {:e}\n'.format(e, scale))
-        fo.write('======\n')
+        fo.write('Elemento {:d}, scale = {:e}\n'.format(e, scale))
         fo.write('{}\n'.format(kele/scale))
         for i in range(nnxe):
             ni = MCloc[i]
@@ -65,7 +64,8 @@ def ensamble(MC, MN, MP, gl, etype, case=''):
                 nj = MCloc[j]
                 rangej = np.linspace(j*gl, (j+1)*gl-1, gl).astype(int)
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
-                Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+kele[np.ix_(rangei, rangej)]
+                Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+\
+                        kele[np.ix_(rangei, rangej)]
     scale = np.max(np.max(Kglob))
     Kglob[abs(Kglob/scale) < 1e-9] = 0
     fo.write('\n\nMatriz Global , scale factor = {:e}\n'.format(scale))

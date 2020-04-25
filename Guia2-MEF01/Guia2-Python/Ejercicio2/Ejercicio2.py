@@ -40,16 +40,30 @@ class Grilla:
         for e in range(len(self.MC)):
             X = np.reshape(self.MN[self.MC[e, :], 0], (NNXEL, 1))
             Y = np.reshape(self.MN[self.MC[e, :], 1], (NNXEL, 1))
-            ax.plot(X, Y, '-ob')
+            ax.plot(X, Y, '-ob', label='Estructura Inicial')
+        handles, labels = ax.get_legend_handles_labels()
+        display = [len(self.MC)-1, len(self.MC)-1+len(self.MN)]
+        ax.legend([handle for i, handle in enumerate(handles) if i==len(self.MC)-1],
+                [label for i, label in enumerate(labels) if i==len(self.MC)-1])
+        fig.savefig('PuenteInicial.pdf')
+        for e in range(len(self.MC)):
+            X = np.reshape(self.MN[self.MC[e, :], 0], (NNXEL, 1))
+            Y = np.reshape(self.MN[self.MC[e, :], 1], (NNXEL, 1))
             X2 = X + scale*self.U[self.GL*self.MC[e, :]]
             Y2 = Y + scale*self.U[self.GL*(self.MC[e, :]+1)-1]
-            ax.plot(X2, Y2, '-or')
+            ax.plot(X2, Y2, '-or', label='Estructura Cargada')
         ax.quiver(
                 self.MN[:, 0] + scale*self.VD[:, 0],
                 self.MN[:, 1] + scale*self.VD[:, 1],
                 self.VF[:, 0],
-                self.VF[:, 1]
+                self.VF[:, 1],
+                label='Fuerzas'
                 )
+        plt.title('Desplazamientos x{}'.format(scale))
+        handles, labels = ax.get_legend_handles_labels()
+        display = [len(self.MC)-1, len(self.MC)-1+len(self.MN), len(labels)-1]
+        ax.legend([handle for i, handle in enumerate(handles) if i in display],
+                [label for i, label in enumerate(labels) if i in display])
         fig.savefig('Puente.pdf')
         plt.close()
         return
