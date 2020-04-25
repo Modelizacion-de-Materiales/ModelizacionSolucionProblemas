@@ -1,15 +1,15 @@
-Elemento 0, scale = 4.200000e+08
+Elemento 0, scale = 2.000000e+02
 [[ 1. -1.]
  [-1.  1.]]
-Elemento 1, scale = 4.200000e+08
+Elemento 1, scale = 2.000000e+02
 [[ 1. -1.]
  [-1.  1.]]
-Elemento 2, scale = 4.200000e+08
+Elemento 2, scale = 2.000000e+02
 [[ 1. -1.]
  [-1.  1.]]
 
 
-Matriz Global , scale factor = 8.400000e+08
+Matriz Global , scale factor = 4.000000e+02
 [[ 0.5 -0.5  0.   0. ]
  [-0.5  1.  -0.5  0. ]
  [ 0.  -0.5  1.  -0.5]

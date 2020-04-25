@@ -1,0 +1,22 @@
+\documentclass[convert]{standalone}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{tikz}
+\begin{document}
+
+\begin{tikzpicture}
+  \node at (-5, 4)  {\includegraphics[width=11cm]{./ResultadoDesplazamientos-02N.pdf} };
+  \node at ( 5, 4) {\includegraphics[width=11cm]{./ResultadoDesplazamientos-03N.pdf} };
+  \node at (-5,-4)  {\includegraphics[width=11cm]{./ResultadoDesplazamientos-04N.pdf} };
+  \node at ( 5,-4)  {\includegraphics[width=11cm]{./ResultadoDesplazamientos-05N.pdf} };
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \node at (-5, 4)  {\includegraphics[width=11cm]{./ResultadoTensiones-02N.pdf} };
+  \node at ( 5, 4) {\includegraphics[width=11cm]{./ResultadoTensiones-03N.pdf} };
+  \node at (-5,-4)  {\includegraphics[width=11cm]{./ResultadoTensiones-04N.pdf} };
+  \node at ( 5,-4)  {\includegraphics[width=11cm]{./ResultadoTensiones-05N.pdf} };
+\end{tikzpicture}
+
+
+\end{document}

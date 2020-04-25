@@ -1,0 +1,57 @@
+\mode<article>
+
+Para resolver este problema debemos recordar
+que las fuerzas distribuidas pueden tranformarse en 
+fuerzas nodales mediante la integral:
+
+\mode*
+
+\begin{frame}<presentation>[label=FrameProblema3Forces]
+    \frametitle{Problema 3: Fuerzas Distribuidas}
+
+    \begin{equation}
+        F_e = \int _{elemento}{
+            \begin{bmatrix} N_1(x) \\ N_2(x) \end{bmatrix}
+        f (x)
+        dx
+    }
+    \end{equation}
+
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameCalculoFuerzas]
+    \frametitle{Calculo de fuerzas Directo}
+    \begin{columns}
+        \column{0.4\textwidth}
+            \begin{codeblock}
+                \verbatiminput{./CalculoFuerzasShow.py}
+            \end{codeblock}
+
+        \column{0.6\textwidth}
+            \begin{codeblock}
+                \verbatiminput{./CalculoFuerzasShow2.py}
+            \end{codeblock}
+
+    \end{columns}
+\end{frame}
+\begin{frame}<presentation>[label=FramePaneDesplaza]
+    \frametitle{Desplazamientos}
+    \center
+    \includegraphics[width=0.6\textwidth,trim=0cm 0cm 22cm 0cm, clip=true]
+    {./Guia2-Python/Ejercicio3/pane-results.pdf}
+
+\end{frame}
+\begin{frame}<presentation>[label=FramePaneTensiones]
+    \frametitle{Tensiones}
+    \begin{columns}
+        \column{0.1\textwidth}
+        $$ \tau = \frac{\Delta l_e}{l_e} E$$
+        \column{0.8\textwidth}
+
+    \center
+    \includegraphics[width=0.8\textwidth,trim=22cm 0cm 0cm 0cm, clip=true]
+    {./Guia2-Python/Ejercicio3/pane-results.pdf}
+
+
+    \end{columns}
+\end{frame}
