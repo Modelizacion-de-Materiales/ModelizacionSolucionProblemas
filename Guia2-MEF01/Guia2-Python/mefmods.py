@@ -50,6 +50,7 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     # esta linea es necesaria porque en python los indicesvan desde cero
     fo = open('MatricesElementales-'+case+'.dat', 'w')
     for e in range(ne):
+        pdb.set_trace()
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(ETYPES[e], MP[e, :], MNloc, MCloc)
@@ -178,7 +179,6 @@ def makevins(GL, NNODES, LVIN):
     s = np.empty((0, 1), dtype=int)
     us = np.empty((0, 1), dtype=float)
     IVIN, MVIN = LVIN
-    pdb.set_trace()
     for n in range(NNODES):
         if n in (IVIN[:, 0]):
             # el tema de usar np.where es que devuelve un array con todas las 

@@ -18,17 +18,17 @@ import matplotlib.pyplot as plt
 
 class Grilla:
 
-    def __init__(self, gefile='Puente.ge', case='puente'):
-        self.GL, self.MC, self.MN, self.MP, self.LVIN = mef.getgeo(gefile)
+    def __init__(self, gefile='Puente.ge', case='puente', pltscale=100):
+        self.GL, self.MC, self.MN, self.MP, self.ET, self.LVIN = mef.getgeo(gefile)
         self.gefile = gefile
         self.case = case
         self.R, self.S, self.US, self.FR = mef.makevins(self.GL, len(self.MN), self.LVIN)
-        self.K = mef.ensamble(self.MC, self.MN, self.MP, self.GL, 2)
-        self.U, self.F = mef.resolvermef(self.R, self.S, self.K, self.US, self.FR, case)
-        np.savetxt('Desplazamientos.dat', self.U)
-        np.savetxt('Fuerzas.dat', self.F)
+        self.K = mef.ensamble(self.MC, self.MN, self.MP, self.GL, self.ET, self.case)
+        self.U, self.F = mef.resolvermef(self.R, self.S, self.K, self.US, self.FR, self.case)
+        np.savetxt(case+'Desplazamientos.dat', self.U)
+        np.savetxt(case+'Fuerzas.dat', self.F)
         self.VD, self.VF = self.getvsdf()
-        self.plotmesh()
+        self.plotmesh(pltscale)
 
     def plotmesh(self, scale=100):
         NEL, NNXEL = np.shape(self.MC)
@@ -45,7 +45,7 @@ class Grilla:
         display = [len(self.MC)-1, len(self.MC)-1+len(self.MN)]
         ax.legend([handle for i, handle in enumerate(handles) if i==len(self.MC)-1],
                 [label for i, label in enumerate(labels) if i==len(self.MC)-1])
-        fig.savefig('PuenteInicial.pdf')
+        fig.savefig(self.case+'Inicial.pdf')
         for e in range(len(self.MC)):
             X = np.reshape(self.MN[self.MC[e, :], 0], (NNXEL, 1))
             Y = np.reshape(self.MN[self.MC[e, :], 1], (NNXEL, 1))
@@ -64,7 +64,7 @@ class Grilla:
         display = [len(self.MC)-1, len(self.MC)-1+len(self.MN), len(labels)-1]
         ax.legend([handle for i, handle in enumerate(handles) if i in display],
                 [label for i, label in enumerate(labels) if i in display])
-        fig.savefig('Puente.pdf')
+        fig.savefig(self.case+'Final.pdf')
         plt.close()
         return
 
@@ -79,4 +79,6 @@ class Grilla:
         return VD, VF
 
 
-P = Grilla(gefile='Puente.ge', case='Puente')
+M = Grilla(gefile='./Mensula.g', case='Mensula', pltscale=1)
+# P = Grilla(gefile='./Puente.ge', case='Puente', pltscale=100)
+M = Grilla(gefile='./Mensula-niro.g', case='Mensula-niro', pltscale=1)
