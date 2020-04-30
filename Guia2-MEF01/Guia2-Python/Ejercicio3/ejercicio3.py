@@ -38,10 +38,11 @@ class barra:
                 (np.linspace(0, self.NNODOS-2, self.NNODOS-1, dtype=int, axis=0),
                     np.linspace(1, self.NNODOS-1, self.NNODOS-1, dtype=int, axis=0))
                 ).reshape((NNODOS-1, 2))
+        self.ET = np.ones(len(self.MC))
         self.MP = self.E*self.A / (self.L / (self.NNODOS - 1)) * \
             np.ones((NNODOS-1, 1))
         # Matriz de rigidez
-        self.K = mef.ensamble(self.MC, self.MN, self.MP, self.GL, 1, self.case)
+        self.K = mef.ensamble(self.MC, self.MN, self.MP, self.GL, self.ET, self.case)
         # condiciones de contorno y soluion
         self.Fext = self.fuerza()
         self.R = np.linspace(0, self.NNODOS-2, NNODOS-1, dtype=int)

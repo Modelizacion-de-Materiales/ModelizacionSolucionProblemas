@@ -50,7 +50,6 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     # esta linea es necesaria porque en python los indicesvan desde cero
     fo = open('MatricesElementales-'+case+'.dat', 'w')
     for e in range(ne):
-        pdb.set_trace()
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(ETYPES[e], MP[e, :], MNloc, MCloc)
