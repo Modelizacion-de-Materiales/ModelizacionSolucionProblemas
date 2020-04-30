@@ -39,7 +39,7 @@ def resolvermef(r, s, K, us, fr, case):
     return U, F
 
 
-def ensamble(MC, MN, MP, gl, etype, case=''):
+def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
@@ -52,7 +52,7 @@ def ensamble(MC, MN, MP, gl, etype, case=''):
     for e in range(ne):
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
-        kele = kelemental(etype, MP[e, :], MNloc, MCloc)
+        kele = kelemental(ETYPES[e], MP[e, :], MNloc, MCloc)
         scale = np.max(np.max(kele))
         fo.write('Elemento {:d}, scale = {:e}\n'.format(e, scale))
         fo.write('{}\n'.format(kele/scale))
@@ -82,7 +82,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
     """
     if etype == 1:  # caso etype =resortes
         kel = MP*np.array([[1, -1], [-1, 1]], dtype=float)
-    elif etype == 2: # caso etipe = barras 
+    elif etype == 2:  # caso etipe = barras 
         """
         En este caso voy a necesitar la matriz de nodos local
         y la matriz de conectividad local.
@@ -94,11 +94,6 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         dy = np.diff(Y)
         THETA = atan2(dy, dx)
         L = sqrt(dx**2 + dy**2)
-        #pdb.set_trace()
-        #c2 = cos(THETA)**2
-        #cs = cos(THETA)*sin(THETA)
-        #s2 = sin(THETA)**2
-        # pdb.set_trace()
         c = cos(THETA)
         s = sin(THETA)
         R = np.array([[c, s], [-s, c]])
@@ -110,6 +105,17 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         # algunas veces los cos y sin dan valores muy bajos. entonces:
         tol = 1e-8
         kel[abs(kel) < tol] = 0.0
+    elif etype == 3:  # barras unidimensionales con torsion
+        kel = np.zeros((4, 4))
+        X = NODES[:, 0]
+        dx = np.diff(X)
+        L = sqrt(dx**2)
+        kel = (MP[0]*MP[1]/L**3) * np.array(
+                [[12, 6*L, -12, 6*L],
+                    [6*L, 4*L**2, -6*L, 2*L**2],
+                    [-12, -6*L, 12, -6*L],
+                    [6*L, 2*L**2, -6*L, 4*L**2]]
+                )
     return kel
 
 
@@ -134,12 +140,14 @@ def getgeo(filename):
                 NELEM = DIMELEM[0]
                 NNXEL = DIMELEM[1]
                 MC = np.zeros((NELEM, NNXEL), dtype=int)
+                ELTYPES = np.zeros((NELEM,1),dtype=int)
                 # Matriz de propiedades, inicio para 2 propiedades, luego corrijo
                 MP = np.zeros((NELEM, 2), dtype=float)
                 for i in range(NELEM):
                     thiselem = np.fromstring(
                             fi.readline().strip(), sep=' '
                             )
+                    ELTYPES[i, :] = thiselem[0]
                     MC[i, :] = thiselem[1:NNXEL+1]
                     MP[i, :] = thiselem[NNXEL+1:]
             if line.strip() == 'GL':
@@ -158,7 +166,7 @@ def getgeo(filename):
                             )
                     IVIN[v, :] = thisvin[:1+GL]
                     MVIN[v, :] = thisvin[1+GL:]
-    return GL, MC, MN, MP, (IVIN, MVIN)
+    return GL, MC, MN, MP, ELTYPES, (IVIN, MVIN)
 
 
 def makevins(GL, NNODES, LVIN):
@@ -170,6 +178,7 @@ def makevins(GL, NNODES, LVIN):
     s = np.empty((0, 1), dtype=int)
     us = np.empty((0, 1), dtype=float)
     IVIN, MVIN = LVIN
+    pdb.set_trace()
     for n in range(NNODES):
         if n in (IVIN[:, 0]):
             # el tema de usar np.where es que devuelve un array con todas las 
