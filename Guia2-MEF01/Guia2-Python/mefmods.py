@@ -8,6 +8,7 @@ import copy
 import pdb
 from math import atan2, sin, cos, sqrt
 import re
+import matplotlib.pyplot as plt
 np.set_printoptions(precision=2, linewidth=100)
 
 
@@ -197,3 +198,129 @@ def makevins(GL, NNODES, LVIN):
             fr = np.vstack((fr, np.zeros((GL, 1), dtype=float)))
         pass
     return r, s, us, fr
+
+### Matrices de desplazamientos
+##################################################
+
+def makenodex(X, GL, DIM, NNODOS):
+    """
+    convierte una cantidad vectorial X en la respectiva 
+    matriz de vectores para esos nodos.
+    Por ejemplo, para los desplazamientos D = [ D1X, D1Y , D2X, D2Y, ... ]
+    devuelve:
+    MD = [ [ D1X, D1Y ],
+           [ D2X, D2Y ],
+           ]
+    """
+    MX = np.zeros((NNODOS, GL))
+    for i in range(NNODOS):
+        rangei = np.linspace(i*GL, (i+1)*GL-1, GL, dtype=int)
+        MX[i, :] = X[rangei].reshape(1,GL)
+    return MX
+
+
+# ## Funciones de Interpolacion
+#################################################
+
+
+def NL1DA(x, L):
+    """
+    Función de interpolación Lineal Unidimensional
+    NL1DA (x,L ) = (1-x)/L
+    NL1DA(0,L) = 1,
+    NL1DA(L,L) = 0,
+    """
+    return (1.-x)/L
+
+
+def NL1DB(x, L):
+    """
+    Función de interpolación Lineal
+    NL1DA (x,L ) = x/L
+    NL1DA(0,L) = 0,
+    NL1DA(L,L) = 1,
+    """
+    return x/L
+
+def NT1(x, L):
+    """
+    Funcion de interpolación Lineal Para Torsión
+    NT1(x,L) = (1/L**3) *( 2*x**3 - 3*x**2*L + L**3)
+    """
+    return (1/L**3)*(2*x**3 - 3*L*x**2 + L**3)
+
+def NT2(x, L):
+    """
+    Funcion de interpolación Lineal Para Torsión
+    NT2(x,L) = (1/L**3) *(1/L**3)*(L*x**3-2*L**2*x**2+x*L**3)
+    """
+    return (1/L**3)*(L*x**3-2*L**2*x**2+x*L**3)
+
+
+def NT3(x, L):
+    """
+    Funcion de interpolación Lineal Para Torsión
+    NT3(x,L) = (1/L**3) *( 2*x**3 - 3*x**2*L + L**3)
+    """
+    return (1/L**3)*(-2*x**3+3*L*x**2)
+
+
+def NT4(x, L):
+    """
+    Funcion de interpolación Lineal Para Torsión
+    NT3(x,L) = (1/L**3) *( 2*x**3 - 3*x**2*L + L**3)
+    """
+    return (1/L**3)*(-2*L*x**3+L**2*x**2)
+
+
+# ## Graficar el mallado, inicial y final
+def plotmesh(MC, MN, MF, MD,  case, scale=100):
+    """ 
+    Grafica el mallado original y luego desplazado, 
+    requiere tener la matriz de nodos  , la matriz de desplzamientos y 
+    la matriz de fuerza
+    inputs:
+    MC matriz de conectividad
+    MN Matriz de nodos
+    MF matriz de fuerzas 
+    MD Matriz de desplazamientos
+    case string con nombre de caso
+    
+    opcional
+    scale: factor de escala para el dibujo
+    """
+    NEL, NNXEL = np.shape(MC)
+    # grafico la  matriz de nodos desplazada
+    fig, ax = plt.subplots()
+    plt.title(case)
+    # ax.use_sticky_edges = False
+    ax.margins(0.1)
+    for e in range(len(MC)):
+        X = np.reshape(MN[MC[e, :], 0], (NNXEL, 1))
+        Y = np.reshape(MN[MC[e, :], 1], (NNXEL, 1))
+        ax.plot(X, Y, '-ob', label='Estructura Inicial')
+    handles, labels = ax.get_legend_handles_labels()
+    display = [len(MC)-1, len(MC)-1+len(MN)]
+    ax.legend([handle for i, handle in enumerate(handles) if i==len(MC)-1],
+            [label for i, label in enumerate(labels) if i==len(MC)-1])
+    fig.savefig(case+'Inicial.pdf')
+    for e in range(len(MC)):
+        X2 = MN[MC[e, :], 0]+scale*MD[MC[e, :], 0]  # np.reshape(MN[MC[e, :], 0], (NNXEL, 1))
+        Y2 = MN[MC[e, :], 1]+scale*MD[MC[e, :], 1]  # np.reshape(MN[MC[e, :], 1], (NNXEL, 1))
+        ax.plot(X2, Y2, '-or', label='Estructura Cargada')
+    ax.quiver(
+            MN[:, 0] + scale*MD[:, 0],
+            MN[:, 1] + scale*MD[:, 1],
+            MF[:, 0],
+            MF[:, 1],
+            label='Fuerzas'
+            )
+    plt.title('Desplazamientos x{}'.format(scale))
+    handles, labels = ax.get_legend_handles_labels()
+    display = [len(MC)-1, len(MC)-1+len(MN), len(labels)-1]
+    ax.legend([handle for i, handle in enumerate(handles) if i in display],
+            [label for i, label in enumerate(labels) if i in display])
+    fig.savefig(case+'Final.pdf')
+    plt.close()
+    return
+

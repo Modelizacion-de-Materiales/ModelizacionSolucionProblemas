@@ -1,0 +1,21 @@
+GL
+2
+NODES
+4
+0.0  0.0  0.0
+15.0  0.0  0.0
+30.0  0.0  0.0
+ELEMENTS
+2 2
+3 0  1 200  29e6 
+3 1  2 200  29e6 
+VINS
+2
+0 1 1 0 0
+3 1 -1 0 0
+DISTRIVFORCE
+CONST
+200
+# node  vin=1: desplazamiento, vin = -1: fuerza
+# node  vinx viny valvinx valviny
+

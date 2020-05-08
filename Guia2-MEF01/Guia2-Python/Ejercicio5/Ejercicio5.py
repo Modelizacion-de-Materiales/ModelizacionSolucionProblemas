@@ -12,9 +12,9 @@ import os.path
 #matplotlib.use('Qt5Agg')
 
 
-class trampolin(object):
+class Esclaon(object):
 
-    def __init__(self, filein='Trampolin.ge', case='Trampolin'):
+    def __init__(self, filein='Esclaon.ge', case='Escalon'):
         self.case = case
         self.GL,\
                 self.MC,\
@@ -30,6 +30,8 @@ class trampolin(object):
             self.ET,
             'Trampolin')
         self.R, self.S, self.US, self.FR = mef.makevins(self.GL, len(self.MN), self.VINS)
+        self.W = -200 # lb / ft
+        self.FR += self.W*15*np.array([ -1/2., -15/12., -1/2., 15/12.])
         self.U, self.F = mef.resolvermef(self.R, self.S, self.K, self.US, self.FR, self.case)
 
 
