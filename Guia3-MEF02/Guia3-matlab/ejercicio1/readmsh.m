@@ -1,7 +1,7 @@
 function [NODOS,ELEM]=readmsh(filein)
  %[NODOS,ELEM,seccion,modulo,gl,us,fr,r,s]
  
-fid=fopen(filein,'r');
+fid=fopen(filein,'r');  % filecopy = [filein, 'copy.msh']
 linel=0;
 while ~feof(fid)
     linea=fgetl(fid);
