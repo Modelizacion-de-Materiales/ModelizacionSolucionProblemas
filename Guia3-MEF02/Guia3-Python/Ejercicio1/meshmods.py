@@ -11,19 +11,26 @@ class mesh(object):
 
     métodos:
     =================
-    readmsh()
-    writemsh()
-    writedatablock()
+    readmsh(file): define atributos del mallado: MC, MN, etc
+    writemsh(mesh.MC, mesh.MN): guarda un mallado dado por sus matrices
+    writedatablock(file, data): agrega data a un mallado existente
+    mkvins([physgroups, vintypes]): genera los vectores rs segun los vintypes en los phusgroups (listas)
 
 
     atributes:
     =================
     MC: matriz de conectividad
     MN: matriz de nodos
+    R: vector de incognitas
+    S: grados de libertad vinculados
+    F: lista de fuerzas externas
+    U: desplazamientos vinculados
     """
 
-    def __init__(self):
+    def __init__(self, dim=2, mshformat=2.2):
         self.out = outfile 
+        self.dim = dim
+        self.mshformat = mshformat
 
     def readmsh(self, meshfile,  etype=2):
         """
@@ -65,7 +72,8 @@ class mesh(object):
                 self.MC = np.array(MC)
                 self.NEL = self.MC.shape[0]
         fi.close()
-
     
+    def getmeshboundaries(physnames, boundkinds):
 
+        
 
