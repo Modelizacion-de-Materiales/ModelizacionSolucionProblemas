@@ -1,10 +1,4 @@
 Guia 3 - MEF2D y MEF-temp
 ============================
 
-#pasar cosas que ya estaban hechas!
-
-#Resumen
-
-Atencion
-==========
-estaba mal, habia vuelto a copiar la guia vieja.
+una idea que surgió en la clase es usar los phisical groups como indicadores para las condicioens de contorno.
