@@ -72,8 +72,29 @@ class mesh(object):
                 self.MC = np.array(MC)
                 self.NEL = self.MC.shape[0]
         fi.close()
+        self.meshfile = meshfile
     
-    def getmeshboundaries(physnames, boundkinds):
+    def getmeshboundaries(self, boundkinds):
+        nbounds = len(boundkinds)
+        fi = open(self.meshfile)
+        lines = fi.readlines()
+        fi.close()
+        l = 0
+        physnames = []
+        physcodes = []
+        while l < len(lines):
+           if '$PhysicalNames' in line:
+               l += 1
+               nnames = int(lines[l])
+               for i in range(nnames):
+                   l += 1
+                   info = lines[l].split()
+                   physcodes.append(info[:1])
+                   physnames.append(info[-1])
+
+
+
+
 
         
 
