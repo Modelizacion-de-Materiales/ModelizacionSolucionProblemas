@@ -1,5 +1,5 @@
 #!/usr/bin/python3.6
-# -*- encoding utf8 -*-
+# -*- coding: utf8 -*-
 import numpy as np
 import pdb
 
@@ -28,7 +28,6 @@ class mesh(object):
     """
 
     def __init__(self, dim=2, mshformat=2.2):
-        self.out = outfile 
         self.dim = dim
         self.mshformat = mshformat
 
@@ -43,7 +42,7 @@ class mesh(object):
         else:   # supongo lineas
             self.NNXEL = 2
             self.GL = 2
-        fi = open(self.meshfile, 'r')
+        fi = open(meshfile, 'r')
         for line in fi:
             if '$Nodes' in line:
                 NNODES = np.int(
@@ -73,28 +72,23 @@ class mesh(object):
                 self.NEL = self.MC.shape[0]
         fi.close()
         self.meshfile = meshfile
-    
-    def getmeshboundaries(self, boundkinds):
-        nbounds = len(boundkinds)
+
+    def getnames(self):
         fi = open(self.meshfile)
-        lines = fi.readlines()
-        fi.close()
-        l = 0
         physnames = []
         physcodes = []
-        while l < len(lines):
-           if '$PhysicalNames' in line:
-               l += 1
-               nnames = int(lines[l])
-               for i in range(nnames):
-                   l += 1
-                   info = lines[l].split()
-                   physcodes.append(info[:1])
-                   physnames.append(info[-1])
-
-
-
-
-
-        
+        physdim = []
+        for line in fi:
+            if '$PhysicalNames' in line:
+                pdb.set_trace()
+                nnames = int(fi.readline())
+                for i in range(nnames):
+                    info = fi.readline().split()
+                    physcodes.append(info[1])
+                    physnames.append(info[-1])
+                    physdim.append(info[0])
+                break
+        self.physnames = physnames
+        self.physcodes = physcodes
+        self.physdim = physdim
 
