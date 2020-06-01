@@ -4,7 +4,7 @@ from meshmods import mesh
 import mefmods as mef
 import pdb
 import numpy as np
-thiscase='chapa-sym'
+thiscase = 'chapa-masfino'
 CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
@@ -23,9 +23,18 @@ MP = np.hstack(
             )
         )
 K = mef.ensamble(MC, CHAPA.MN, MP, CHAPA.GL, ETYPES, thiscase)
-UR, FS = mef.resolvermef(R, S, K, US, FR, thiscase)
-pdb.set_trace()
-pass
+U, F = mef.resolvermef(R, S, K, US, FR, thiscase)
+CHAPA.writemsh(thiscase+'-out.msh')
+Uxyz = np.zeros(CHAPA.MN.shape)
+Fxyz = np.zeros(CHAPA.MN.shape)
+for n in range(len(CHAPA.MN)):
+   Uxyz[n] = [U[n*CHAPA.GL], U[n*CHAPA.GL+1], 0]
+   Fxyz[n] = [F[n*CHAPA.GL], F[n*CHAPA.GL+1], 0]
+Uxyz = np.array(Uxyz)
+Fxyz = np.array(Fxyz)
+CHAPA.writedatablock(thiscase+'-out.msh', Uxyz, '"Desplazamientos"', 0, 0.)
+CHAPA.writedatablock(thiscase+'-out.msh', Fxyz, '"Fuerzas"', 0, 0.)
+
 # print(CHAPA.elements)
 # print(CHAPA.MN)
 # print(CHAPA.physcodes)

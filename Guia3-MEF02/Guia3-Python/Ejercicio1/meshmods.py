@@ -129,5 +129,48 @@ class mesh(object):
         self.physnames = physnames
         self.physcodes = physcodes
         self.MN = MN
+        self.MC = elements[-1]
         return elements
- 
+
+    def writemsh(self, filename):
+        fo = open(filename, 'w')
+        fo.write('$MeshFormat\n2.2 0 8\n$EndMeshFormat\n')
+        fo.write('$Nodes\n')
+        fo.write('{:d}\n'.format(len(self.MN)))
+        for n in range(len(self.MN)):
+            line = '{:d} '.format(n+1)
+            for x in self.MN[n, :]:
+                line += ' {:f}'.format(x)
+            line += '\n'
+            fo.write(line)
+        fo.write('$EndNodes\n')
+        fo.write('$Elements\n')
+        fo.write('{:d}\n'.format(len(self.MC)))
+        for e in range(len(self.MC)):
+            line = '{:d} 2 0 '.format(e+1)
+            for n in self.MC[e]:
+                line += ' {:d}'.format(n)
+            fo.write(line+'\n')
+        fo.write('$EndElements\n')
+        fo.close()
+
+    def writedatablock(self, filename, data, title, itime, time, dim=3, blocktype='NodeData'):
+        fo = open(filename, 'a')
+        fo.write('$'+blocktype+'\n')
+        fo.write('1\n'+title+'\n')
+        fo.write('1\n'+'{:f}\n'.format(time))
+        fo.write('3\n{:d}\n{:d}\n{:d}\n'.format(
+                itime,
+                dim,
+                len(data)
+                )
+            )
+        for i in range(len(data)):
+            line = '{:d} '.format(i+1)
+            for d in data[i]:
+                line += ' {:f}'.format(d)
+            line += '\n'
+            fo.write(line)
+        fo.write('$End'+blocktype+'\n')
+        fo.close()
+

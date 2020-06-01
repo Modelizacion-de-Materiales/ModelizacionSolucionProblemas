@@ -67,8 +67,7 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+\
                         kele[np.ix_(rangei, rangej)]
-    # scale = np.max(np.max(Kglob))
-    scale = 1/(0.91 / 75e3)
+    scale = np.max(np.max(Kglob))
     Kglob[abs(Kglob/scale) < 1e-9] = 0
     fo.write('\n\nMatriz Global , scale factor = {:e}\n'.format(scale))
     fo.write('{}\n'.format(Kglob/scale))
@@ -141,7 +140,6 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [gamma[0], beta[0], gamma[1], beta[1], gamma[2], beta[2]]
                     ]
                 )
-        pdb.set_trace()
         kel = t*abs(A)*B.T.dot(D.dot(B))
     return kel
 
@@ -258,12 +256,9 @@ def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
         N2 = BOUNDARY[1][e,1]-1
         Y = MESH.MN[[N1, N2], 1]
         L = abs(np.diff(Y))
-        f[[2*N1, 2*N2]] = np.ones((2, 1))*VALUES[1]*L / 2
+        f[[2*N1, 2*N2]] += np.ones((2, 1))*VALUES[1]*L / 2
     fr = f[r].reshape(-1,1)
     us = us.reshape(-1,1)
-    return r, s, us, fr
-
-
     return r, s, us, fr
 
 
