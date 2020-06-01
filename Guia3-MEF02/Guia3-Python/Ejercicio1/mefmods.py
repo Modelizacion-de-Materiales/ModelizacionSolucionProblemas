@@ -118,21 +118,26 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [6*L, 2*L**2, -6*L, 4*L**2]]
                 )
     elif etype == 2:  # triángulos de 2gl por nodo
-        X = np.hstack((np.ones((3, 1)), NODES[:, 0:2]))
-        A = 0.5 * np.linalg.det(X)
         # Xinv = np.linalg.inv(X) / (2*A)
         # alpha = Xinv[0]
         # beta = Xinv[1]
         # gamma = Xinv[2]
-        x = NODES[:, 0]
-        y = NODES[:, 1]
-        alpha = [x[1]*y[2] - x[2]*y[1], x[0]*y[2] - x[2]*y[0], x[0]*y[1] - x[1]*y[0]]
-        beta = [y[1] - y[2], y[2] - y[0], y[0] - y[1]]
-        gamma = [x[2] - x[1], x[0] - x[2], x[1] - x[0]]
         t = MP[0] # espesor
         nu = MP[1] # modulo de poison
         E = MP[2] # modulo de elasticidad
         D = E * np.array([[1, nu, 0.], [nu, 1., 0.], [0., 0., 0.5*(1-nu)]]) / (1 - nu**2)
+        B, A = makeB(NODES, CONEC) 
+        kel = t*abs(A)*B.T.dot(D.dot(B))
+    return kel
+    
+def makeB(MNloc, MCloc):
+        X = np.hstack((np.ones((3, 1)), MNloc[:, 0:2]))
+        A = 0.5 * np.linalg.det(X)
+        x = MNloc[:, 0]
+        y = MNloc[:, 1]
+        alpha = [x[1]*y[2] - x[2]*y[1], x[0]*y[2] - x[2]*y[0], x[0]*y[1] - x[1]*y[0]]
+        beta = [y[1] - y[2], y[2] - y[0], y[0] - y[1]]
+        gamma = [x[2] - x[1], x[0] - x[2], x[1] - x[0]]
         B = (1/(2*A))*np.array(
                 [
                     [beta[0], 0., beta[1], 0, beta[2], 0],
@@ -140,8 +145,20 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [gamma[0], beta[0], gamma[1], beta[1], gamma[2], beta[2]]
                     ]
                 )
-        kel = t*abs(A)*B.T.dot(D.dot(B))
-    return kel
+        return B, A
+
+def getstress(MESH, MP,  U):
+    sigma = np.zeros((len(MESH.MC), 3))
+    for e in range(len(MESH.MC)):
+        B, A = makeB(MESH.MN[MESH.MC[e]-1], MESH.MC[e])
+        nu = MP[e, 1]  # modulo de poison
+        E = MP[e, 2]  # modulo de elasticidad
+        D = E * np.array([[1, nu, 0.], [nu, 1., 0.], [0., 0., 0.5*(1-nu)]]) / (1 - nu**2)
+        Uloc = []
+        for n in MESH.MC[e]:
+            Uloc = np.append(Uloc, U[(n-1)*MESH.GL:(n-1)*MESH.GL+1+1])
+        sigma[e] = ((D.dot(B)).dot(Uloc)).T
+    return sigma
 
 
 def getgeo(filename):

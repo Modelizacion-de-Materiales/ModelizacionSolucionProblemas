@@ -34,6 +34,16 @@ Uxyz = np.array(Uxyz)
 Fxyz = np.array(Fxyz)
 CHAPA.writedatablock(thiscase+'-out.msh', Uxyz, '"Desplazamientos"', 0, 0.)
 CHAPA.writedatablock(thiscase+'-out.msh', Fxyz, '"Fuerzas"', 0, 0.)
+sigma = mef.getstress(CHAPA, MP, U)
+CHAPA.writedatablock(thiscase+'-out.msh', sigma[:, 0], '"sigma_x"', 0, 0., dim=1, blocktype='ElementData')
+CHAPA.writedatablock(thiscase+'-out.msh', sigma[:, 1], '"sigma_y"', 0, 0., dim=1, blocktype='ElementData')
+CHAPA.writedatablock(thiscase+'-out.msh', sigma[:, 2], '"tau_xy"', 0, 0., dim=1, blocktype='ElementData')
+SA = 0.5*(sigma[:, 0] + sigma[:, 1])
+SB = np.sqrt(SA**2 + sigma[:, 2]**2)
+sigma_max = SA + SB
+sigma_min = SA - SB
+CHAPA.writedatablock(thiscase+'-out.msh', sigma_max, '"sigma_max"', 0, 0., dim=1, blocktype='ElementData')
+CHAPA.writedatablock(thiscase+'-out.msh', sigma_min, '"sigma_min"', 0, 0., dim=1, blocktype='ElementData')
 
 # print(CHAPA.elements)
 # print(CHAPA.MN)

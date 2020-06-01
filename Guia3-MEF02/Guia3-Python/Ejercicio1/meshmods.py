@@ -129,7 +129,7 @@ class mesh(object):
         self.physnames = physnames
         self.physcodes = physcodes
         self.MN = MN
-        self.MC = elements[-1]
+        self.MC = np.array(elements[-1])
         return elements
 
     def writemsh(self, filename):
@@ -167,8 +167,11 @@ class mesh(object):
             )
         for i in range(len(data)):
             line = '{:d} '.format(i+1)
-            for d in data[i]:
-                line += ' {:f}'.format(d)
+            if dim > 1:
+                for d in data[i]:
+                    line += ' {:f}'.format(d)
+            else:
+                line += ' {:f}'.format(data[i])
             line += '\n'
             fo.write(line)
         fo.write('$End'+blocktype+'\n')
