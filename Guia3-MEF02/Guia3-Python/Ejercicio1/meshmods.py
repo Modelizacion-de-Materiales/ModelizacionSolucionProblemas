@@ -125,11 +125,9 @@ class mesh(object):
                     info = [int(i) for i in fi.readline().strip().split()]
                     # i, etype, ntags, info = 
                     elements[info[3]-1].append(info[3+info[2]:])
-        self.elements = elements
+        self.elements = [np.array(alist) for alist in elements]
         self.physnames = physnames
         self.physcodes = physcodes
         self.MN = MN
         return elements
-                    
-
  

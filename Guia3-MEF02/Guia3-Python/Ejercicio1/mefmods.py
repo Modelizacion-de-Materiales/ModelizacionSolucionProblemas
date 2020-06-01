@@ -35,8 +35,8 @@ def resolvermef(r, s, K, us, fr, case):
     U[s] = us
     F[s] = K[s, :].dot(U)
     F[r] = fr
-    np.savetxt(case+'Forces.dat', F, fmt='%.6e')
-    np.savetxt(case+'Displace.dat', U, fmt='%.6e')
+    np.savetxt(case+'Forces.dat', F, fmt='%.4e')
+    np.savetxt(case+'Displace.dat', U, fmt='%.4e')
     return U, F
 
 
@@ -67,7 +67,8 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
                 rangenj = np.linspace(nj*gl, (nj+1)*gl-1, gl).astype(int)
                 Kglob[np.ix_(rangeni, rangenj)] = Kglob[np.ix_(rangeni, rangenj)]+\
                         kele[np.ix_(rangei, rangej)]
-    scale = np.max(np.max(Kglob))
+    # scale = np.max(np.max(Kglob))
+    scale = 1/(0.91 / 75e3)
     Kglob[abs(Kglob/scale) < 1e-9] = 0
     fo.write('\n\nMatriz Global , scale factor = {:e}\n'.format(scale))
     fo.write('{}\n'.format(Kglob/scale))
@@ -118,7 +119,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [6*L, 2*L**2, -6*L, 4*L**2]]
                 )
     elif etype == 2:  # triángulos de 2gl por nodo
-        X = np.hstack((np.ones((3, 1)), NODES[:, 0:1]))
+        X = np.hstack((np.ones((3, 1)), NODES[:, 0:2]))
         A = 0.5 * np.linalg.det(X)
         # Xinv = np.linalg.inv(X) / (2*A)
         # alpha = Xinv[0]
@@ -126,13 +127,13 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
         # gamma = Xinv[2]
         x = NODES[:, 0]
         y = NODES[:, 1]
-        alpha = [x[1]*y[2] - x[2]*y[1], x[0]*y[3] - x[3]*y[0], x[0]*y[1] - x[1]*y[0]]
+        alpha = [x[1]*y[2] - x[2]*y[1], x[0]*y[2] - x[2]*y[0], x[0]*y[1] - x[1]*y[0]]
         beta = [y[1] - y[2], y[2] - y[0], y[0] - y[1]]
-        gamma = [x[2] - x[1], x[0] - x[2], x[2] - x[0]]
+        gamma = [x[2] - x[1], x[0] - x[2], x[1] - x[0]]
         t = MP[0] # espesor
         nu = MP[1] # modulo de poison
         E = MP[2] # modulo de elasticidad
-        D = E / (1 - nu**2) * [[1, nu, 0.], [nu, 1., 0.], [0., 0., 0.5*(1-nu)]]
+        D = E * np.array([[1, nu, 0.], [nu, 1., 0.], [0., 0., 0.5*(1-nu)]]) / (1 - nu**2)
         B = (1/(2*A))*np.array(
                 [
                     [beta[0], 0., beta[1], 0, beta[2], 0],
@@ -140,6 +141,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
                     [gamma[0], beta[0], gamma[1], beta[1], gamma[2], beta[2]]
                     ]
                 )
+        pdb.set_trace()
         kel = t*abs(A)*B.T.dot(D.dot(B))
     return kel
 
@@ -223,7 +225,7 @@ def makevins(GL, NNODES, LVIN):
     return r, s, us, fr
 
 
-def mkbound(GL, NNODES, BOUNDARY, TYPES,  VALUES):
+def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
     """ 
     usa definición de elementos lineales para armar las correspondientes 
     condiciones de vínculo
@@ -237,20 +239,32 @@ def mkbound(GL, NNODES, BOUNDARY, TYPES,  VALUES):
     returns:
     r, s, us, fr
     """
-    r = np.empty((0,1))
-    s = np.empty((0,1))
-    us = np.empty((0,1))
-    fr = np.empty((0,1)) 
-    for n in range(NNODES):
-        if (n == BOUNDARY['"embedded"']).any():
-            for g in range(GL):
-                np.append(s, n*GL + g)
+    r = np.empty((0, 1), dtype=int)
+    s = np.empty((0, 1), dtype=int)
+    us = np.empty((0, 1), dtype=float)
+    fr = np.empty((0, 1), dtype=float)
+    f = np.zeros((len(MESH.MN)*MESH.GL, 1))
+    for n in range(len(MESH.MN)):
+        if (n == BOUNDARY[0]-1).any():
+            for g in range(MESH.GL):
+                s = np.append(s, n*MESH.GL + g)
+                us = np.append(us, VALUES[0])
                 np.append(us, 0)
+        else:
+            for g in range(MESH.GL):
+                r = np.append(r, int(n*MESH.GL+g))
+    for e in range(len(BOUNDARY[1])):
+        N1 = BOUNDARY[1][e,0]-1
+        N2 = BOUNDARY[1][e,1]-1
+        Y = MESH.MN[[N1, N2], 1]
+        L = abs(np.diff(Y))
+        f[[2*N1, 2*N2]] = np.ones((2, 1))*VALUES[1]*L / 2
+    fr = f[r].reshape(-1,1)
+    us = us.reshape(-1,1)
+    return r, s, us, fr
 
 
-
-
-    pass
+    return r, s, us, fr
 
 
 ### Matrices de desplazamientos

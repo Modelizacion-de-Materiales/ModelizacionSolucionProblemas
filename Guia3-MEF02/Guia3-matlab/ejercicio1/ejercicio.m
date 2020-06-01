@@ -1,5 +1,5 @@
 
-thismsh='chapa';
+thismsh='chapa-nosym';
 system(['rm ',thismsh,'-out.msh']);
 gl=2;
 E=30e6; %psi
