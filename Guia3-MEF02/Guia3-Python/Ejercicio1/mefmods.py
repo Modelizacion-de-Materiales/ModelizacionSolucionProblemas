@@ -222,17 +222,35 @@ def makevins(GL, NNODES, LVIN):
             fr = np.vstack((fr, np.zeros((GL, 1), dtype=float)))
     return r, s, us, fr
 
-def mkvins(self, MB):
+
+def mkbound(GL, NNODES, BOUNDARY, TYPES,  VALUES):
     """ 
-    Creación de vínculos en base a la matríz de vínculos MB
-    MB = [ [ tipox tipoy x y Fx Fy ] ]
-    tipo :  
-    1 -> desplazamiento
-    -1 -> fuerza
-    2 -> desplzazamiento sobre toda la linea 
-    -2 -> fuerza distribuida sobre toda la linea
-    F : valor del vinculo: desplazamiento, fuerza nodal o tensión en la linea.
+    usa definición de elementos lineales para armar las correspondientes 
+    condiciones de vínculo
+
+    parametros
+    =====================
+    boundary : matriz de conectividad para los elementos de borde
+    types: tipo de condicion de contorno
+    values: valores de las condiciones de contorno
+
+    returns:
+    r, s, us, fr
     """
+    r = np.empty((0,1))
+    s = np.empty((0,1))
+    us = np.empty((0,1))
+    fr = np.empty((0,1)) 
+    for n in range(NNODES):
+        if (n == BOUNDARY['"embedded"']).any():
+            for g in range(GL):
+                np.append(s, n*GL + g)
+                np.append(us, 0)
+
+
+
+
+    pass
 
 
 ### Matrices de desplazamientos

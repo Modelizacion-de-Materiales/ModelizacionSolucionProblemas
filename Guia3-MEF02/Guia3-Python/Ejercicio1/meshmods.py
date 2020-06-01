@@ -27,11 +27,12 @@ class mesh(object):
     U: desplazamientos vinculados
     """
 
-    def __init__(self, dim=2, mshformat=2.2):
+    def __init__(self, meshfile, dim=2, mshformat=2.2):
         self.dim = dim
         self.mshformat = mshformat
+        self.meshfile = meshfile
 
-    def readmsh(self, meshfile,  etype=2):
+    def readmsh(self,  etype=2):
         """
         devuelve matriz de nodos y de conectividad
         para el archivo msh leído
@@ -74,13 +75,12 @@ class mesh(object):
         self.meshfile = meshfile
 
     def getnames(self):
-        fi = open(self.meshfile)
+        # fi = open(self.meshfile)
         physnames = []
         physcodes = []
         physdim = []
         for line in fi:
             if '$PhysicalNames' in line:
-                pdb.set_trace()
                 nnames = int(fi.readline())
                 for i in range(nnames):
                     info = fi.readline().split()
@@ -92,3 +92,44 @@ class mesh(object):
         self.physcodes = physcodes
         self.physdim = physdim
 
+    def newreadmsh(self):
+        fi = open(self.meshfile)
+        physnames = []
+        physcodes = []
+        physdim = []
+        elements = []
+        for line in fi:
+            if '$PhysicalNames' in line:
+                nnames = int(fi.readline())
+                for i in range(nnames):
+                    info = fi.readline().split()
+                    physcodes.append(info[1])
+                    physnames.append(info[-1])
+                    physdim.append(info[0])
+                    elements.append([])
+            if '$Nodes' in line:
+                NNODES = np.int(
+                        fi.readline().strip(),
+                        )
+                MN = np.zeros((NNODES, 3))
+                for n in range(NNODES):
+                    MN[n, :] = np.fromstring(
+                             fi.readline().strip(),
+                             dtype=float,
+                             sep=' '
+                             )[-3:]
+                self.MN = MN
+            if '$Elements' in line:
+                totale = int(fi.readline().strip())
+                for e in range(totale):
+                    info = [int(i) for i in fi.readline().strip().split()]
+                    # i, etype, ntags, info = 
+                    elements[info[3]-1].append(info[3+info[2]:])
+        self.elements = elements
+        self.physnames = physnames
+        self.physcodes = physcodes
+        self.MN = MN
+        return elements
+                    
+
+ 
