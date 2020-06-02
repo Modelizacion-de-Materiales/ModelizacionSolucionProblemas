@@ -13,7 +13,7 @@ step=0;
 j=1;
 %for N=1:20;   % Número de elementos.
 %while (sum( err(j,:) > tol ) ~= 0)&&j<2
-    while j < 2
+    while j < 5
     %% loop
     step=step+1;
     N=fix( N*(10^0.1) )+1; % ten points per decade logaritmic scale.
