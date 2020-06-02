@@ -22,6 +22,7 @@ end
 fprintf(fid,'$Nodes\n');
 fprintf(fid,'%d\n',nnodes);
 for i=1:nnodes
+  % fid.write('{:d}  {:6.4f} ....       \n'.format(i, NOD[i,:]))
     fprintf(fid,'%d  %6.4f  %6.4f  %6.4f\n',i, NOD(i,:));
 end
 fprintf(fid,'$EndNodes\n');

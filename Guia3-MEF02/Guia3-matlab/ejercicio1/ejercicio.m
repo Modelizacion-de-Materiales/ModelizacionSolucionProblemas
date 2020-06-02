@@ -1,5 +1,5 @@
 
-thismsh='chapa-sym';
+thismsh='chapa-nosym';
 system(['rm ',thismsh,'-out.msh']);
 gl=2;
 E=30e6; %psi
@@ -10,6 +10,7 @@ sigma_ext=1000; % tension remota, psi
 [NOD,MC]=readmsh([thismsh,'.msh']);
 [us,fr,r,s]=mkvin(NOD,MC,gl,t,sigma_ext);
 K=mkrigid(MC,NOD,gl,E,nu,t);
+K_save = K*0.91 / 75e3
 %%
 Kred=K(r,r);
 ur=Kred\fr;
