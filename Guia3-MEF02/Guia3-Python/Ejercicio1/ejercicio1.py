@@ -4,7 +4,7 @@ from meshmods import mesh
 import mefmods as mef
 import pdb
 import numpy as np
-thiscase = 'chapa-masfino'
+thiscase = 'chapa-sym'
 CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
@@ -23,6 +23,7 @@ MP = np.hstack(
             )
         )
 K = mef.ensamble(MC, CHAPA.MN, MP, CHAPA.GL, ETYPES, thiscase)
+pdb.set_trace()
 U, F = mef.resolvermef(R, S, K, US, FR, thiscase)
 CHAPA.writemsh(thiscase+'-out.msh')
 Uxyz = np.zeros(CHAPA.MN.shape)
