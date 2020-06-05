@@ -5,7 +5,7 @@ wa=zeros(total_steps,5);
 for i=1:total_steps
     nnodi=length(w{i}(1:gl:end));
     h=min([4,i]);
-    wa(i,1:h+1)=[nnodi,w{i}(1:h)'];
+    wa(i,1:h+1)=[nnodi,w{i}(1:h)'/(2*pi)];
 end
 %%
 close all;
