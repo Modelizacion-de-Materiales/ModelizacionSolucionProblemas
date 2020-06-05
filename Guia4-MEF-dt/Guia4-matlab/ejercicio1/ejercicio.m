@@ -11,9 +11,12 @@ err=ones(1,4);
 N=1;
 step=0;
 j=1;
+title1='===========\nmatriz de rigidez\n'
+title2='===========\nmasas consistentes\n'
+title3='===========\nmasas reducidas\n'
 %for N=1:20;   % Número de elementos.
 %while (sum( err(j,:) > tol ) ~= 0)&&j<2
-    while j < 5
+    while j < 8
     %% loop
     step=step+1;
     N=fix( N*(10^0.1) )+1; % ten points per decade logaritmic scale.
@@ -31,26 +34,37 @@ j=1;
     inercias=I*ones(nels,1);
     secciones=A*ones(nels,1);
     densidades=rho*ones(nels,1);
+    fo = fopen([thiscase,'.dat'])
+    fmtspec = [];
+    for i =1:N
+      fmtspec = [fmtspec, '%10.4e %10.4e']
+    end
+    fmtspec = [fmtspec,'\n']
     %% resolución
     % El único Vínculo es que se debe empotrar el borde derecho!
     [us,fr,r,s]=mkvin(NOD,MC,gl); % hacer vínculos.
     K=mkrig(3,gl,NOD,MC,modulos,secciones,inercias); %Hacer matríz de rigidez.
     %% Matrices de masa
+    fprintf(fo, title1)
+    % dlmwrite([thiscase,'.dat'], K, '-append', 'delimiter','\t', 'precision', 3)
+    fprintf(fo, fmtspec, K)
+    fclose(fo)
+
     Mente=mkmasg(3,gl,NOD,MC,densidades,secciones); %hacer matriz de masas consistentes.
+    %dlmwrite([thiscase,'.dat'], title2, '-append', 'delimiter','' )
+    %dlmwrite([thiscase,'.dat'], Mente, '-append' , 'delimiter','\t', 'precision', 3 )
     Mida=mkmasg(4,gl,NOD,MC,densidades,secciones); % hmkmasa(gl,2,NOD,MC,rho,A,L);acer matriz de masas reducida.
-    %fs=fr-K(r,s)*us; ur=K(r,r)\fs; % Resolver propiamente. Esto no es un
-    %problema de estática sino uno de autovalores generalizados.
+    %dlmwrite([thiscase,'.dat'], title3, '-append', 'delimiter','' )
+    %dlmwrite([thiscase,'.dat'], Mida, '-append' , 'delimiter','\t', 'precision', 3 )
     %% Resolución 
+    %  [K  - w**2 M] U  = 0
     [Dente,W2ente]=eig(K(r,r),Mente(r,r));
     [Dida,W2ida]=eig(K(r,r),Mida(r,r));
     %% Guardo los resultados para graficar
-    wente{step}=sqrt(diag(W2ente));
-    wida{step}=sqrt(diag(W2ida));
-%    if(N>4);
-        j=j+1;
-%        err(j,:)=abs(wente{step}(1:4)-wente{step-1}(1:4))./abs(wente{step}(1:4));
-%    end
-    delete([thiscase,'.*'])
+    wente{step}=sqrt(diag(W2ente))/(2*pi);
+    wida{step}=sqrt(diag(W2ida))/(2*pi);
+    j=j+1;
+%    delete([thiscase,'.*'])
 end
 %%
 %D=[zeros(1,N);D]; %Debo agregar el nodo vinculado
@@ -65,7 +79,7 @@ end
 plotmodes(wente,Uente,nnodo,gl,L,'Consistentes');
 plotmodes(wida,Uida,nnodo,gl,L,'Reducidas');
 %% postprocessing
-
+compara(wente, wida, 2, 'consistente','reducida')
 
 
 
