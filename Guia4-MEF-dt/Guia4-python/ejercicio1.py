@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 import numpy as np
-import mefmods as mef
-from scipy.linalg import eigh
 import matplotlib.pyplot as plt
+from scipy.linalg import eigh
 from viga import Viga
+import plotfrecs as pf
 import pdb
-plot.rc('text', usetex=True)
 
 # primero trato de hacer una matriz de nodos cualquiera
 V = Viga(1, 210e9, 10e-4, 7850, 10e-8)
@@ -16,8 +15,42 @@ V = Viga(1, 210e9, 10e-4, 7850, 10e-8)
 maxmode = 4
 nmax = 15
 wtrans, dtrans = V.converge_study(nmax, maxmode, 'trans')
+# solucion de muchos modos
+V.mesh(100, 'trans')
+wv, dv = V.solvemods(V.K, V.M)
+dv = dv[::2, :] / dv[-2, :]
+xv = np.linspace(0, 1, 101)
 wtrans_lump, dtrans_lump = V.converge_study(nmax, maxmode,  'trans_lump')
 
+MODES = [dtrans, dtrans_lump]
+# MODES[caso][nnodos][nodo, modo]
+labels = ('consistentes', 'concentradas')
+pf.plotmodes(MODES, [2, 6, 10], dv, labels, 'transversales')
+
+ws = [wtrans, wtrans_lump]
+cases = ['consistente', 'concentrada']
+name='transversal'
+pf.plotfrecs(ws, cases, name)
+# cases = np.linspace(2, len(MODES[0]), 3, dtype=int)
+# maxmode = MODES[0][-1][-1].shape[1]
+# ncases = len(cases)
+# for M in range(maxmode):
+#     # M para los modos 
+#     figM, axM = plt.subplots(len(labels), 1, sharex=True)
+#     for l in range(len(labels)):
+#         # l para el label -> MODE[l][][M]
+#         pl = []
+#         caselabel = []
+#         for i, case in enumerate(cases):
+# #            if case < M:
+#             x = np.linspace(0, 1, case+1)
+#             pl.append(axM[l].plot(x, MODES[l][case-1][0][:, M], 'o:')[0])
+#             caselabel.append('{} nodos'.format(case))
+#         pl.append(axM[l].plot(xv, dv[:, M]))
+#         caselabel.append('100 nodos')
+#         axM[l].legend(labels=[], title=labels[l], loc='upper left')
+#     figM.legend(handles=pl, labels=caselabel, ncol=3, loc='upper center')
+#     plt.savefig('Modo_{}.pdf'.format(M))
 # fig, ax = plt.subplots( maxmode, 1,  figsize=(8, 20), sharex=True)
 # for M in range(maxmode):
 #     axnum = maxmode-M-1
