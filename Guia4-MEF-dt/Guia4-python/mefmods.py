@@ -367,7 +367,7 @@ def NT2(x, L):
     Funcion de interpolación Lineal Para Torsión
     NT2(x,L) = (1/L**3) *(1/L**3)*(L*x**3-2*L**2*x**2+x*L**3)
     """
-    return (1/L**3)*(L*x**3-2*L**2*x**2+x*L**3)
+    return (1/L**3)*(L*x**3-2*(L**2)*(x**2)+x*(L**3))
 
 
 def NT3(x, L):
@@ -383,7 +383,7 @@ def NT4(x, L):
     Funcion de interpolación Lineal Para Torsión
     NT3(x,L) = (1/L**3) *( 2*x**3 - 3*x**2*L + L**3)
     """
-    return (1/L**3)*(-2*L*x**3+L**2*x**2)
+    return (1/L**3)*(L*x**3-L**2*x**2)
 
 
 # ## Graficar el mallado, inicial y final

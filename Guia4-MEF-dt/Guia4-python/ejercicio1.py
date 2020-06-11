@@ -12,19 +12,18 @@ V = Viga(1, 210e9, 10e-4, 7850, 10e-8)
 # V.mesh(3, 'trans')
 
 # Estudio de convergencia, modos transversales lump vs consistentes
-maxmode = 4
+maxmode = 6
 nmax = 15
 wtrans, dtrans = V.converge_study(nmax, maxmode, 'trans')
 # solucion de muchos modos
 V.mesh(100, 'trans')
 wv, dv = V.solvemods(V.K, V.M)
-dv = dv[::2, :] / dv[-2, :]
+# dv = dv[::2, :] / dv[-2, :]
 xv = np.linspace(0, 1, 101)
 wtrans_lump, dtrans_lump = V.converge_study(nmax, maxmode,  'trans_lump')
 
 MODES = [dtrans, dtrans_lump]
-# MODES[caso][nnodos][nodo, modo]
-labels = ('consistentes', 'concentradas')
+labels=('consistentes', 'concentradaas')
 pf.plotmodes(MODES, [2, 6, 10], dv, labels, 'transversales')
 
 ws = [wtrans, wtrans_lump]

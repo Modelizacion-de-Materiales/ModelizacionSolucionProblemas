@@ -101,7 +101,7 @@ class Viga(object):
             imax = min(Modemax, len(Wl))
 #           ws[N].append([np.nan]*Modemax)
             ws[N, :imax] = Wl[:imax]
-            Vs[N].append(Vl[::2, :imax]/Vl[-2, :imax])
+            Vs[N].append(Vl[:, :imax])
         return ws, Vs
 
 
