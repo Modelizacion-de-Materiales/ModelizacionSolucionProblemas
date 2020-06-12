@@ -18,16 +18,13 @@ def plotfrecs(ws, cases, name, glstep=2, fig_size=(5, 8)):
             right=0.97
             )
     ax[-1].set_xlabel('Numero de nodos')
-    # no se por que este annotate no anda !
-    # ax[0].annotate('frecuencia(Hz)', (0.,0.), xytext=(0., 0.),
-    #         textcoords='offset points',
-    #         rotation=90,
-    #         fontsize=10
-    #         )
-#    [a.set_xticks([]) for a in ax[:-1]]
+    ax[-1].annotate('frecuencia(Hz)',
+            (0.05, 0.5), xycoords='figure fraction',
+            xytext=(0, 0), textcoords='offset points',
+            rotation=90
+            )
     nelem = np.linspace(0, len(ws[0])-1, len(ws[0]), dtype=int)+1
     nodes = nelem+1
-#    ax[-1].set_xticks(nodes)
     for M in range(maxmode):
         axnum = maxmode-M-1
         lin = []
@@ -57,9 +54,11 @@ def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
                 )
         # detalles del grafico
         # axM[-1].set_ylabel(r'$\Delta y$')
-        axM[0].annotate(r'$\Delta y$', (0.0, 0.0), xytext=(-80, -20),
-                rotation=90,
+        axM[0].annotate(r'$\Delta y$',
+                (0.05, 0.5), xycoords='figure fraction',
+                xytext=(0,0),
                 textcoords='offset points',
+                rotation=90,
                 fontsize=16
                 )
         axM[-1].set_xlabel('x', fontsize=16)
@@ -115,7 +114,7 @@ def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
                 title='Nodos:'.format(M)
                 )
         plt.savefig(name+'Modo_{}.pdf'.format(M))
-        plt.close()
+        #plt.close()
 
 
 # me falta una función para graficar todos los modos juntos

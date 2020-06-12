@@ -33,5 +33,5 @@ cases = ['consistente', 'concentrada']
 name = 'longitudinal'
 pf.plotfrecs(wsL, cases, name)
 
-pf.allmodesplot(dvL[:, :5], 'longitudinales', fig_size=(4, 10))
+pf.allmodesplot(dvL[:, :5], 'longitudinales', fig_size=(4, 10), glstep=1)
 
