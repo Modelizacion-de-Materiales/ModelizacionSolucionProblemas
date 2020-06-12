@@ -54,7 +54,7 @@ class Viga(object):
             # la matriz de rigidez es la mimsa para lumo y no lump
             self.K = mef.ensamble(
                     self.MC, self.MN, self.MPS,
-                    2, [0]*len(self.MC), case='Stiff_long_{}'.format(N)
+                    1, [0]*len(self.MC), case='Stiff_long_{}'.format(N)
                     )
         elif 'trans' in etype:
             # en el caso de transversal, las prpiedades de stiffnes son momento de inercia  y area
@@ -69,12 +69,12 @@ class Viga(object):
         if etype == 'long':
             self.M = mef.ensamble(
                     self.MC, self.MN, self.MPM,
-                    2, ['long']*N, case='Masas_long_{}'.format(N)
+                    1, ['long']*N, case='Masas_long_{}'.format(N)
                     )
         elif etype == 'long_lump':
             self.M = mef.ensamble(
                     self.MC, self.MN, self.MPM,
-                    2, ['long_lump']*N, case='Masas_long_{}'.format(N)
+                    1, ['long_lump']*N, case='Masas_long_{}'.format(N)
                     )
         elif etype == 'trans':
             self.M = mef.ensamble(
@@ -87,9 +87,13 @@ class Viga(object):
                     2, ['trans_lump']*N, case='Masas_long_{}'.format(N)
                     )
 
-    def solvemods(self, K_, M_):
-        w, vl = eigh(K_[2:, 2:], M_[2:, 2:])
-        v = np.vstack((np.zeros((2, vl.shape[1])), vl))
+    def solvemods(self, K_, M_, mode='trans'):
+        if 'long' in mode:
+            mingl = 1
+        else:
+            mingl = 2
+        w, vl = eigh(K_[mingl:, mingl:], M_[mingl:, mingl:])
+        v = np.vstack((np.zeros((mingl, vl.shape[1])), vl))
         return np.sqrt(w)/(2*np.pi), v
 
     def converge_study(self, Nmax, Modemax, mode):
@@ -97,7 +101,7 @@ class Viga(object):
         Vs = [[] for i in range(Nmax)]
         for N in range(Nmax):
             self.mesh(N+1, mode)
-            Wl, Vl = self.solvemods(self.K, self.M)
+            Wl, Vl = self.solvemods(self.K, self.M, mode=mode)
             imax = min(Modemax, len(Wl))
 #           ws[N].append([np.nan]*Modemax)
             ws[N, :imax] = Wl[:imax]
