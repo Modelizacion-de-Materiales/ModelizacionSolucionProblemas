@@ -67,6 +67,8 @@ class barra(object):
         self.T = np.ones((N+1, 1))*self.To
         self.T[0] = self.Ti
         self.T[-1] = self.Td
+        self.r = np.linspace(1, self.T.shape[0]-2, self.T.shape[0]-2, dtype=int)
+        self.s = [0, self.T.shape[0]-1]
 
     def solve_stationary(self, C_, M):
         """
@@ -74,6 +76,33 @@ class barra(object):
         K T = 
 
         """
-        mingl = 1
+        mingl = 1 
         pass
+
+    def evolve(self,  dt=0.1, tmax=5000., to=0., tol=1e-4):
+        T = [self.T]
+        F = [-self.conductivity.prod()*np.gradient(self.T, axis=0)]
+        t = to
+        dT = [np.zeros_like(self.T)]
+        while t <= tmax:
+            t += dt
+            aux = np.zeros_like(self.T)
+            aux[self.s] = T[-1][self.s]
+            aux[self.r] = T[-1][self.r] - dt*np.linalg.solve(
+                self.C[np.ix_(self.r, self.r)],
+                self.K[np.ix_(self.r, self.r)].dot(T[-1][self.r]) +
+                self.K[np.ix_(self.r, self.s)].dot(T[-1][self.s])
+                )
+            T.append(aux)
+            dT.append((T[-1] - T[-2])/dt)
+            F.append(
+                    self.C.dot(dT[-1])+self.K.dot(T[-1])
+                    )
+            if abs((abs(F[-1][-1]) - abs(F[-1][0]))/F[-1][0]) < tol:
+                break
+        T = np.array(T).reshape(len(T), T[-1].shape[0])
+        F = np.array(F).reshape(len(F), F[-1].shape[0])
+
+        return T, F
+
 
