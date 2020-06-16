@@ -4,6 +4,7 @@ gl=1; %grados de libertad.
 L=1; %m de longitud
 A=pi*(6e-3)^2 ; %m^2, área.
 k=200; % W/mC, conductividad térmica.
+% ojo que despues piso la C
 C=900; % J/kgC, calor especifico.
 rho=2700; % densidad kg m^-3;
 tol = 1e-3;
