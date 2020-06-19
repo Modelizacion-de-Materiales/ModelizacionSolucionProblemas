@@ -1,7 +1,7 @@
 
 %% Inicializar variables generales
 gl=1; %grados de libertad.
-L=1; %m de longitud
+L=0.1; %m de longitud
 A=pi*(6e-3)^2 ; %m^2, área.
 k=200; % W/mC, conductividad térmica.
 % ojo que despues piso la C
@@ -16,7 +16,7 @@ thiscase='barra';
 T=30*ones(N,1); % Temperatura inicial.
 writegeo(L,N-1,[thiscase,'.geo']);  % hacer la geometría
 system('rm *.msh');
-system(['gmsh -1 -format msh22',thiscase,'.geo ',thiscase,'.msh']); %hacer el msh
+system(['gmsh -1 -format msh22 ',thiscase,'.geo ',thiscase,'.msh']); %hacer el msh
 [NOD,MC]=readmsh([thiscase,'.msh'],1);  % obtener nodos y matriz de conectividad, solo para líneas.
 ngl=size(NOD,1)*gl;   % numero totales de grados de libertad.
 nnodo=size(NOD,1);   % número de nodos total
