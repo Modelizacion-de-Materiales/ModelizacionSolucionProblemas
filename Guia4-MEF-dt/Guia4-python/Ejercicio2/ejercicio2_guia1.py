@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-# vim: source ~/.vim/ftplugin/python.vim
+# -*- coding: utf8 -*-
 
 import pdb
 import numpy as np
 # import matplotlib
 # matplotlib.use('Qt5agg')
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 
 def plotlistT(theTlist, dt):
@@ -38,3 +39,22 @@ def plotlistT(theTlist, dt):
     figfile = theTlist.replace('.dat', '.pdf')
     plt.savefig(figfile)
     plt.close()
+
+
+def plotFs(listaFs, dt):
+    FS = np.loadtxt(listaFs)
+    NT, N = np.shape(FS)
+    ts = np.linspace(0, NT-1, NT)*dt
+    fig, ax = plt.subplots(
+            2, 1,
+            sharex=True,
+            gridspec_kw={'height_ratios': [2, 1]},
+            )
+    plt.subplots_adjust(left=0.2, right=0.95)
+    ax[0].plot(ts, FS[:, 0], label='flujo entrante')
+    ax[0].plot(ts, -FS[:, -1], label='flujo entrante')
+    ax[0].set_ylabel('Flujo (J/m)')
+    ax[1].semilogy(ts, np.abs(np.abs(FS[:, 0]) - np.abs(FS[:, -1])), '-k')
+    ax[1].set_ylabel(r'$|F_{in} - F_{out}|$')
+    ax[1].set_xlabel('t (s)')
+    fig.savefig('flujodt_{:.2f}.pdf'.format(dt))
