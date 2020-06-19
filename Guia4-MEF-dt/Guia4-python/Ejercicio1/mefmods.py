@@ -115,7 +115,7 @@ def kelemental(etype, MP, NODES=None, CONEC=None):
     etype == 1: resortes unimensionales [ 1 -1 , -1 1]
     """
     if etype == 0:  # caso etype =resortes
-        kel = MP*np.array([[1, -1], [-1, 1]], dtype=float)
+        kel = MP.prod()*np.array([[1, -1], [-1, 1]], dtype=float)
     elif etype == 1:  # caso etipe = barras 
         """
         En este caso voy a necesitar la matriz de nodos local
