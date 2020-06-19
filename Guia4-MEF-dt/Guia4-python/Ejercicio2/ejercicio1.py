@@ -4,7 +4,7 @@ from barrat import barra
 from ejercicio2_guia1 import plotlistT
 import pdb
 
-B = barra()
+B = barra(L=0.1)
 B.mesh(4)
 
 dt = 0.1

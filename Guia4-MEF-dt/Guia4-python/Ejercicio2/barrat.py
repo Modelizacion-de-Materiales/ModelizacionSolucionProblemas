@@ -26,7 +26,7 @@ class barra(object):
     # Metodos
     mesh(N): dividir en N elementos
     """
-    def __init__(self, L=1, A=np.pi*(0.012/2)**2, rho=2700, k=200, c=900, To=30, Ti=80, Td=30):
+    def __init__(self, L=1, A=np.pi*(0.012/2)**2, rho=2700, k=200, c=900, To=30, Ti=80, Td=50):
         """
         define los atributos de la clase
         """
