@@ -1,12 +1,13 @@
+set encoding utf8
 FILES=system('/bin/ls output2x2*.dat | sort -V ')
 N=system('/bin/ls output2x2*.dat | sort -V | sed "s/output//g ; s/x.*//g"')
 MCS=system('/bin/ls output2x2*.dat | sort -V |sed "s/output.*-//;s/mcs.dat//"')
 do for[i=1:words(FILES) ] { 
   x=word(N,i)**2
-  print word(FILES,i)."  ".word(N,i)."  ".word(MCS,i)
+#  print word(FILES,i)."  ".word(N,i)."  ".word(MCS,i)
 }
 load './plot_exact_results.gpi'
-set terminal epslatex input
+set terminal epslatex input #  header "\\usepackage[utf8]{inputenc}\n"
 set output 'scale_2x2.tex'
 set title 'cálculos 2x2 vs teoria'
 set ylabel '$ <E^2> - <E>^2  / kT^2 $'

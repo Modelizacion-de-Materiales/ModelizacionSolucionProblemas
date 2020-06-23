@@ -18,10 +18,10 @@ TRANSIENT=ceil(NSTEPS/10);
 % idea sacada del paper que me paso ruben.
 NORM = 1/(NSTEPS*N^2) ;
 
-thissize=[num2str(N,'%d'),'x',num2str(N,'%d')]
-thismcs=[num2str(NSTEPS,'%d'),'mcs']
-thisfile=['output',thissize,'-',thismcs,'.dat']
-thisfig=['output',thissize,'-',thismcs]
+thissize=[num2str(N,'%d'),'x',num2str(N,'%d')];
+thismcs=[num2str(NSTEPS,'%d'),'mcs'];
+thisfile=['output',thissize,'-',thismcs,'.dat'];
+thisfig=['output',thissize,'-',thismcs];
 
 %guardo encabezado de archivo
 fid=fopen(thisfile,'w'); 
@@ -36,8 +36,7 @@ s = sign(rand(N) - 0.5) ;
   % TERMALIZACION A T ALTA
 %  i1 = ceil( rand(NSTEPS,1)*(N) ); 
 %  i2 = ceil( rand(NSTEPS,1)*(N) ); 
-  siflips=0;
-  noflips=0;
+  siflips=0; noflips=0;
   for i = 1:NSTEPS  % {
   [ dE, dM, s , siflips, noflips ] =  ...
      metropolising(J,beta(1),s,siflips,noflips );
@@ -51,7 +50,9 @@ s = sign(rand(N) - 0.5) ;
 sumOfNeighbours = getneigbours( s );
 E = - ( J / 2 ) * sum ( sum( s.*sumOfNeighbours )) + mu*Hext*sum(s(:)); 
 M = sum(sum(s));
-
+%plotting params
+colormap summer;
+basename=['N_', num2str(N, '%02d')];
 
 for t = 1:length(kT) % {
   %  inicio los acumuladores
@@ -66,19 +67,20 @@ for t = 1:length(kT) % {
 %    [ dE, dM, s , noflips, siflipls ] =  ...
 %       metropolising(J,beta(t),s,noflips,siflips );
 %  end % }
-%  %image((s+1)*256)
-%  %saveas(gcf,[num2str(t,'%03d'),'-init.png'])
-%  %close
-%
-%  % y calculo la energía inicial de la distribución:
-  sumOfNeighbours = getneigbours( s );
-  E = - ( J / 2 ) * sum ( sum( s.*sumOfNeighbours )) + mu*Hext*sum(s(:)); 
-  M = sum(sum(s));
+  cases=[basename, '_kT_',num2str(t,'%02d')];
+  fig = figure();
+  fig.PaperOrientation='landscape';
+%  fig.Units='normalized';
+  fig.Position=[0,0,25,15];
+  subplot(1,2,1); image((s+1)*256);   xticks([]); yticks([]);  title('init');
+  % y calculo la energía inicial de la distribución:
   % preparo metropolis
   % en esta versión las coordenadas las genero en la funcion metropolis.
   % cuento los flips para debug !
-  siflips=0;
-  noflips=0;
+  sumOfNeighbours = getneigbours( s );
+  E = - ( J / 2 ) * sum ( sum( s.*sumOfNeighbours )) + mu*Hext*sum(s(:)); 
+  M = sum(sum(s));
+  siflips=0; noflips=0;
   % luego del transitorio inicia los acumuladores parael caso.
   E_ACUM = E;  M_ACUM = M; E2_ACUM = E^2 ;  Mabs_ACUM = M;
   % METROPOLIS
@@ -94,29 +96,32 @@ for t = 1:length(kT) % {
      E_ACUM = E_ACUM + E ; Mabs_ACUM=Mabs_ACUM+abs(M); M_ACUM = M_ACUM + M;
      E2_ACUM = E2_ACUM + (E)^2;
   end % }
-  %image((s+1)*256)
-  %saveas(gcf,[num2str(t,'%03d'),'-end.png'])
-  %close
-
+  subplot(1,2,2); image((s+1)*256);  xticks([]); yticks([]);  title('end'); 
+  title(fig.Children(end), ['kT = ', num2str(kT(t)) , ', size = ', num2str(N),'X', num2str(N)]);
+  %saveas(fig, [cases,'.pdf']);
+  print([cases,'.pdf'], '-dpdf','-bestfit')
+  close;
   % al final de metrópolis tengo que calcular toda la estadística.
   EMEAN(t) = E_ACUM/NSTEPS  ;%   * NORM ;
   MMEAN(t) = M_ACUM/NSTEPS ;   %* NORM;
   MabsMEAN(t)=Mabs_ACUM/NSTEPS;
   E2MEAN(t) = E2_ACUM/NSTEPS ;%  *NORM ;
   VARIANCE(t) = (E2MEAN(t)-EMEAN(t)^2)/NSTEPS  ;
-  disp(['flips = ',num2str(siflips),' rejects= ', num2str(noflips)])
+  disp(['N = ', num2str(N), ...
+        ' totalflips = ', num2str(NSTEPS), ...
+        '  kT = ', num2str(t),...
+	'  flips = ',num2str(siflips),...
+	' rejects= ', num2str(noflips)])
 
 % fprintf(fid,'# T EMEAN E2MEAN CV MMEAN siflips noflips') 
   fprintf(fid,'%15.4e %15.4e %15.4e   %15.4e %15.4e %15.4e %d %d\n',...
   kT(t), EMEAN(t), E2MEAN(t), VARIANCE(t)/kT(t)^2, MMEAN(t), MabsMEAN(t),...
   siflips, noflips ) ;
-      
-  end % } 
-
+  end % 
   fclose(fid)
- 
-end % }
-
+system(['LD_PRELOAD="/usr/lib64/libstdc++.so.6" pdftk ',basename,'_kT* cat output ',basename,'.pdf'])
+system(['rm ',basename, '_kT*.pdf'])
+end % 
 %function [ NNDN ,  NNUP,  NNLE, NNRI ] = getneigbours( s )
 function [sumofneighmours] = getneigbours( s ) % {
   %%% ojo porque el cricshift esta relentizando el programa ! 

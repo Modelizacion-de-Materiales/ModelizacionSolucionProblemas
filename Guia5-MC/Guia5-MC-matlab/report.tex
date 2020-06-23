@@ -1,0 +1,29 @@
+\documentclass[aspect=169]{beamer}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+\begin{frame}<presentation>[label=FrameGrilla2x2]
+  \frametitle{Grilla 2x2}
+
+  \resizebox{\textwidth}{!}{ \input{./scale_2x2} }
+
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameGrilla16x16]
+  \frametitle{Grilla 16x16}
+  \resizebox{\textwidth}{!}{ \input{./scale_16x16} }
+  
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameMomentoMagnetico]
+  \frametitle{Evolución del Momento Magnético}
+  \resizebox{\textwidth}{!}{\input{./scale_M_N}}
+\end{frame}
+
+\begin{frame}<presentation>[label=FrameCalorEspecifico]
+  \frametitle{Evolución del calor específico}
+  \resizebox{\textwidth}{!}{\input{./scale_cv_N}} 
+\end{frame}
+\end{document}

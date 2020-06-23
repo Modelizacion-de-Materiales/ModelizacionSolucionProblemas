@@ -1,15 +1,17 @@
+set encoding utf8
 # set terminal pdf enhanced color
 # set output 'test.pdf'
 
-FILES=system('/bin/ls output*-500000mcs.dat | sort -V ')
-N=system('/bin/ls output*-500000mcs.dat | sort -V | sed "s/output//g ; s/x.*//g"')
+nsteps='50000'
+FILES=system('/bin/ls output*-'.nsteps.'mcs.dat | sort -V ')
+N=system('/bin/ls output*-'.nsteps.'mcs.dat | sort -V | sed "s/output//g ; s/x.*//g"')
 do for[i=1:words(FILES) ] { 
   x=word(N,i)**2
   print word(FILES,i)."  ".word(N,i)."  "
 }
 set xlabel "$ T / T_0$"
-
-set terminal epslatex input 
+set xrange [1:*]
+set terminal epslatex input # header "\\usepackage[utf8]{inputenc}\n"
 set title " resultados para 5M MCS "
 
 #set title "Escaleo en tamaño"
@@ -17,7 +19,7 @@ set key title " tamaño de sistema "
 
 set output 'scale_M_N.tex'
 # ojo, el ls lo tengo que hacer sobre los de 10kmcs" 
-set ylabel "$ \\lvert M \\rvert $"
+set ylabel "$||M||$"
 plot for [i=1:words(FILES)] \
      word(FILES,i) u 1:($6/word(N,i)**2) w l ti word(N,i)."x".word(N,i)
 set out
