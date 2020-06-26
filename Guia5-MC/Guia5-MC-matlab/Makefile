@@ -7,7 +7,6 @@ report: allplots #plot2x2
 #report: plot_escal #plot_cv
 #	pdflatex report.tex
 
-
 allplots: plot plot2x2 
 
 plot: plot.gpi
