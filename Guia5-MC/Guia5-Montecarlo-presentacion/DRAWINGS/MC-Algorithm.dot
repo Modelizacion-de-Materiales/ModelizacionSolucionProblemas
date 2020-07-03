@@ -1,0 +1,11 @@
+digraph metropolis {
+{
+  rank = same;
+  start [label="inicializar distribucion", shape=box];
+  calc  calcular energia";
+  chos  elegir un elemento para cambiar\n distribución W"];
+  cal2  calcular el cambio de energía :qq
+}
+
+
+}

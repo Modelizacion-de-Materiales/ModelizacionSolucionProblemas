@@ -72,7 +72,7 @@ for t = 1:length(kT) % {
   fig.PaperOrientation='landscape';
 %  fig.Units='normalized';
   fig.Position=[0,0,25,10];
-  subplot(1,2,1); colormap grey; grid on; image((s+1)*256);   xticks([]); yticks([]);  title('init');
+  subplot(1,2,1); colormap summer; grid on; image((s+1)*256);   xticks([]); yticks([]);  title('init');
   % y calculo la energía inicial de la distribución:
   % preparo metropolis
   % en esta versión las coordenadas las genero en la funcion metropolis.
