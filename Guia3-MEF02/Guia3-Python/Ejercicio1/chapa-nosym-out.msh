@@ -77,3 +77,27 @@ $ElementData
 1  2.401922
 2  -2.401922
 $EndElementData
+$ElementData
+1
+"sigma_max"
+1
+0.000000
+3
+0
+1
+2
+1  1306.249413
+2  994.001000
+$EndElementData
+$ElementData
+1
+"sigma_min"
+1
+0.000000
+3
+0
+1
+2
+1  -0.004417
+2  -0.005804
+$EndElementData

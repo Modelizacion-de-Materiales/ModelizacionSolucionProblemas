@@ -4,7 +4,7 @@ from meshmods import mesh
 import mefmods as mef
 import pdb
 import numpy as np
-thiscase = 'chapa-sym'
+thiscase = 'chapa-nosym'
 CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
