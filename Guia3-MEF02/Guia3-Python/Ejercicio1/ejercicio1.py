@@ -4,7 +4,7 @@ from meshmods import mesh
 import mefmods as mef
 import pdb
 import numpy as np
-thiscase = 'chapa-nosym'
+thiscase = 'chapa-fino'
 CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
@@ -23,7 +23,6 @@ MP = np.hstack(
             )
         )
 K = mef.ensamble(MC, CHAPA.MN, MP, CHAPA.GL, ETYPES, thiscase)
-pdb.set_trace()
 U, F = mef.resolvermef(R, S, K, US, FR, thiscase)
 CHAPA.writemsh(thiscase+'-out.msh')
 Uxyz = np.zeros(CHAPA.MN.shape)
@@ -35,6 +34,18 @@ Uxyz = np.array(Uxyz)
 Fxyz = np.array(Fxyz)
 CHAPA.writedatablock(thiscase+'-out.msh', Uxyz, '"Desplazamientos"', 0, 0.)
 CHAPA.writedatablock(thiscase+'-out.msh', Fxyz, '"Fuerzas"', 0, 0.)
+CHAPA.writedatablock(
+        thiscase+'-out.msh',
+        np.hstack((Fxyz[:, 0].reshape(-1, 1), np.zeros((len(Fxyz), 2)))),
+        '"F_x"',
+        0,
+        0.)
+CHAPA.writedatablock(
+        thiscase+'-out.msh', 
+        np.hstack((np.zeros((len(Fxyz), 1)), Fxyz[:, 1:])),
+        '"F_y"',
+        0,
+        0.)
 sigma = mef.getstress(CHAPA, MP, U)
 CHAPA.writedatablock(thiscase+'-out.msh', sigma[:, 0], '"sigma_x"', 0, 0., dim=1, blocktype='ElementData')
 CHAPA.writedatablock(thiscase+'-out.msh', sigma[:, 1], '"sigma_y"', 0, 0., dim=1, blocktype='ElementData')
