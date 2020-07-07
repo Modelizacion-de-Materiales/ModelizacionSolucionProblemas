@@ -259,7 +259,7 @@ def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
     us = np.empty((0, 1), dtype=float)
     fr = np.empty((0, 1), dtype=float)
     # que condiciones de contorno hay ?
-    isembedd = isembed_x = isembed_y = False
+    isembedd = isembed_x = isembed_y = isstres = isstres_1 = False
     if '"embedd"' in TYPES:
         i_embed = TYPES.index('"embedd"')
         isembedd = True
@@ -272,6 +272,9 @@ def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
     if '"stress"' in TYPES:
         i_stres = TYPES.index('"stress"')
         isstres = True
+    if '"stress1"' in TYPES:
+        i_stres_1 = TYPES.index('"stress1"')
+        isstres_1 = True
     f = np.zeros((len(MESH.MN)*MESH.GL, 1))
     for n in range(len(MESH.MN)):
         # MDF-COMMENT lo que me falta hacer es 
@@ -297,13 +300,20 @@ def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
                 r = np.append(r, int(n*MESH.GL+g))
     if isstres:
         for e in range(len(BOUNDARY[TYPES.index('"stress"')])):
-            N1 = BOUNDARY[i_stres][e,0]-1
-            N2 = BOUNDARY[i_stres][e,1]-1
+            N1 = BOUNDARY[i_stres][e, 0]-1
+            N2 = BOUNDARY[i_stres][e, 1]-1
             Y = MESH.MN[[N1, N2], 1]
             L = abs(np.diff(Y))
             f[[2*N1, 2*N2]] += np.ones((2, 1))*VALUES[i_stres]*L / 2
-    fr = f[r].reshape(-1,1)
-    us = us.reshape(-1,1)
+    if isstres_1:
+        for e in range(len(BOUNDARY[TYPES.index('"stress1"')])):
+            N1 = BOUNDARY[i_stres_1][e, 0]-1
+            N2 = BOUNDARY[i_stres_1][e, 1]-1
+            Y = MESH.MN[[N1, N2], 1]
+            L = abs(np.diff(Y))
+            f[[2*N1, 2*N2]] += np.ones((2, 1))*VALUES[i_stres_1]*L / 2
+    fr = f[r].reshape(-1, 1)
+    us = us.reshape(-1, 1)
     return r, s, us, fr
 
 

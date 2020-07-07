@@ -21,11 +21,12 @@ MC = CHAPA.elements[CHAPA.physnames.index('"sheet"')]-1
 LEMBX = CHAPA.elements[CHAPA.physnames.index('"embedd_x"')]
 LEMBY = CHAPA.elements[CHAPA.physnames.index('"embedd_y"')]
 LSTRE = CHAPA.elements[CHAPA.physnames.index('"stress"')]
+LSTRE1 = CHAPA.elements[CHAPA.physnames.index('"stress1"')]
 R, S, US, FR = mef.mkbound(
         CHAPA,
-        [LEMBX, LEMBY, LSTRE],
-        ('"embedd_x"', '"embedd_y"', '"stress"'),
-        [0, 0,  1000]
+        [LEMBX, LEMBY, LSTRE,  LSTRE1],
+        ('"embedd_x"', '"embedd_y"', '"stress"',   '"stress1"'),
+        [0, 0,  1000, -1000]
         )
 ETYPES = 2*np.ones(len(MC))
 nu = 0.3  # Modulo de Poison
