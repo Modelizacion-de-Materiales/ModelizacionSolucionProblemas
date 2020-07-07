@@ -258,25 +258,50 @@ def mkbound(MESH, BOUNDARY, TYPES,  VALUES):
     s = np.empty((0, 1), dtype=int)
     us = np.empty((0, 1), dtype=float)
     fr = np.empty((0, 1), dtype=float)
+    # que condiciones de contorno hay ?
+    isembedd = isembed_x = isembed_y = False
+    if '"embedd"' in TYPES:
+        i_embed = TYPES.index('"embedd"')
+        isembedd = True
+    if '"embedd_x"' in TYPES:
+        i_embed_x = TYPES.index('"embedd_x"')
+        isembed_x = True
+    if '"embedd_y"' in TYPES:
+        i_embed_y = TYPES.index('"embedd_y"')
+        isembed_y = True
+    if '"stress"' in TYPES:
+        i_stres = TYPES.index('"stress"')
+        isstres = True
     f = np.zeros((len(MESH.MN)*MESH.GL, 1))
     for n in range(len(MESH.MN)):
-        #MDF-COMMENT lo que me falta hacer es 
-        #MDF-COMMENT pedirle que diferenie si 
-        #MDF-COMMENT es un vunculo de los dos grados de libertad o uno solo
-        if (n == BOUNDARY[0]-1).any():
+        # MDF-COMMENT lo que me falta hacer es 
+        # MDF-COMMENT pedirle que diferencie si 
+        # MDF-COMMENT es un vunculo de los dos grados de libertad o uno solo
+        # if (n == BOUNDARY[0]-1).any():
+        if isembedd and (n == BOUNDARY[i_embed] - 1).any():
             for g in range(MESH.GL):
                 s = np.append(s, n*MESH.GL + g)
-                us = np.append(us, VALUES[0])
-                np.append(us, 0)
+                us = np.append(us, VALUES[i_embed])
+#                np.append(us, 0)
+        elif isembed_x and (n == BOUNDARY[i_embed_x] - 1).any():
+            s = np.append(s, n*MESH.GL)
+            us = np.append(us, VALUES[i_embed_x])
+            for g in range(1, MESH.GL):
+                r = np.append(r, int(n*MESH.GL + g))
+        elif isembed_y and (n == BOUNDARY[i_embed_y] - 1).any():
+            r = np.append(r, int(n*MESH.GL))
+            s = np.append(s, n*MESH.GL+1)
+            us = np.append(us, VALUES[i_embed_y])
         else:
             for g in range(MESH.GL):
                 r = np.append(r, int(n*MESH.GL+g))
-    for e in range(len(BOUNDARY[1])):
-        N1 = BOUNDARY[1][e,0]-1
-        N2 = BOUNDARY[1][e,1]-1
-        Y = MESH.MN[[N1, N2], 1]
-        L = abs(np.diff(Y))
-        f[[2*N1, 2*N2]] += np.ones((2, 1))*VALUES[1]*L / 2
+    if isstres:
+        for e in range(len(BOUNDARY[TYPES.index('"stress"')])):
+            N1 = BOUNDARY[i_stres][e,0]-1
+            N2 = BOUNDARY[i_stres][e,1]-1
+            Y = MESH.MN[[N1, N2], 1]
+            L = abs(np.diff(Y))
+            f[[2*N1, 2*N2]] += np.ones((2, 1))*VALUES[i_stres]*L / 2
     fr = f[r].reshape(-1,1)
     us = us.reshape(-1,1)
     return r, s, us, fr

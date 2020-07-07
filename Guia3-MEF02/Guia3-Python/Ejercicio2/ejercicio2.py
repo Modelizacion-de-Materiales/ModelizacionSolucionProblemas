@@ -4,18 +4,27 @@ from meshmods import mesh
 import mefmods as mef
 import pdb
 import numpy as np
-thiscase = 'chapa'
+import getopt, sys
+#try: 
+#    opts, args = getopt.getopt(sys.argv[1:], "hi:o:", ["ifile=", "ofile="])
+#except getopt.GetoptError:
+#    print('ejercicio2.py -i <inputfile> -o <outputfile>')
+#    sys.exit()
+if len(sys.argv) == 2:
+    thiscase = sys.argv[-1]
+else:
+    thiscase = 'chapa'
 CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
 MC = CHAPA.elements[CHAPA.physnames.index('"sheet"')]-1
-LEMBX = CHAPA.elements[CHAPA.physnames.index('"embedded_x"')]
-LEMBY = CHAPA.elements[CHAPA.physnames.index('"embedded_y"')]
+LEMBX = CHAPA.elements[CHAPA.physnames.index('"embedd_x"')]
+LEMBY = CHAPA.elements[CHAPA.physnames.index('"embedd_y"')]
 LSTRE = CHAPA.elements[CHAPA.physnames.index('"stress"')]
 R, S, US, FR = mef.mkbound(
-        CHAPA, 
-        [LEMBX, LEMBY, LSTRE], 
-        ('"embedded_x"', '"embedded_y"'),
+        CHAPA,
+        [LEMBX, LEMBY, LSTRE],
+        ('"embedd_x"', '"embedd_y"', '"stress"'),
         [0, 0,  1000]
         )
 ETYPES = 2*np.ones(len(MC))
@@ -62,6 +71,7 @@ sigma_max = SA + SB
 sigma_min = SA - SB
 CHAPA.writedatablock(thiscase+'-out.msh', sigma_max, '"sigma_max"', 0, 0., dim=1, blocktype='ElementData')
 CHAPA.writedatablock(thiscase+'-out.msh', sigma_min, '"sigma_min"', 0, 0., dim=1, blocktype='ElementData')
+print('case = {}, max(sigma_max) = {}'.format(thiscase, sigma_max.max()))
 
 # print(CHAPA.elements)
 # print(CHAPA.MN)
