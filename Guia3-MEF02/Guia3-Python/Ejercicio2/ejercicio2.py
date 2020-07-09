@@ -18,15 +18,53 @@ CHAPA = mesh(thiscase+'.msh')
 CHAPA.newreadmsh()
 CHAPA.GL = 2
 MC = CHAPA.elements[CHAPA.physnames.index('"sheet"')]-1
-LEMBX = CHAPA.elements[CHAPA.physnames.index('"embedd_x"')]
-LEMBY = CHAPA.elements[CHAPA.physnames.index('"embedd_y"')]
-LSTRE = CHAPA.elements[CHAPA.physnames.index('"stress"')]
-LSTRE1 = CHAPA.elements[CHAPA.physnames.index('"stress1"')]
+boundaries = []
+boundary_conditions=[]
+stresses = []
+values = []
+try:
+    LEMB = CHAPA.elements[CHAPA.physnames.index('"embedd"')]
+    boundaries.append(LEMB)
+    boundary_conditions.append('"embedd"')
+    values.append(0)
+except:
+    print('No hay empotramiento total')
+try:
+    LEMBX = CHAPA.elements[CHAPA.physnames.index('"embedd_x"')]
+    boundaries.append(LEMBX)
+    boundary_conditions.append('"embedd_x"')
+    values.append(0)
+except:
+    print('No hay empotramiento parcial x')
+try:
+    LEMBY = CHAPA.elements[CHAPA.physnames.index('"embedd_y"')]
+    boundaries.append(LEMBY)
+    boundary_conditions.append('"embedd_y"')
+    values.append(0)
+except:
+    print('No hay empotramiento parcial en y')
+try:
+    LSTRE = CHAPA.elements[CHAPA.physnames.index('"stress"')]
+    boundaries.append(LSTRE)
+    boundary_conditions.append('"stress"')
+    values.append(1000)
+except:
+    print('No Hay stress')
+try: 
+    LSTRE1 = CHAPA.elements[CHAPA.physnames.index('"stress1"')]
+    boundaries.append(LSTRE1)
+    boundary_conditions.append('"stress1"')
+    values.append(-1000)
+except:
+    print('no hay stress extra')
 R, S, US, FR = mef.mkbound(
         CHAPA,
-        [LEMBX, LEMBY, LSTRE,  LSTRE1],
-        ('"embedd_x"', '"embedd_y"', '"stress"',   '"stress1"'),
-        [0, 0,  1000, -1000]
+#        [LEMBX, LEMBY, LSTRE,  LSTRE1],
+#        ('"embedd_x"', '"embedd_y"', '"stress"',   '"stress1"'),
+        boundaries,
+        boundary_conditions,
+        values
+#        [0, 0,  1000, -1000]
         )
 ETYPES = 2*np.ones(len(MC))
 nu = 0.3  # Modulo de Poison

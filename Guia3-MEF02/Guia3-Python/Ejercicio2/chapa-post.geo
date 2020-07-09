@@ -1,0 +1,26 @@
+// Gmsh project created on Wed Jul  8 16:13:16 2020
+model="chapa1-out";
+Merge StrCat(model,".msh");
+View[0].Visible = 0;
+View[1].Visible = 0;
+View[2].Visible = 1;
+View[2].Name = "";
+View[3].Visible = 1;
+View[3].Name = "";
+View[4].Visible = 0;
+View[5].Visible = 0;
+View[6].Visible = 0;
+View[7].Visible = 1;
+View[7].Name = "";
+View[8].Visible = 0;
+View[0].OffsetY = -150;
+Print.EpsCompress = 0;
+//Print.EpsQuality = 1;
+Print.Text = 1;
+Print.Background = 1;
+General.TranslationY = 1.3;
+General.TranslationX = 0;
+General.ScaleX = 1;
+General.ScaleY = 1;
+Print StrCat(model,".jpg");
+Exit;
