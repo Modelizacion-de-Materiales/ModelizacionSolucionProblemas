@@ -5,9 +5,9 @@ nu=0.3;
 t=1; %inch
 sigma_ext=1000; % tension remota, psi
 
-thiscase='chapa-1cuad';  %nombre del caso actual.
-writegeo(0,1,-10,10,-5,5,2,10,[thiscase,'.geo']);
-system(['gmsh ',thiscase,'.geo -2 -o ',thiscase,'.msh'])
+thiscase='chapa2_1cuad';  %nombre del caso actual.
+%writegeo(0,1,-10,10,-5,5,2,10,[thiscase,'.geo']);
+%system(['gmsh ',thiscase,'.geo -2 -o ',thiscase,'.msh'])
 [NOD,MC]=readmsh([thiscase,'.msh']);  % obtener nodos y matriz de conectividad.
 ngl=size(NOD,1)*gl;   % numero totales de grados de libertad.
 nnodo=size(NOD,1);   % número de nodos total
@@ -45,4 +45,6 @@ nodedatablock(thiscaseout,nnodo,'"sigma x (Pa,av) " ',1,0,0.0,sigmax_nod);
 nodedatablock(thiscaseout,nnodo,'"shear (Pa,av) " ',1,0,0.0,shear_nod);
 nodedatablock(thiscaseout,nnodo,'"Desplazamiento (m) " ',3,0,0.0,[Ux Uy zeros(nnodo,1)] );
 nodedatablock(thiscaseout,nnodo,'"Fuerzas (N) " ',3,0,0.0,[Fx' Fy' zeros(nnodo,1)] );
+nodedatablock(thiscaseout,nnodo,'"F_x (N) " ',3,0,0.0,[Fx' zeros(nnodo,2)] );
+nodedatablock(thiscaseout,nnodo,'"F_y (N) " ',3,0,0.0,[zeros(nnodo,1) Fy' zeros(nnodo,1)] );
 elementdatablock(thiscaseout,nels,'"Tensiones 1(Pa)"',1,0,0.0,principales(:,1))
