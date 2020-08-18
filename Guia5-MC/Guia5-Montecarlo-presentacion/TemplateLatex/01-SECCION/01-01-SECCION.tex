@@ -1,0 +1,44 @@
+%%% Mariano Daniel Forti para
+%%% Modelizacion de materiales 
+%%% 2019 (c)
+% EN estos archivos se carga la info 
+% este es un ejemplo de una diapositiva 
+% en dos columnas. 
+\begin{frame}{Columnas.}
+
+  % texto introductorio
+  \centering
+  \textbf{  En esta diapositiva 
+  se cargan cosas en   dos columnas. }
+  \par
+ 
+\begin{columns}
+  \column{0.3\textwidth} 
+    Primera columna del texto para escribir
+    lo que sea necesario.
+
+    puede haber varios parrafos. 
+
+
+  \column{0.6\textwidth} 
+  % el contenido de la columna resaltado
+  \begin{beamercolorbox}
+    [ht=20pt,wd=\textwidth,center,
+    colsep=5pt]
+    {highlight1}
+\centering Subcolumnas. \par 
+  \end{beamercolorbox}
+  \begin{columns}
+    \column{0.5\textwidth}
+      Temas a tratar
+
+    \column{0.5\textwidth}
+      \begin{itemize}
+	  \item interpolacion
+	  \item integracion
+	  \item ecuaciones diferenciales
+	    ordinarias. 
+      \end{itemize}
+  \end{columns}
+\end{columns}
+\end{frame}

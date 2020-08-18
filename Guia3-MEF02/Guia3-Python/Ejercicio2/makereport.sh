@@ -23,7 +23,7 @@ echo "\usepackage{tikz}" >> $report
 echo "\usepackage{amsmath}" >> $report
 echo "\begin{document}" >> $report
 
-for file in chapa*.jpg
+for file in chapa*-out.pdf
     do
         fe=$(echo  $file  | tr -d -c 0-9.)
         newfile=${file/0\./0}
@@ -32,7 +32,7 @@ for file in chapa*.jpg
             mv $file $newfile
         fi
         echo "\begin{frame}" >> $report
-        echo "\frametitle{${file/\.jpg/}}" >> $report
+        echo "\frametitle{${file/\.pdf/g}}" >> $report
         echo "\includegraphics[width=\textwidth]{$newfile}" >> $report
         echo "\begin{tikzpicture}[overlay] " >> $report
         echo "    \node at (-7.8,1.6) {\tiny $\sigma_{max} (Pa) $}; " >> $report

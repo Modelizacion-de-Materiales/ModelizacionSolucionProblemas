@@ -1,12 +1,11 @@
-MATLAB = matlab -nodesktop -nosplash -nojvm -r 
+MATLAB = matlab -nodesktop -nosplash -noFigureWindows -r 
 ising: ising.m INPUT.m
 	${MATLAB} 'INPUT ; exit'  
 
-report: allplots #  plot2x2
+report: allplots #plot2x2
 	pdflatex report.tex
 #report: plot_escal #plot_cv
 #	pdflatex report.tex
-
 
 allplots: plot plot2x2 
 
