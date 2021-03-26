@@ -43,13 +43,13 @@ def misplines(XSPLINE,YSPLINE,fun_name_spline):
                                   
  
     B=np.linalg.solve(A,YY)  # linalg se importa de numpy. linalg.solve resuelve el sistema lineal AA*B=YY.
-    a=np.zeros([N-1,1])
-    c=np.zeros([N-1,1])
-    b=np.zeros([N-1,1])
-    d=np.zeros([N-1,1])
+    a=np.zeros([NX-1,1])
+    c=np.zeros([NX-1,1])
+    b=np.zeros([NX-1,1])
+    d=np.zeros([NX-1,1])
 
     # una vez que tengo las b, resuelvo recursivamente las otras cosas.
-    for i in np.linspace(0,N-2,N-1).astype(int):
+    for i in np.linspace(0,NX-2,NX-1).astype(int):
         a[i]=(1.0/3.0) * ( B[i+1] - B[i] ) / h[i]
         c[i]=(YSPLINE[i+1]-YSPLINE[i])/h[i] - B[i]*h[i] - a[i]*( h[i]**2 )
         b[i]=B[i,0]
@@ -88,7 +88,7 @@ def derivar(XDERIVAR,YDERIVAR):
         # En los puntos internos , la derivada es centrada
         dYDERIVAR[i]=((YDERIVAR[i+1]-YDERIVAR[i-1])/(XDERIVAR[i+1]-XDERIVAR[i-1]))
         # Derivada en el último  punto es un cociente incremental a la izquierda
-    dYDERIVAR[N-1]=( [ (YDERIVAR[NX-1]-YDERIVAR[NX-2])/(XDERIVAR[NX-1]-XDERIVAR[NX-2]) ] )
+    dYDERIVAR[NX-1]=( [ (YDERIVAR[NX-1]-YDERIVAR[NX-2])/(XDERIVAR[NX-1]-XDERIVAR[NX-2]) ] )
 
     # la funcion devuelve solo las coordenadas Y
 
@@ -97,51 +97,6 @@ def derivar(XDERIVAR,YDERIVAR):
 
 
 
-z,T = np.loadtxt('DATA.txt',unpack=True) # loadtxt se importa de numpy
-    
-print ("Z = ", z)
-print ("T = ", T)
-
-
-N=len(z)
-print( "N = ", N)
-
-
-a,b,c,d = misplines(z,T,'funcion')
-
-dT = derivar(z,T)
-da,db,dc,dd=misplines(z,dT,'derivada')
-
-ddT=derivar(z,dT)
-dda,ddb,ddc,ddd=misplines(z,ddT,'derivadasegunda')
-
-"""
-el grafico se va armando sin mostrar hasta que se pide explicitamente.
-pyplot.plot funciona como el plot de matlab , grafica vectores. 
-notar que se importa de matplotlib.pyplot
-"""
-
-plt.plot(z,T,'ok',ms=8,label="Mediciones")
-plt.plot(z,dT,'or',ms=8,label="Primera Derivada")
-plt.plot(z,ddT,'og',ms=8,label="Segunda Derivada")
-
-for i in np.linspace(0,N-2,N-1).astype(int):
-    zi=np.linspace(z[i],z[i+1],10).astype(float)
-#funcion:
-    Ti=a[i]*(zi-z[i])**3+b[i]*(zi-z[i])**2+c[i]*(zi-z[i]) +d[i]
-# Derivada:
-    dTi=da[i]*(zi-z[i])**3+db[i]*(zi-z[i])**2+dc[i]*(zi-z[i]) +dd[i]
-#Derivada Segunda:
-    ddTi=dda[i]*(zi-z[i])**3+ddb[i]*(zi-z[i])**2+ddc[i]*(zi-z[i]) +ddd[i]
-#plot:
-    plt.plot(zi,Ti,'--k',zi,dTi,'--r',zi,ddTi,'--g')  # plot es importada de matplotlib.pyplot
-
-
-plt.legend(loc='best')
-plt.title("La funcion T vs z y las derivadas interpoladas")
-plt.xlabel ("z (m)")
-plt.savefig('Tvsz.png')
-plt.show()
 
 
 
