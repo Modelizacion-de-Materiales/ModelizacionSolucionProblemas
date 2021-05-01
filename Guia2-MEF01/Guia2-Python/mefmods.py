@@ -9,7 +9,7 @@ import pdb
 from math import atan2, sin, cos, sqrt
 import re
 import matplotlib.pyplot as plt
-np.set_printoptions(precision=2, linewidth=100)
+#np.set_printoptions(precision=4, linewidth=100)
 
 
 #U, F = mef.resolvermef(R, S, K, US, FR, 'puente')

@@ -10,12 +10,20 @@ class springs:
         self.gl = 1    # un grado de libertad por nodo
         self.r = np.array([1, 2], dtype=int)  # vectores incognits
         self.s = np.array([0, 3], dtype=int)  # vinculos
-        self.us = np.array([0, 0.002], dtype=float).reshape([2, 1])  # vinculos
+        self.us = np.array([0, 0.002], dtype=float)
+        self.us = self.us.reshape([2, 1])  # vinculos
         self.MC = np.array([[0, 1], [1, 2], [2, 3]])  # conectividad
         self.MN = np.array([0, 1, 2, 3], dtype=float).reshape(4, 1)  # Nodos
         self.MP = 200 * np.ones((len(self.MN), 1))
         # |self.K = mef.ensamble(self.MC, self.MN, self.GL, etype=1, case='resortes')  # Mat rigidez
-        self.K = mef.ensamble(self.MC, self.MN, self.MP, self.gl, 1, case='resortes')  # Mat rigidez
+        self.K = mef.ensamble(
+            self.MC,
+            self.MN,
+            self.MP,
+            self.gl,
+            [1]*len(self.MC),
+            case='resortes'
+        )  # Mat rigidez
 #        self.K = 200*np.array(
 #                [[1, -1, 0, 0], [-1, 2, -1, 0], [0, -1, 2, -1], [0, 0, -1, 1]],
 #                dtype=float)  # 
@@ -26,4 +34,4 @@ class springs:
                 ) # Resuelvo Desplazamientos
 
 
-resortes = springs()
+#resortes = springs()
