@@ -44,8 +44,8 @@ class Grilla:
         self.K = mef.ensamble(self.MC, self.MN, self.MP, self.GL, self.ET, self.case)
         # resolver el sistema con nuestro método de siempre
         self.U, self.F = mef.resolvermef(self.R, self.S, self.K, self.US, self.FR, self.case)
-        np.savetxt(case+'Desplazamientos.dat', self.U)
-        np.savetxt(case+'Fuerzas.dat', self.F)
+        np.savetxt(os.path.join(_my_dir, case+'Desplazamientos.dat'), self.U)
+        np.savetxt(os.path.join(_my_dir, case+'Fuerzas.dat'), self.F)
         self.VD, self.VF = self.getvsdf()
 #        fig = self.plotmesh(pltscale)
 #        fig.show()
@@ -101,4 +101,3 @@ class Grilla:
 
 #M = Grilla(gefile='./Mensula.g', case='Mensula', pltscale=1)
 # P = Grilla(gefile='./Puente.ge', case='Puente', pltscale=100)
-#M = Grilla(gefile='./Mensula-niro.g', case='Mensula-niro', pltscale=1)

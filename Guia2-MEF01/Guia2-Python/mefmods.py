@@ -9,6 +9,8 @@ import pdb
 from math import atan2, sin, cos, sqrt
 import re
 import matplotlib.pyplot as plt
+import os, sys
+from ast import literal_eval
 #np.set_printoptions(precision=4, linewidth=100)
 
 
@@ -44,18 +46,20 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
+    caller=sys._getframe(1)
+    caller_dir = os.path.dirname( os.path.join(os.getcwd(), caller.f_code.co_filename) )
     # numero de nodos
     N = len(MN)*gl
     Kglob = np.zeros([N, N])
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
-    fo = open('MatricesElementales-'+case+'.dat', 'w')
+    fo = open(os.path.join(caller_dir, 'MatricesElementales-'+case+'.dat'), 'w')
     for e in range(ne):
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(ETYPES[e], MP[e, :], MNloc, MCloc)
         scale = np.max(np.max(kele))
-        fo.write('Elemento {:d}, scale = {:e}\n'.format(e, scale))
+        fo.write('Elemento {:d}, scale = {:e}, size = {:d}\n'.format(e, scale, kele.shape[0]))
         fo.write('{}\n'.format(kele/scale))
         for i in range(nnxe):
             ni = MCloc[i]
@@ -324,3 +328,21 @@ def plotmesh(MC, MN, MF, MD,  case, scale=100):
     plt.close()
     return
 
+def read_local_matrices(filename):
+    with open(filename, 'r') as f:
+        matrices=f.readlines()
+
+    K = []
+
+    for i, line in enumerate(matrices):
+        if 'Elemento' in line:
+            info = re.split(',?\s+=?\s*|=', line.strip())
+            e = info[1]
+            scale = float(info [3])
+            size = int(info[5])
+            matriz = ' '.join(matrices[i+1:i+1+size])
+            matriz = re.sub('\s+',', ', matriz).strip(', ')
+            matriz = re.sub('\[, ','[', matriz)
+            kele = np.array( literal_eval(matriz))*scale
+            K.append(kele)
+    return K
