@@ -82,6 +82,16 @@ class barra:
         """
         return np.diff(self.U, axis=0)*self.E/(self.L/(self.NNODOS-1))
 
+    def tension_bien(self):
+        """
+        Estas tensiones las calculo usando los desplazamientos locales
+        """
+        Keles = mef.read_local_matrices('MatricesElementales-'+self.case)
+        U=self.U.reshape((self.NNODOS, self.GL))
+        for e in range(self.MC.shape[0])
+
+
+
 
     def plot_teos(self, force=False):
         """
