@@ -18,6 +18,8 @@ def plotlistT(theTlist, dt):
     lostagsy = [y+1 for y in TS[index, losTs1-1]]
 #    lostagsy.append(TS[np.int(N/2-1), NT-1])  # el ultimo tag
     lostagsx = [index for i in range(len(lostagsy))]
+
+    fig, ax = plt.subplots()
     plt.plot(TS[:, losTs1-1], '--ok')
     for i in range(len(losTags1)):
         segmentoy = np.array([
@@ -28,17 +30,17 @@ def plotlistT(theTlist, dt):
                 [(90/np.pi)*np.arctan2(TS[index+1, losTs1[i]] - TS[index+1, losTs1[i]], 1)]
                 )
         textloc = np.array([lostagsx[i], segmentoy[1]])
-        realrot = plt.gca().transData.transform_angles(
+        realrot = ax.transData.transform_angles(
                 rot, textloc.reshape((1, 2))
                 )[0]
-        plt.text(lostagsx[i], lostagsy[i], losTags1[i], rotation=realrot)  # rot*45/(np.pi/4.))
-    plt.xlabel('X')
-    plt.title(r'$\delta t = {:.2f}$'.format(dt))
-    plt.ylabel(r'T ($^{o}C$)')
-    plt.xlim(0, N-1)
+        ax.text(lostagsx[i], lostagsy[i], losTags1[i], rotation=realrot)  # rot*45/(np.pi/4.))
+    ax.set_xlabel('X')
+    ax.set_title(r'$\delta t = {:.2f}$'.format(dt))
+    ax.set_ylabel(r'T ($^{o}C$)')
+    ax.set_xlim(0, N-1)
     figfile = theTlist.replace('.dat', '.pdf')
-    plt.savefig(figfile)
-    plt.close()
+    fig.savefig(figfile)
+    return fig
 
 
 def plotFs(listaFs, dt):
@@ -58,3 +60,4 @@ def plotFs(listaFs, dt):
     ax[1].set_ylabel(r'$|F_{in} - F_{out}|$')
     ax[1].set_xlabel('t (s)')
     fig.savefig('flujodt_{:.2f}.pdf'.format(dt))
+    return fig

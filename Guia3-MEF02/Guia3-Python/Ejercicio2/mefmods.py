@@ -160,6 +160,31 @@ def getstress(MESH, MP,  U):
         sigma[e] = ((D.dot(B)).dot(Uloc)).T
     return sigma
 
+def getstress2( MC, ETYPES, MP, MN, U, GL=2):
+    """
+    Esta función obtiene las tensinones a partir de la matriz de conectividad y de nodos dados como elementos extrernos
+
+    Argumentos
+    ==========
+    MC: Matriz de conectividad
+    ETYPES: tipos de elementos
+    MP: Matriz de propiedades,
+    MN: Matriz de nodos
+    U: Desplazamientos
+    """
+    sigma = np.zeros((len(MC), 3))
+
+    for e in range(len(MC)):
+        B, A = makeB(MN[MC[e]-1], MC[e])
+        nu = MP[e, 1]  # modulo de poison
+        E = MP[e, 2]  # modulo de elasticidad
+        D = E * np.array([[1, nu, 0.], [nu, 1., 0.], [0., 0., 0.5*(1-nu)]]) / (1 - nu**2)
+        Uloc = []
+        for n in MC[e]:
+            Uloc = np.append(Uloc, U[int((n-1)*GL):int((n-1)*GL+1+1)])
+        sigma[e] = ((D.dot(B)).dot(Uloc)).T
+    return sigma
+
 
 def getgeo(filename):
     # fi = open(filename,'r')

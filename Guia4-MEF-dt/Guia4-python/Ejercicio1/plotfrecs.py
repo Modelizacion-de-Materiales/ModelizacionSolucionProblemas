@@ -19,7 +19,7 @@ def plotfrecs(ws, cases, name, glstep=2, fig_size=(5, 8)):
             )
     ax[-1].set_xlabel('Numero de nodos')
     ax[-1].annotate('frecuencia(Hz)',
-            (0.05, 0.5), xycoords='figure fraction',
+            (0.02, 0.5), xycoords='figure fraction',
             xytext=(0, 0), textcoords='offset points',
             rotation=90
             )
@@ -43,6 +43,7 @@ def plotfrecs(ws, cases, name, glstep=2, fig_size=(5, 8)):
 def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
     maxmode = MODES[0][-1][-1].shape[1]
     xv = np.linspace(0, 1, dv[::glstep].shape[0])
+    Figs = []
     for M in range(maxmode):
         # M para los modos
         figM, axM = plt.subplots(len(labels), 1, sharex=True, figsize=fig_size)
@@ -55,10 +56,10 @@ def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
         # detalles del grafico
         # axM[-1].set_ylabel(r'$\Delta y$')
         axM[0].annotate(r'$\Delta y$',
-                (0.05, 0.5), xycoords='figure fraction',
+                (0.05, 0.81), xycoords='figure fraction',
                 xytext=(0,0),
                 textcoords='offset points',
-                rotation=90,
+                rotation=0,
                 fontsize=16
                 )
         axM[-1].set_xlabel('x', fontsize=16)
@@ -113,7 +114,9 @@ def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
                 bbox_to_anchor=(0.5, 0.95),
                 title='Nodos:'.format(M)
                 )
-        plt.savefig(name+'Modo_{}.pdf'.format(M))
+        Figs.append(figM)
+        figM.savefig(name+'Modo_{}.pdf'.format(M))
+    return Figs
         #plt.close()
 
 
@@ -132,6 +135,7 @@ def allmodesplot(dv, name, fig_size=(5, 7), font_size=14, glstep=2):
     ax.set_xlabel('X')
     ax.set_ylabel(r'$\Delta y$')
     plt.savefig(name+'allmodes.pdf')
-    plt.close()
+    return fig
+    #plt.close()
 
 
