@@ -12,7 +12,7 @@ from matplotlib import gridspec
 def plotlistT(theTlist, dt):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
-    losTs1 = np.logspace(0, np.log10(NT), 5, dtype=int)
+    losTs1 = np.logspace(0, np.log10(NT)-1, 5, dtype=int)
     index = np.int(N/2)-1
     losTags1 = [r'$t =$ {:.1f}'.format(val*dt) for val in losTs1]
     lostagsy = [y+1 for y in TS[index, losTs1-1]]
@@ -22,10 +22,14 @@ def plotlistT(theTlist, dt):
     fig, ax = plt.subplots()
     plt.plot(TS[:, losTs1-1], '--ok')
     for i in range(len(losTags1)):
-        segmentoy = np.array([
-            TS[lostagsx[i], losTs1[i]-1],
-            TS[lostagsx[i]+1, losTs1[i-1]]
-            ])
+        try:
+            segmentoy = np.array([
+                TS[lostagsx[i], losTs1[i]-1],
+                TS[lostagsx[i]+1, losTs1[i-1]]
+                ])
+        except Exception as E:
+            pdb.set_trace()
+            pass
         rot = np.array(
                 [(90/np.pi)*np.arctan2(TS[index+1, losTs1[i]] - TS[index+1, losTs1[i]], 1)]
                 )
