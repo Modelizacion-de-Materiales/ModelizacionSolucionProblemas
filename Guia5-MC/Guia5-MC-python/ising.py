@@ -82,6 +82,7 @@ class ising():
         return magnet, DE, DM
 
 
-mag = magnet()
-kT, Hext, J = ising.startmagnet()
-ACUMS = mag.cool_down(kT, 10000)
+if __name__ == "__main__":
+    mag = magnet()
+    kT, Hext, J = ising.startmagnet()
+    ACUMS = mag.cool_down(kT, 10000)
