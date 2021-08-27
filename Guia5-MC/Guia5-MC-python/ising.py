@@ -1,189 +1,112 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-from importlib.machinery import SourceFileLoader
-import pdb
 import matplotlib.pyplot as plt
-from time import sleep
-from tqdm.notebook import tqdm_notebook
+from tqdm.notebook import tqdm_notebook, tqdm
 import numpy as np
 from copy import copy
+import pdb
+import pickle
 
-# In[2]:
-
-
-plt.style.use('default')
-plt.rc('figure', figsize = (15,8))
-plt.rc('axes', labelsize=24)
-plt.rc('xtick', labelsize=20)
-plt.rc('ytick', labelsize=20)
-
-
-# In[3]:
-
-
+# system size
 N = 10
 
-
-# # Comienzo a hacer los cambios
-
-# In[4]:
-
-
-steps = int(4e5)
-KT = np.hstack([2.2+np.logspace(-2, np.log10(2), 20), 2.2-np.logspace(-2, np.log10(2), 20)])
+# steps and dimensions
+steps = int(1e5)
+KT = np.hstack([ 2.2+np.logspace(-2, np.log10(2), 10) , 2.2-np.logspace(-2, np.log10(2),10)])
 KT = KT[KT>0]
 KT.sort()
 KT = KT[::-1]
 beta = 1/KT
 
 
-# In[5]:
-
-
+# all the randoms
 changes = np.random.randint(N, size=(steps, 2, len(beta)))
+# coins = np.random.rand(steps, len(beta))
 
-
-# In[6]:
-
-
-coins = np.random.rand(steps, len(beta))
-
-
-# In[48]:
-
-
+# acumulators and history
 S = []
 acumM = []
 acumE = []
+acumE2 = []
+acumVAR = []
 Mhist = []
 Ehist = []
+VARhist = []
 flips = []
 metroflips = []
 boltsfactors = []
 
-progress = tqdm_notebook(enumerate(beta), ncols = 700, total=len(beta), ascii=True)
+# fig, ax = plt.subplots(1,2)
+#MDF-COMMENT progress = tqdm_notebook(enumerate(beta), ncols = 80, total=len(beta), ascii=True)
+progress = tqdm(enumerate(beta), ncols = 80, total=len(beta), ascii=True)
 for t, Beta in progress:
+
     if len(S) > 0:
         S.append(copy(S[-1]))
     else:
         S.append( np.random.randint(2, size=(N,N))*2-1)
         
-    E = [
-        -0.5* S[-1]*(
-                np.roll(S, 1, 0)+
-                np.roll(S[-1], -1, 0)+
-                np.roll(S[-1], 1, 1)+
-                np.roll(S[-1], -1, 1)
-        ).sum()]
-    M = [S[-1].sum()/N**2]
-    Macum = np.abs(M); Eacum = sum(E)
+    NEIG0 =np.roll(S, 1, 0)+np.roll(S[-1], -1, 0)+np.roll(S[-1], 1, 1)+np.roll(S[-1], -1, 1)
+    E = [-0.5*(S[-1]*NEIG0).sum()]
+    M = [S[-1].sum()]
+    E2 = [E[-1]**2]
+    DE = [0]
+    Macum = np.abs(M); Eacum = sum(E) ; E2acum = sum(E2) ;
+    VAR = sum(np.power(E,2)) - E2acum
+    VARacum = sum(VAR)
     progress.set_description(f'Beta = {Beta}')
     flips.append(0)
     metroflips.append(0)
     boltsfactors.append([])
-    
-    
     for i, change in enumerate(changes[:,:,t]):
-#        Saux = S[-1].copy()
-#        NEIG = np.roll(Saux, 1, 0)+np.roll(Saux, -1, 0) + np.roll(Saux, 1, 1) + np.roll(Saux, -1, 1) 
-        NEIG = S[-1][change[0]-N,change[1]]+\
-                S[-1][change[0]-1, change[1]]+\
-                S[-1][change[0],change[1]-N]+\
+        NEIG = S[-1][change[0]-N,change[1]] + \
+                S[-1][change[0]-1, change[1]] +\
+                S[-1][change[0],change[1]-N] +\
                 S[-1][change[0],change[1]-1] 
         Saux = -copy(S[-1][change[0],change[1]])
         DE_candidate = -2*Saux*NEIG
         boltsfactors[-1].append(np.exp(-Beta*DE_candidate))
         if (DE_candidate < 0): 
-            S[-1][change[0],change[1]] = Saux# copy(Saux)
+            S[-1][change[0],change[1]] = copy(Saux)# copy(Saux)
+            DM = 2*copy(Saux)
             DE = copy(DE_candidate)
             flips[-1] += 1
-        elif coins[i, t] < boltsfactors[-1][-1]:
+        elif np.random.rand() < boltsfactors[-1][-1]: # coins[i, t] < boltsfactors[-1][-1]:
             S[-1][change[0],change[1]] = copy(Saux) #-1# copy(Saux)
+            DE = copy(DE_candidate)
+            DM = 2*copy(Saux)
             DE = copy(DE_candidate)
             metroflips[-1] += 1
         else: 
             DE = 0
-        M.append(M[-1]+2*S[-1][change[0],change[1]]/N**2)
-        E.append(E[-1]+DE)
+        M.append(M[-1]+ DM)
+        E.append((E[-1]+DE))
+        E2.append(E[-1]**2)
+#        VAR.append(E[-1]**2 - E2[-1])
         Macum += np.abs(M[-1])
         Eacum += E[-1]
-    Mhist.append(M)
-    Ehist.append(M)
-    acumM.append(Macum/changes.shape[0])
-    acumE.append(Eacum/changes.shape[0])
+        E2acum += E2[-1]
+        VARacum += E2acum - sum(E)**2
+
+    Mhist.append(M[::5])
+    Ehist.append(E[::5])
+    VARhist.append(VAR[::5])
+    acumM.append(Macum)#/changes.shape[0]/N**2)
+    acumE.append(Eacum)#/changes.shape[0]/N**2)
+    acumE2.append(E2acum)#/changes.shape[0]/N**2)
+    acumVAR.append(VARacum)
     
+output_pickle = f'{N}x{N}_{changes.shape[0]}-steps.pkl'
 
-
-# In[49]:
-
-
-plt.plot(KT,np.array(acumM)*changes.shape[2]/changes.shape[0],'o-')
-plt.savefig(f'M_acum_Niter={steps}.pdf')
-
-
-# In[37]:
-
-
-fig = plt.figure()
-for i in range(len(S)):
-    ax = fig.add_subplot(4, int(len(S)/4)+1, i+1)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.imshow(S[i])
-    ax.set_title(' {:4.2f}'.format(KT[i]))
-fig.tight_layout()
-fig.savefig(f'final_magnetizatons_Niter={steps}.pdf')
-#
-#
-## In[39]:
-#
-#
-#changes.shape
-#
-#
-## In[40]:
-#
-#
-#KT
-#
-#
-## In[41]:
-#
-#
-#np.shape(Ehist)
-#
-#
-## In[42]:
-#
-#
-#plt.plot(Ehist[-1])
-#plt.plot(Ehist[0])
-#
-#
-## In[43]:
-#
-#
-#metroflips
-#
-#
-## In[45]:
-#
-#
-#np.shape(boltsfactors)
-#
-#
-## In[47]:
-#
-#
-#plt.plot(boltsfactors[0])
-#
-#
-## In[ ]:
-#
-#
-#
-#
+with open(output_pickle, 'wb') as f:
+    pickle.dump(np.array(KT), f)
+    pickle.dump(np.array(changes), f)
+    pickle.dump(np.array(S), f)
+    pickle.dump(np.array(Mhist), f)
+    pickle.dump(np.array(Ehist), f)
+    pickle.dump(np.array(VARhist), f)
+    pickle.dump(np.array(acumM), f)
+    pickle.dump(np.array(acumE), f)
+    pickle.dump(np.array(acumE2), f)
+    pickle.dump(np.array(acumVAR), f)
