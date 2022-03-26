@@ -14,7 +14,10 @@ por lo que queremos hacer pasar una función definida a tramos.
     \begin{split}
     { (X_i, Y_i) }_{i = 1 \dots N}\\
       I_i = \left[ X_i , X_{i+1} \right] \\
-      f_i = a_i (x - X_i)^3 + b_i (x-X_i)^2 + c_i (x-X_i) + d_i
+      f_i = a_i (x - X_i)^3 + b_i (x-X_i)^2 + c_i (x-X_i) + d_i\\
+      \vspace{1cm}
+      f ^{ \prime }_i = 3 a_i (x - X_i) ^2 + b_i (x - X_i) + c_i\\
+      f^{\prime\prime} _i = 6 a_i (x - X_i)  + b_i
     \end{split}
   \end{equation}
 \end{frame}
@@ -26,6 +29,22 @@ desemboca en un sistema de ecuaciones que termina en un sistema lineal para
 los coeficientes $b_i$ . 
 
 \mode*
+\begin{frame}<presentation>[label=FrameCondiciones]
+  \frametitle{Condiciones sobre los polinomios}
+  El ensamble de polinomios pasa por los puntos:
+    \begin{equation}
+	f_i(X_i) =  Y_i \quad \Rightarrow d_i = Y_i 
+    \end{equation}
+  El ensamble y sus derivadas son continuos:
+    \begin{equation}
+      \begin{aligned}
+	f_i(X_{i+1}) = f_{i+1}(X_{i+1}) \\
+	f^{\prime}_i(X_{i+1}) = f^{\prime}_{i+1}(X_{i+1}) \\
+	f^{\prime\prime}_i(X_{i+1}) = f^{\prime\prime}_{i+1}(X_{i+1}) 
+      \end{aligned}
+    \end{equation}
+\end{frame}
+
 \begin{frame}[label=FrameSistemaEcuacionesSplines]
   \frametitle<presentation>{Sistema De Ecuaciones para Splines}
 
@@ -94,7 +113,7 @@ a los datos originales.
   \frametitle<presentation>{Resultado Splines}
   \begin{figure}
     \center
-    \includegraphics[width=0.8\textwidth]{./Guia0-Fortran/Ejercicio1/allcurve.pdf}
+    \includegraphics[width=0.8\textwidth]{./Guia0_python/Ejercicio6/allcurve.pdf}
     \caption{\label{FiguraSplinesArmadas}Función de Interpolación Definida a Tramos}
   \end{figure}
 \end{frame}
@@ -103,7 +122,7 @@ a los datos originales.
   \frametitle<presentation>{Splines en todo el intervalo}
   \begin{figure}
     \center
-    \includegraphics[width=0.6\textwidth,trim=1cm 7cm 1cm 6cm]{./scplines.pdf}
+    \includegraphics[width=0.8\textwidth]{./Guia0_python/Ejercicio6/extenedpolys.pdf}
     \caption{\label{FiguraSplinesExtendidos} Cada polinomio vale solo en su intervalo}
   \end{figure}
 \end{frame}
