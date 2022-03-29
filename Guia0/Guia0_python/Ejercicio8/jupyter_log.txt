@@ -1,0 +1,142 @@
+/data/Anaconda/JupyterLab/lib/python3.9/site-packages/jupyter_server/transutils.py:13: FutureWarning: The alias `_()` will be deprecated. Use `_i18n()` instead.
+  warnings.warn(warn_msg, FutureWarning)
+[I 2021-08-27 19:23:47.964 ServerApp] jupyter_server_mathjax | extension was successfully linked.
+[I 2021-08-27 19:23:47.970 ServerApp] jupyterlab | extension was successfully linked.
+[I 2021-08-27 19:23:47.970 ServerApp] jupyterlab_git | extension was successfully linked.
+[W 2021-08-27 19:23:47.972 NotebookApp] 'browser' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2021-08-27 19:23:47.972 NotebookApp] 'browser' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2021-08-27 19:23:48.175 ServerApp] The module 'jupyter_nbextensions_configurator' could not be found. Are you sure the extension is installed?
+[W 2021-08-27 19:23:48.175 ServerApp] The module 'ipyparallel.nbextension' could not be found. Are you sure the extension is installed?
+[I 2021-08-27 19:23:48.175 ServerApp] nbclassic | extension was successfully linked.
+[I 2021-08-27 19:23:48.175 ServerApp] nbdime | extension was successfully linked.
+[I 2021-08-27 19:23:48.200 ServerApp] nbclassic | extension was successfully loaded.
+[I 2021-08-27 19:23:48.201 ServerApp] jupyter_server_mathjax | extension was successfully loaded.
+[I 2021-08-27 19:23:48.201 LabApp] JupyterLab extension loaded from /data/Anaconda/JupyterLab/lib/python3.9/site-packages/jupyterlab
+[I 2021-08-27 19:23:48.201 LabApp] JupyterLab application directory is /data/Anaconda/JupyterLab/share/jupyter/lab
+[I 2021-08-27 19:23:48.203 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2021-08-27 19:23:48.206 ServerApp] jupyterlab_git | extension was successfully loaded.
+[I 2021-08-27 19:23:48.302 ServerApp] nbdime | extension was successfully loaded.
+[I 2021-08-27 19:23:48.302 ServerApp] Serving notebooks from local directory: /home/mariano/modelizacion/SolucionesProblemas/Guia0/Guia0_python/Ejercicio7
+[I 2021-08-27 19:23:48.302 ServerApp] Jupyter Server 1.10.2 is running at:
+[I 2021-08-27 19:23:48.302 ServerApp] http://mlaptopIII:8888/lab?token=5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281
+[I 2021-08-27 19:23:48.302 ServerApp]  or http://127.0.0.1:8888/lab?token=5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281
+[I 2021-08-27 19:23:48.302 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 2021-08-27 19:23:48.307 ServerApp] 
+    
+    To access the server, open this file in a browser:
+        file:///home/mariano/.local/share/jupyter/runtime/jpserver-913-open.html
+    Or copy and paste one of these URLs:
+        http://mlaptopIII:8888/lab?token=5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281
+     or http://127.0.0.1:8888/lab?token=5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281
+[I 2021-08-27 19:23:59.579 LabApp] Build is up to date
+[W 2021-08-27 19:24:00.307 ServerApp] 404 GET /api/contents/SolucionesGuias/Guia0/Ejercicio2?1630085040300 (127.0.0.1): No such file or directory: SolucionesGuias/Guia0/Ejercicio2
+[W 2021-08-27 19:24:00.307 ServerApp] No such file or directory: SolucionesGuias/Guia0/Ejercicio2
+[W 2021-08-27 19:24:00.308 ServerApp] 404 GET /api/contents/SolucionesGuias/Guia0/Ejercicio2?1630085040300 (127.0.0.1) 2.95ms referer=http://localhost:8888/lab
+-\|/-\|/[W 2021-08-27 19:24:04.957 ServerApp] Notebook ModeloSIR.ipynb is not trusted
+[I 2021-08-27 19:24:05.826 ServerApp] Kernel started: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:24:22.802 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:26:05.370 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:27:17.220 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:27:35.698 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:27:50.498 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:28:05.429 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:30:05.465 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:31:04.149 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:33:04.190 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:35:04.230 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:35:54.344 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:36:24.765 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:37:04.278 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:40:41.004 ServerApp] Kernel restarted: 011f8e2e-d2f1-4d33-b64e-602e2cff0a7a
+[I 2021-08-27 19:41:04.328 ServerApp] Saving file at /ModeloSIR.ipynb
+[I 2021-08-27 19:41:05.289 ServerApp] Saving file at /ModeloSIR.ipynb
+[E 2021-08-27 22:41:22.065 ServerApp] {
+      "Host": "localhost:8888",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+      "Accept": "*/*",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate",
+      "Referer": "http://localhost:8888/lab/tree/ModeloSIR.ipynb",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Authorization": "token 5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281",
+      "X-Xsrftoken": "2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210",
+      "Origin": "http://localhost:8888",
+      "Content-Length": "78",
+      "Connection": "keep-alive",
+      "Cookie": "username-localhost-8889=\"2|1:0|10:1629836609|23:username-localhost-8889|44:Mjc4MDFjOWE3Mjc2NGM0Zjk0OTgxNmQ4N2M4ZTU3MDA=|be2e4dd8ce90a41754d3ebce2c83d14097be6e96d672f5d1011df7e2881f63cc\"; _xsrf=2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210; username-localhost-8890=\"2|1:0|10:1628613008|23:username-localhost-8890|44:NTY0NDYyZTg2MTNjNDg3ZWIwZTQ1NDRiZDIyMzQwODE=|5c91c07fb8bf3438a134c85fc1fb5f629910e56eefb546090dab690424c278dc\"; username-localhost-8888=\"2|1:0|10:1630096859|23:username-localhost-8888|44:NTRjNzk2NDY1ZDM0NDg0NGJmMWYzYjJlZDIyNjllODA=|4cb3bb1b610ab11280005153006a09e7397141ef08233ce9b9c71a0123dbc001\"",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Gpc": "1",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    }
+[E 2021-08-27 22:41:22.066 ServerApp] 500 POST /git/add?1630096862054 (127.0.0.1) 20004.55ms referer=http://localhost:8888/lab/tree/ModeloSIR.ipynb
+[E 2021-08-27 22:41:41.921 ServerApp] {
+      "Host": "localhost:8888",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+      "Accept": "*/*",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate",
+      "Referer": "http://localhost:8888/lab/tree/ModeloSIR.ipynb",
+      "Authorization": "token 5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281",
+      "X-Xsrftoken": "2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210",
+      "Content-Type": "application/json",
+      "Origin": "http://localhost:8888",
+      "Connection": "keep-alive",
+      "Cookie": "username-localhost-8889=\"2|1:0|10:1629836609|23:username-localhost-8889|44:Mjc4MDFjOWE3Mjc2NGM0Zjk0OTgxNmQ4N2M4ZTU3MDA=|be2e4dd8ce90a41754d3ebce2c83d14097be6e96d672f5d1011df7e2881f63cc\"; _xsrf=2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210; username-localhost-8890=\"2|1:0|10:1628613008|23:username-localhost-8890|44:NTY0NDYyZTg2MTNjNDg3ZWIwZTQ1NDRiZDIyMzQwODE=|5c91c07fb8bf3438a134c85fc1fb5f629910e56eefb546090dab690424c278dc\"; username-localhost-8888=\"2|1:0|10:1630096878|23:username-localhost-8888|44:ZTY2OGE5MjI3MWE4NDUwZDgyM2NiYWNkZTJiNzRhMWQ=|d57ae86ffc24a8bb07991fe9bc074fbf7fd05b398b2c60eed10efb6c1b64f956\"",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Gpc": "1",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache",
+      "Content-Length": "0"
+    }
+[E 2021-08-27 22:41:41.921 ServerApp] 500 POST /git/branch?1630096881894 (127.0.0.1) 20003.30ms referer=http://localhost:8888/lab/tree/ModeloSIR.ipynb
+[E 2021-08-27 22:41:43.218 ServerApp] {
+      "Host": "localhost:8888",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+      "Accept": "*/*",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate",
+      "Referer": "http://localhost:8888/lab/tree/ModeloSIR.ipynb",
+      "Content-Type": "text/plain;charset=UTF-8",
+      "Authorization": "token 5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281",
+      "X-Xsrftoken": "2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210",
+      "Origin": "http://localhost:8888",
+      "Content-Length": "78",
+      "Connection": "keep-alive",
+      "Cookie": "username-localhost-8889=\"2|1:0|10:1629836609|23:username-localhost-8889|44:Mjc4MDFjOWE3Mjc2NGM0Zjk0OTgxNmQ4N2M4ZTU3MDA=|be2e4dd8ce90a41754d3ebce2c83d14097be6e96d672f5d1011df7e2881f63cc\"; _xsrf=2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210; username-localhost-8890=\"2|1:0|10:1628613008|23:username-localhost-8890|44:NTY0NDYyZTg2MTNjNDg3ZWIwZTQ1NDRiZDIyMzQwODE=|5c91c07fb8bf3438a134c85fc1fb5f629910e56eefb546090dab690424c278dc\"; username-localhost-8888=\"2|1:0|10:1630096882|23:username-localhost-8888|44:YzNmNzA2YzdiOWI5NDNiODg1NWI3YTEzODUxNjdmNGQ=|66953de1bbc15ad6d8c2ffbc1dfb450c41d478c08ea16fc4d3c47fb48e1a66ba\"",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Gpc": "1",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    }
+[E 2021-08-27 22:41:43.219 ServerApp] 500 POST /git/add?1630096883207 (127.0.0.1) 20003.03ms referer=http://localhost:8888/lab/tree/ModeloSIR.ipynb
+[E 2021-08-27 22:42:04.953 ServerApp] {
+      "Host": "localhost:8888",
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0",
+      "Accept": "*/*",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate",
+      "Referer": "http://localhost:8888/lab/tree/ModeloSIR.ipynb",
+      "Authorization": "token 5dc1737df0e914ef43decd614a418e42e0b2e5273aaa6281",
+      "X-Xsrftoken": "2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210",
+      "Content-Type": "application/json",
+      "Origin": "http://localhost:8888",
+      "Connection": "keep-alive",
+      "Cookie": "username-localhost-8889=\"2|1:0|10:1629836609|23:username-localhost-8889|44:Mjc4MDFjOWE3Mjc2NGM0Zjk0OTgxNmQ4N2M4ZTU3MDA=|be2e4dd8ce90a41754d3ebce2c83d14097be6e96d672f5d1011df7e2881f63cc\"; _xsrf=2|14e106f6|2351d66f5fde009313f53ae45306f3e3|1628610210; username-localhost-8890=\"2|1:0|10:1628613008|23:username-localhost-8890|44:NTY0NDYyZTg2MTNjNDg3ZWIwZTQ1NDRiZDIyMzQwODE=|5c91c07fb8bf3438a134c85fc1fb5f629910e56eefb546090dab690424c278dc\"; username-localhost-8888=\"2|1:0|10:1630096904|23:username-localhost-8888|44:ZDk2MmRlYjBjZTU2NGNlOGE5YWUwNmZiYmM4YTc2NWM=|fcdd858e64822d349dee32cf953c3e03d421aa2f3334c1d49f8b158bd8e15af2\"",
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Gpc": "1",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache",
+      "Content-Length": "0"
+    }
+[E 2021-08-27 22:42:04.954 ServerApp] 500 POST /git/branch?1630096904946 (127.0.0.1) 20002.63ms referer=http://localhost:8888/lab/tree/ModeloSIR.ipynb
+[I 2021-08-27 22:42:11.372 ServerApp] Shutting down on /api/shutdown request.
+[IPKernelApp] WARNING | Parent appears to have exited, shutting down.
