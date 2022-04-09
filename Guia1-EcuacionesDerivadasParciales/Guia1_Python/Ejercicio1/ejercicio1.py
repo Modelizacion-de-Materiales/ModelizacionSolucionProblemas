@@ -65,10 +65,22 @@ class Chapa:
             if k not in allborders:
                 fila[[ k-self.Nx, k-1, k, k+1, k+self.Nx ]] = np.array([beta2, 1, -2*(1+beta), 1, beta2])
 
-
-
         self.B = B
         self.M = M
+
+    def msolve(self):
+        import time
+
+        if not hasattr(self, 'M'):
+            raise ValueError('no se ha definido la matriz del sistema')
+
+        t1 = time.time()
+        self.T = np.linalg.solve(self.M, self.B)
+        t2 = time.time() - t1
+
+        return self.T, t2 - t1
+
+
 
 
 
