@@ -6,8 +6,11 @@ def getcasedict(name, dictarray):
     return result
 
 def getvalcc(valcc, tycc):
-    if len(set(tycc.values())) == 1:
+    if len(set(tycc.values())) == 1: # all the tycc are equal
         return np.mean(list(valcc.values()))
+    elif 'temp' in tycc.values():
+        valkeys = [key for key, val in tycc.items() if val=='temp'][0]
+        return valcc[valkeys]
 
 class Chapa:
 
@@ -18,11 +21,12 @@ class Chapa:
         self.tycc = tycc
         self.valcc = valcc
         self.beta = self.Ny / self.Nx
-
         
     def makeborders(self):
+
         if not hasattr(self, 'Nx'):
             raise ValueError('aún no a definido la geometría')
+
         self.border = {
                 'a': np.linspace(0, self.Nk-self.Nx, self.Ny).astype(int),
                 'b': np.linspace(0, self.Nx-1, self.Nx).astype(int),
@@ -31,6 +35,7 @@ class Chapa:
                 }
 
     def makevertices(self):
+
         if not hasattr(self, 'border'):
             raise ValueError('aún no ha definido los border')
 
@@ -59,7 +64,16 @@ class Chapa:
             B[k] = getvalcc(getcasedict(vertname, self.valcc), getcasedict(vertname, self.tycc))
 
         for bordename, kvec in self.border.items():
-            B[kvec[1:-1]] = getvalcc(getcasedict(bordename, self.valcc), getcasedict(bordename, self.tycc))
+            thisvalcc = getcasedict(bordename, self.valcc)
+            thistycc = getcasedict(bordename, self.tycc)
+            B[kvec[1:-1]] = getvalcc( thisvalcc, thistycc)
+            if 'flujo' in thistycc.values():
+                if 'a' in bordename:
+                    for k in kvec[1:-1]:
+                        M[k, [k-self.Nx, k, k+1, k+self.Nx]] = np.array([beta2, -2*(beta+1), 2, beta2])
+                elif 'b' in bordename:
+                    for k in kvec[1:-1]:
+                        M[k, [k-1, k, k+1, k+self.Nx]] = np.array([1, -2*(beta+1), 1, 2*beta2])
 
         for k, fila in enumerate(M):
             if k not in allborders:
@@ -70,14 +84,11 @@ class Chapa:
 
     def msolve(self):
         import time
-
         if not hasattr(self, 'M'):
             raise ValueError('no se ha definido la matriz del sistema')
-
         t1 = time.time()
         self.T = np.linalg.solve(self.M, self.B)
         t2 = time.time() - t1
-
         return self.T, t2 - t1
 
 
