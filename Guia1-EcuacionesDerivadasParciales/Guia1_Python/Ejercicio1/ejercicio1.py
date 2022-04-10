@@ -1,9 +1,9 @@
 import numpy as np
 import pdb
+import time
 
 def getcasedict(name, dictarray):
-    result = {thisname: thisval for thisname, thisval in dictarray.items() if thisname in name}
-    return result
+    return {thisname: thisval for thisname, thisval in dictarray.items() if thisname in name}
 
 def getvalcc(valcc, tycc):
     if len(set(tycc.values())) == 1: # all the tycc are equal
@@ -39,12 +39,13 @@ class Chapa:
         if not hasattr(self, 'border'):
             raise ValueError('aún no ha definido los border')
 
-        self.vertice = {
-                'ab': np.intersect1d(self.border['a'], self.border['b']),
-                'bc':  np.intersect1d(self.border['c'], self.border['b']),
-                'cd':  np.intersect1d(self.border['c'], self.border['d']),
-                'ad':   np.intersect1d(self.border['a'], self.border['d'])
-                }
+        self.vertice = {'ab':[0], 'bc': [self.Nx-1], 'cd':[self.Nk-1], 'ad':[self.Nk-self.Nx]}
+#                }
+#                'ab': np.intersect1d(self.border['a'], self.border['b']),
+#                'bc':  np.intersect1d(self.border['c'], self.border['b']),
+#                'cd':  np.intersect1d(self.border['c'], self.border['d']),
+#                'ad':   np.intersect1d(self.border['a'], self.border['d'])
+#                }
 
     def makematrix(self):
 
@@ -82,14 +83,52 @@ class Chapa:
         self.B = B
         self.M = M
 
-    def msolve(self):
-        import time
+    def msolve(self, returntime = True):
         if not hasattr(self, 'M'):
             raise ValueError('no se ha definido la matriz del sistema')
-        t1 = time.time()
         self.T = np.linalg.solve(self.M, self.B)
-        t2 = time.time() - t1
-        return self.T, t2 - t1
+        return self.T
+
+    def maketplot(self):
+        if not hasattr(self, 'T'):
+            raise ValueError('aún no ha resuelto la temperatura')
+        self.Tplot = self.T.reshape(self.Nx, self.Ny)
+
+
+def init_chapa(Nx, Ny = None, valcc = None, tycc = None):
+    if Ny is None:
+        Ny = Nx
+    if valcc is None:
+        valcc = {'a': 75, 'b': 0, 'c': 50, 'd':100}
+    if tycc is None:
+        tycc = {'a': 'temp', 'b': 'flujo', 'c': 'temp', 'd': 'temp'}
+    thechapa = Chapa(Nx, Ny, tycc, valcc)
+    thechapa.makeborders()
+    thechapa.makevertices()
+    thechapa.makematrix()
+    return thechapa
+
+
+def escaleo(maxn = 100, nsizes = 10):
+
+    sizes = np.logspace(1,np.log10(maxn),nsizes).astype(int)
+    times = np.array([])
+
+    from tqdm.auto import tqdm
+
+    progress = tqdm(sizes)
+    
+    for thissize in progress:
+        progress.set_description(f'size = {thissize}')
+        thischapa = init_chapa(thissize)
+        t1 = time.time()
+        thischapa.msolve()
+        dt = time.time() - t1
+        times = np.append(times, dt)
+
+    return sizes, times
+
+
 
 
 
