@@ -72,7 +72,7 @@ def MAKET(miA, miT0, TOL, case):
     # defino una flag y un contador para controlar la propagacion
     flag = True
     i = 0
-    ERR = np.zeros((1, 200))
+    ERR = np.array([]) # np.zeros((1, 200))
     while flag:
         i = i + 1
 # recupero la ultima lista de temperaturas
@@ -85,13 +85,13 @@ def MAKET(miA, miT0, TOL, case):
         ALLF = np.append(ALLF, NEWF, axis=1)
         # tengo que calcular el error de alguna manera.
         # El Error lo mido con el cambio de flujo
-        ERR[0, i-1] = np.abs(np.diff(ALLF[-1, -2:])/ALLF[-1, -1])
-        if (i >= 200) | (ERR[0, i-1] < TOL) | (ERR[0, i-1] > 100):
+        ERR = np.append(ERR, np.abs(np.diff(ALLF[-1, -2:])/ALLF[-1, -1]))
+        if (i >= 200) | (ERR[-1] < TOL) | (ERR[i-1] > 100):
             # propago solo 100 pasos.
             # la idea es medirlo con un error
             flag = False
             print("se detiene propagacion temporal en i = {:d}".format(i))
-    return ALLT, ALLF, ERR[0, :i]
+    return ALLT, ALLF, ERR
 
 
 # inicio como matriz identidad para que me queden guardados
@@ -108,7 +108,7 @@ def init(midt, midx):
     return lam, T0
 
 
-def plotlistT(theTlist, dt, milam):
+def plotlistT(theTlist, dt,  milam, dx = 1):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
     losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
@@ -126,8 +126,8 @@ def plotlistT(theTlist, dt, milam):
             TS[lostagsx[i]+1, losTs1[i]]
             ])
         rot = np.array(
-                [(180/np.pi)*np.arctan2(TS[5, losTs1[i]] - TS[4, losTs1[i]],
-                    1), ]
+                [(90/np.pi)*np.arctan2(TS[4, losTs1[i]] - TS[3, losTs1[i]],
+                    dx), ]
                 )
         textloc = np.array([lostagsx[i], segmentoy[1]])
         realrot = plt.gca().transData.transform_angles(
@@ -151,11 +151,11 @@ def plotlisF(thelist, dt):
 def resolv_explicito(milam, miT0):
     # Main variables
     # x = np.linspace(-1, L, N)  # vector de posiciones
-    case = 'explicito-lam='+('{:.3f}'.format(lam))
+    case = 'explicito-lam='+('{:.3f}'.format(milam))
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
     errfile = 'E-'+case+'.dat'
-    A = EXPLICITO(len(miT0), lam)
+    A = EXPLICITO(len(miT0), milam)
     T, F, E = MAKET(A, miT0, 1e-3, case)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
@@ -169,7 +169,7 @@ def resolv_CN(milam, miT0):
     fluxfile = 'F-'+case+'.dat'
     errfile = 'E-'+case+'.dat'
     A = CN(len(miT0), milam)
-    T, F, E = MAKET(A, T0, 1e-3, case)
+    T, F, E = MAKET(A, miT0, 1e-3, case)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
     np.savetxt(errfile, E.transpose(), fmt='%.6e')
@@ -178,14 +178,11 @@ def resolv_CN(milam, miT0):
 
 if __name__ == "__main__":
     """
-
     dt = 0.61379 #seg
     dt = 0.6 # comportamiento estable
     dt  =  0.65 comportamiento inestable.
     Ta = 100  # temperatura borde izquierdo
     Tb = 50   # temperatura borde derecho
-
-
     """
     dt = 0.65
     dx = 1
