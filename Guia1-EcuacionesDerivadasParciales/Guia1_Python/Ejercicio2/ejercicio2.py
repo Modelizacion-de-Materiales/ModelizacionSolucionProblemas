@@ -112,7 +112,6 @@ def plotlistT(theTlist, dt,  milam, dx = 1):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
     losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
-    # losTs2 = np.linspace((NT-1)/3+1, NT-1, 3).astype(int)
     losTags1 = [r'$t =$ {:.1f}'.format(val*dt) for val in losTs1]
     losTs1 = np.append(losTs1, NT-1)
     losTags1.append(r'$t = ${:.1f}'.format(NT*dt))
