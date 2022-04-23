@@ -117,27 +117,23 @@ def plotlistT(theTlist, dt,  milam, dx = 1):
     losTags1.append(r'$t = ${:.1f}'.format(NT*dt))
     lostagsy = [y+1 for y in TS[np.int(N/2)-1, losTs1]]
     lostagsy.append(TS[np.int(N/2-1), NT-1])  # el ultimo tag
-    lostagsx = [np.int(N/2) for i in range(len(lostagsy))]
+    lostagsx = [np.int(N/2)]*len(lostagsy)# for i in range(len(lostagsy))]
     plt.plot(TS[:, losTs1], '--ok')
-    for i in range(len(losTags1)):
-        segmentoy = np.array([
-            TS[lostagsx[i], losTs1[i]],
-            TS[lostagsx[i]+1, losTs1[i]]
-            ])
+    for thistagx, thistagy, thistag, thisT in zip(lostagsx, lostagsy, losTags1, losTs1):
+        segmentoy = np.array([TS[thistagx, thisT],TS[thistagx+1, thisT]])
         rot = np.array(
-                [(90/np.pi)*np.arctan2(TS[4, losTs1[i]] - TS[3, losTs1[i]],
-                    dx), ]
+                [(180/np.pi)*np.arctan2(TS[thistagx, thisT] - TS[thistagx-dx, thisT], dx) ]
                 )
-        textloc = np.array([lostagsx[i], segmentoy[1]])
+        textloc = np.array([thistagx, thistagy]) #segmentoy[1]])
         realrot = plt.gca().transData.transform_angles(
                 rot, textloc.reshape((1, 2))
                 )[0]
-        plt.text(lostagsx[i]-1, lostagsy[i], losTags1[i], rotation=realrot)  # rot*45/(np.pi/4.))
+        plt.text(thistagx, thistagy, thistag, rotation=realrot, horizontalalignment='left', verticalalignment='bottom')  # rot*45/(np.pi/4.))
     plt.xlabel('X')
     plt.title(r'$\delta t = {:.2f}, \lambda = {:.3f}$'.format(dt, milam))
     plt.ylabel(r'T ($^{o}C$)')
     plt.xlim(0, N-1)
-    plt.show()
+    #plt.show()
     figfile = theTlist.replace('.dat', '.pdf')
     plt.savefig(figfile)
     plt.close()
