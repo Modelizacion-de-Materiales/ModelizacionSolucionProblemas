@@ -108,31 +108,24 @@ def init(midt, midx):
     return lam, T0
 
 
-def plotlistT(theTlist, dt,  milam, dx = 1):
+def plotlistT(theTlist, dt,  milam, dx = 1, ncurves = 5):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
-    losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
+#    losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
+    losTs1 = np.logspace(0, np.log10(NT), ncurves).astype(int)-1
     losTags1 = [r'$t =$ {:.1f}'.format(val*dt) for val in losTs1]
-    losTs1 = np.append(losTs1, NT-1)
-    losTags1.append(r'$t = ${:.1f}'.format(NT*dt))
-    lostagsy = [y+1 for y in TS[np.int(N/2)-1, losTs1]]
-    lostagsy.append(TS[np.int(N/2-1), NT-1])  # el ultimo tag
-    lostagsx = [np.int(N/2)]*len(lostagsy)# for i in range(len(lostagsy))]
+    lostagsy = TS[np.int(N/2)-1, losTs1]
+    lostagsx = [np.int(N/2)-1]*len(lostagsy)
     plt.plot(TS[:, losTs1], '--ok')
     for thistagx, thistagy, thistag, thisT in zip(lostagsx, lostagsy, losTags1, losTs1):
-        segmentoy = np.array([TS[thistagx, thisT],TS[thistagx+1, thisT]])
-        rot = np.array(
-                [(180/np.pi)*np.arctan2(TS[thistagx, thisT] - TS[thistagx-dx, thisT], dx) ]
-                )
-        textloc = np.array([thistagx, thistagy]) #segmentoy[1]])
-        realrot = plt.gca().transData.transform_angles(
-                rot, textloc.reshape((1, 2))
-                )[0]
-        plt.text(thistagx, thistagy, thistag, rotation=realrot, horizontalalignment='left', verticalalignment='bottom')  # rot*45/(np.pi/4.))
+        dy =  TS[thistagx+1, thisT]-TS[thistagx, thisT] 
+        rot =(180/np.pi)*np.arctan(dy / dx)
+        plt.text(thistagx, thistagy, thistag, rotation=rot, rotation_mode='anchor', transform_rotates_text=True)
     plt.xlabel('X')
     plt.title(r'$\delta t = {:.2f}, \lambda = {:.3f}$'.format(dt, milam))
     plt.ylabel(r'T ($^{o}C$)')
     plt.xlim(0, N-1)
+    plt.tight_layout()
     #plt.show()
     figfile = theTlist.replace('.dat', '.pdf')
     plt.savefig(figfile)
