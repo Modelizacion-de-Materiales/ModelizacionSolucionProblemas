@@ -45,7 +45,7 @@ def CN(miN, milam):
     return np.matmul(np.linalg.inv(L), R)
 
 
-def MAKET(miA, miT0, TOL, case):
+def MAKET(miA, miT0, TOL, case, verbose=False, dx = 1):
     """
     Propaga  la condición inicial miT0 usando la matriz 
     miA como propagador, de manera que 
@@ -79,18 +79,20 @@ def MAKET(miA, miT0, TOL, case):
         miT0 = ALLT[:, -1].reshape(miN, 1)
 # calculo la nueva temperatura
         NEWT = miA.dot(miT0)
-        # calculo el nuevo flujo        #
-        NEWF = np.gradient(NEWT, axis=0)
+        NEWF = np.gradient(NEWT, dx,  axis=0)
         ALLT = np.append(ALLT, NEWT, axis=1)
         ALLF = np.append(ALLF, NEWF, axis=1)
         # tengo que calcular el error de alguna manera.
         # El Error lo mido con el cambio de flujo
-        ERR = np.append(ERR, np.abs(np.diff(ALLF[-1, -2:])/ALLF[-1, -1]))
-        if (i >= 200) | (ERR[-1] < TOL) | (ERR[i-1] > 100):
-            # propago solo 100 pasos.
+        #newerr = np.abs( (ALLF[-1, :] - ALLF[-2,:])/ALLF[-1,:] ).sum()
+        newerr = np.abs( (ALLF[:, -1] - ALLF[-1,-1])).sum()/miN #/ALLF[-1,-1] )
+        ERR = np.append(ERR, newerr) # np.abs(np.diff(ALLF[-1, [0,-1]])/ALLF[-1, -1]))
+        if (i >= 500) | (ERR[-1] < TOL) | (ERR[i-1] > 1000):
+            # propago solo 200 pasos.
             # la idea es medirlo con un error
             flag = False
-            print("se detiene propagacion temporal en i = {:d}".format(i))
+            if verbose:
+                print("se detiene propagacion temporal en i = {:d}".format(i))
     return ALLT, ALLF, ERR
 
 
@@ -105,46 +107,94 @@ def init(midt, midx):
     T0 = np.zeros((setN, 1))
     T0[0] = 50
     T0[-1] = 100   
-    return lam, T0
+    X = np.linspace(0,L,setN)
+    return lam, T0, X
 
 
-def plotlistT(theTlist, dt,  milam, dx = 1, ncurves = 5):
+def plotlistT(theTlist, dt,  milam, dx = 1, L = 10,   ncurves = 5, maketags = True, maketitle=True,  savepdf = True, ax=None, fig=None, returntags = False,  **kwargs):
     TS = np.loadtxt(theTlist).transpose()
     N, NT = np.shape(TS)
-#    losTs1 = np.linspace(0, (NT-1)/3, 5).astype(int)
+    X = np.linspace(0,L,N)
     losTs1 = np.logspace(0, np.log10(NT), ncurves).astype(int)-1
     losTags1 = [r'$t =$ {:.1f}'.format(val*dt) for val in losTs1]
     lostagsy = TS[np.int(N/2)-1, losTs1]
     lostagsx = [np.int(N/2)-1]*len(lostagsy)
-    plt.plot(TS[:, losTs1], '--ok')
-    for thistagx, thistagy, thistag, thisT in zip(lostagsx, lostagsy, losTags1, losTs1):
-        dy =  TS[thistagx+1, thisT]-TS[thistagx, thisT] 
-        rot =(180/np.pi)*np.arctan(dy / dx)
-        plt.text(thistagx, thistagy, thistag, rotation=rot, rotation_mode='anchor', transform_rotates_text=True)
-    plt.xlabel('X')
-    plt.title(r'$\delta t = {:.2f}, \lambda = {:.3f}$'.format(dt, milam))
-    plt.ylabel(r'T ($^{o}C$)')
-    plt.xlim(0, N-1)
-    plt.tight_layout()
+    if ax == None:
+        fig, ax = plt.subplots()
+    ax.plot(X, TS[:, losTs1], '--ok')
+    method = theTlist.split('-')[1]
+    if maketags:
+        tags = []
+        for thistagx, thistagy, thistag, thisT in zip(lostagsx, lostagsy, losTags1, losTs1):
+            dy =  TS[thistagx+1, thisT]-TS[thistagx, thisT] 
+            rot =(180/np.pi)*np.arctan(dy / dx)
+            text=ax.text(X[thistagx], thistagy, thistag, rotation=rot, rotation_mode='anchor', transform_rotates_text=True)
+            tags.append( text.set_bbox({'facecolor':'white', 'alpha':0.7}) )
+    ax.set_xlabel('X')
+    ax.set_title(rf'Método {method}, $\delta t = {dt:.4f}, \lambda = {milam:.4f}$')#.format(dt, milam))
+    ax.set_ylabel(r'T ($^{o}C$)')
+    ax.set_xlim(0, max(X))
+#    fig.tight_layout()
     #plt.show()
-    figfile = theTlist.replace('.dat', '.pdf')
-    plt.savefig(figfile)
-    plt.close()
+    if savepdf:
+        figfile = theTlist.replace('.dat', '.pdf')
+        fig.savefig(figfile)
+    if returntags:
+        return  fig, ax, tags
+    else:
+        return fig, ax
 
 
-def plotlisF(thelist, dt):
-    pass
+def plotlistF(theFlist, lam, method='explicito',maketitle=True,  ax=None, fig=None, savepdf=True, **kwargs):
+    FS = np.loadtxt(theFlist).transpose()
+    if ax == None:
+        fig, ax = plt.subplots(**kwargs)
+    ax.plot(FS[0,:], label='Flujo a izquerda')
+    ax.plot(FS[-1,:], label ='Flujo del lado derecho')
+    ax.axhline(color='k')
+    ax.set_xlabel('time index')
+    ax.set_ylabel('Flujo')
+    if maketitle:
+        ax.set_title(rf'$\lambda = {lam}$, método {method}')
+    ax.legend()
+    if savepdf:
+        thefigfile = theFlist.replace('.dat','.pdf')
+        fig.savefig(thefigfile)
+    return fig, ax
 
+def plotlistE(theElist, lam, method='explicito', maketitle=True, ax=None, fig=None, savepdf=True, **kwargs):
+    ES = np.loadtxt(theElist).transpose()
+    if ax == None:
+        fig, ax = plt.subplots(**kwargs)
+    ax.semilogy(ES)
+    ax.set_xlabel('time index')
+    ax.set_ylabel('Error = $|\sum_i (Q_{i} - Q_{derecha})|/n$')
+    if maketitle:
+        ax.set_title(rf'$\lambda = {lam}$, método {method}')
+    if savepdf:
+        thefigfile = theElist.replace('.dat','.pdf')
+        fig.savefig(thefigfile)
+    return fig, ax
+
+def generic_resolv(milam, miT0, tol=1e-3,  method=EXPLICITO):
+    case = f'{method.__name__}-lam={milam:.3f}'
+    tempfile = 'T-'+case+'.dat'
+    fluxfile = 'F-'+case+'.dat'
+    errfile = 'E-'+case+'.dat'
+    A = method(len(miT0), milam)
+    T, F, E = MAKET(A, miT0, tol, case, verbose=False)
+    np.savetxt(tempfile, T.transpose(), fmt='%.6e')
+    np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
+    np.savetxt(errfile, E.transpose(), fmt='%.6e')
+    return {'tempfile': tempfile, 'flujofile': fluxfile, 'errfile':  errfile}
 
 def resolv_explicito(milam, miT0):
-    # Main variables
-    # x = np.linspace(-1, L, N)  # vector de posiciones
     case = 'explicito-lam='+('{:.3f}'.format(milam))
     tempfile = 'T-'+case+'.dat'
     fluxfile = 'F-'+case+'.dat'
     errfile = 'E-'+case+'.dat'
     A = EXPLICITO(len(miT0), milam)
-    T, F, E = MAKET(A, miT0, 1e-3, case)
+    T, F, E = MAKET(A, miT0, 1e-3, case, verbose=False)
     np.savetxt(tempfile, T.transpose(), fmt='%.6e')
     np.savetxt(fluxfile, F.transpose(), fmt='%.6e')
     np.savetxt(errfile, E.transpose(), fmt='%.6e')
