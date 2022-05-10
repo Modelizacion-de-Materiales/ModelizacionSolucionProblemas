@@ -88,7 +88,7 @@ class barra:
         """
         Keles = mef.read_local_matrices('MatricesElementales-'+self.case)
         U=self.U.reshape((self.NNODOS, self.GL))
-        for e in range(self.MC.shape[0])
+#        for e in range(self.MC.shape[0])
 
 
 
@@ -146,7 +146,7 @@ class barra:
         plt.ylabel(r'$d(x)$ (m)')
         plt.legend()
         plt.savefig(dresfile)
-        plt.close()
+        plt.show()
         tresfile = 'ResultadoTensiones-'+self.case+'.pdf'
         plt.plot(self.X, self.to, '--k', label='Solución Teórica')
         plt.title('Solución Numérica para {:d} nodos'.format(self.NNODOS))
@@ -157,7 +157,8 @@ class barra:
                 where='pre', label='Solución Numérica')
         plt.legend()
         plt.savefig(tresfile)
-        plt.close()
+        plt.show()
+#        plt.close()
 
 
 # NODOS = [2, 3, 4, 5]
