@@ -1,4 +1,4 @@
-INCLUDES := ./01-Problema-1.tex ./02-Problema2.tex ./03-Problema3.tex 
+INCLUDES := ./01-Problema-1.tex ./02-Problema2.tex ./03-Problema3.tex  PuenteFigure.pdf
 CODES := ./codesolve.m ./codesolve.txt 
 
 all: notes.pdf beamer.pdf
@@ -26,6 +26,12 @@ Ejercicio2: ./Guia2-Python/Ejercicio2
 
 Ejercicio3: ./Guia2-Python/Ejercicio3
 	make -C ./Guia2-Python/Ejercicio3
+
+PuenteFigure.pdf: PuenteFigure.aux
+	pdflatex PuenteFigure.tex
+
+PuenteFigure.aux: PuenteFigure.tex
+	pdflatex PuenteFigure.tex
 
 .PHONY: Ejercicio1 Ejercicio2 Ejercicio3
 

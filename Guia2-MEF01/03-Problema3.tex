@@ -6,8 +6,8 @@ fuerzas nodales mediante la integral:
 
 \mode*
 
-\begin{frame}<presentation>[label=FrameProblema3Forces]
-    \frametitle{Problema 3: Fuerzas Distribuidas}
+\begin{frame}[label=FrameProblema3Forces]
+    \frametitle<presentation>{Problema 3: Fuerzas Distribuidas}
 
     \begin{equation}
         F_e = \int _{elemento}{
@@ -16,33 +16,28 @@ fuerzas nodales mediante la integral:
         dx
     }
     \end{equation}
-
 \end{frame}
 
-\begin{frame}<presentation>[label=FrameCalculoFuerzas]
-    \frametitle{Calculo de fuerzas Directo}
+\begin{frame}[label=FrameCalculoFuerzas]
+    \frametitle<presentation>{Calculo de fuerzas Directo}
     \begin{columns}
         \column{0.4\textwidth}
-            \begin{codeblock}
-                \verbatiminput{./CalculoFuerzasShow.py}
-            \end{codeblock}
+                \lstinputlisting{./CalculoFuerzasShow.py}
 
         \column{0.6\textwidth}
-            \begin{codeblock}
-                \verbatiminput{./CalculoFuerzasShow2.py}
-            \end{codeblock}
+                \lstinputlisting{./CalculoFuerzasShow2.py}
 
     \end{columns}
 \end{frame}
-\begin{frame}<presentation>[label=FramePaneDesplaza]
-    \frametitle{Desplazamientos}
+\begin{frame}[label=FramePaneDesplaza]
+    \frametitle<presentation>{Desplazamientos}
     \center
     \includegraphics[width=0.6\textwidth,trim=0cm 0cm 22cm 0cm, clip=true]
     {./Guia2-Python/Ejercicio3/pane-results.pdf}
 
 \end{frame}
-\begin{frame}<presentation>[label=FramePaneTensiones]
-    \frametitle{Tensiones}
+\begin{frame}[label=FramePaneTensiones]
+    \frametitle<presentation>{Tensiones}
     \begin{columns}
         \column{0.1\textwidth}
         $$ \tau = \frac{\Delta l_e}{l_e} E$$

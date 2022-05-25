@@ -1,7 +1,7 @@
 def fuerza():
     """
     define las fuerzas equivalentes sobre los nodos para la
-    distribucuón de fuerzas T(x) = - C*x
+    distribucion de fuerzas T(x) = - C*x
     """
     F = np.zeros((len(MN), 1))
     for i in range(len(MN)-1):

@@ -1,8 +1,8 @@
-    r = [1, 2]
-    s = [0, 3]
-    U = np.zeros((4,1))
-    F = np.zeros((4,1))
-    U[s] = [0, 0.002]
-    F[R] = [0, 0]
-    U[r] = numpy.linalg.solve(K[np.ix_(r,r)], F[r] - K[ np.ix_[r, s].dot(U[s]))
+r = [1, 2]
+s = [0, 3]
+U = np.zeros((4,1))
+F = np.zeros((4,1))
+U[s] = [0, 0.002]
+F[R] = [0, 0]
+U[r] = numpy.linalg.solve(K[np.ix_(r,r)], F[r] - K[ np.ix_[r, s].dot(U[s]))
 

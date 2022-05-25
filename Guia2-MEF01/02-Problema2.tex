@@ -3,27 +3,21 @@ Para resolver el problema 2 debemos refererirnos a lo dicho para el
 ensamble de matrices.
 
 \mode*
-\begin{frame}<presentation>[label=FramePuente1]
-    \frametitle{Problema 2}
+\begin{frame}[label=FramePuente1]
+    \frametitle<presentation>{Problema 2}
     \begin{columns}
         \column{0.5\textwidth}
-        \includegraphics[width=\textwidth, page=1]{./Guia2-Python/Ejercicio2/pane-Puente.pdf}
+	\includegraphics[width=\textwidth, page=1]{./PuenteFigure.pdf} / %Ejercicio2/pane-Puente.pdf}
         \column{0.5\textwidth}
-        \begin{codeblock}
-            %\verbatiminput{./Guia2-Python/Ejercicio2/Puente.ge.show}
-            \verbatiminput{./Puente.ge.show}
-        \end{codeblock}
+            \lstinputlisting{./Puente.ge.show}
     \end{columns}
 \end{frame}
 
-\begin{frame}<presentation>[label=FramePuenteMatrices]
-    \frametitle{Problema 2: Matrices Elementales}
+\begin{frame}[label=FramePuenteMatrices]
+    \frametitle<presentation>{Problema 2: Matrices Elementales}
     \begin{columns}
         \column{0.4\textwidth}
-        \begin{codeblock}
-        %\verbatiminput{./Guia2-Python/Ejercicio2/MatricesShow1}
-            \verbatiminput{./MatricesShow1}
-        \end{codeblock}
+            \lstinputlisting{./MatricesShow1}
         \column{0.6\textwidth}
         \begin{codeblock}
         \verbatiminput{./MatricesShow2}
@@ -31,23 +25,18 @@ ensamble de matrices.
     \end{columns}
 \end{frame}
 
-\begin{frame}<presentation>[label=FramePuenteSolucion]
-    \frametitle{Problema 2: Puente}
+\begin{frame}[label=FramePuenteSolucion]
+    \frametitle<presentation>{Problema 2: Puente}
     \begin{columns}
-        \column{0.5\textwidth}
+        \column{0.3\textwidth}
             \includegraphics[width=\textwidth,page=2]{./Guia2-Python/Ejercicio2/pane-Puente.pdf}
-        \column{0.25\textwidth}
+        \column{0.3\textwidth}
         Desplazamientos
-
-        \begin{codeblock}
-            \verbatiminput{./PuenteDisplaceShow.dat}
-        \end{codeblock}
-        \column{0.25\textwidth}
+            \lstinputlisting{./PuenteDisplaceShow.dat}
+        \column{0.3\textwidth}
         Fuerzas
 
-        \begin{codeblock}
-            \verbatiminput{./Guia2-Python/Ejercicio2/PuenteForces.dat}
-        \end{codeblock}
+            \lstinputlisting{./Guia2-Python/Ejercicio2/PuenteForces.dat}
     \end{columns}
 \end{frame}
 \mode<all>

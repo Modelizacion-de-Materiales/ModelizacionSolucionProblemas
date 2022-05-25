@@ -40,7 +40,7 @@ def resolvermef(r, s, K, us, fr, case):
     return U, F
 
 
-def ensamble(MC, MN, MP, gl, ETYPES, case=''):
+def ensamble(MC, MN, MP, gl, ETYPES, case='', return_elementles=False):
     """
     esta función ensambla los elementos indicados por el argumento etype.
     """
@@ -50,10 +50,14 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     ne, nnxe = np.shape(MC)
     # esta linea es necesaria porque en python los indicesvan desde cero
     fo = open('MatricesElementales-'+case+'.dat', 'w')
+    if return_elementles:
+        kelems = []
     for e in range(ne):
         MCloc = MC[e, :]  # el -1 va parapasar a indices
         MNloc = MN[MCloc, :]
         kele = kelemental(ETYPES[e], MP[e, :], MNloc, MCloc)
+        if return_elementles:
+            kelems.append(kele)
         scale = np.max(np.max(kele))
         fo.write('Elemento {:d}, scale = {:e}\n'.format(e, scale))
         fo.write('{}\n'.format(kele/scale))
@@ -73,7 +77,10 @@ def ensamble(MC, MN, MP, gl, ETYPES, case=''):
     fo.write('{}\n'.format(Kglob/scale))
     fo.write('\n su determinante: {:e}'.format(np.linalg.det(Kglob/scale)))
     fo.close()
-    return Kglob
+    if return_elementles:
+        return Kglob, kelems
+    else:
+        return Kglob
 
 
 def kelemental(etype, MP, NODES=None, CONEC=None):
