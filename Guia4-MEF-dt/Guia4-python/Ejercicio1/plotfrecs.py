@@ -36,11 +36,36 @@ def plotfrecs(ws, cases, name, glstep=2, fig_size=(5, 8)):
             loc='upper center',
             ncol=2
             )
+    fig.tight_layout()
     plt.savefig('frecuencias'+name+'.pdf')
     # plt.close()
 
+    
+def interpolar(x, yn, modo):
+    y = []
+    xd = []
+    for ii in range(len(x)-1):
+        li = x[ii+1] - x[ii]
+        xx = np.linspace(li/10, li, 10)
+        if modo == 'trans':
+        # las funciones de nterpolacion son las de las 
+        # vigas de mefmod
+            y.append(
+                NT1(xx, li)*yn[ii] +
+                NT2(xx, li)*thetan[ii] +  # ojom necesito thetan !
+                NT3(xx, li)*yn[ii+1] +
+                NT4(xx, li)*thetan[ii+1]
+            )
+        elif modo == 'long':
+            y.append(
+                yn[ii]*xx/li + yn[ii+1]*(1-xx/li)
+            )
+        xd.append(xx+x[ii])
+    y = np.array(y).ravel() 
+    xd = np.array(xd).ravel()
+    return y, xd
 
-def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
+def plotmodes(MODES, cases, dv, labels, name, modo='long', glstep=1, fig_size=(7, 10)):
     maxmode = MODES[0][-1][-1].shape[1]
     xv = np.linspace(0, 1, dv[::glstep].shape[0])
     Figs = []
@@ -75,30 +100,13 @@ def plotmodes(MODES, cases, dv, labels, name, glstep=2, fig_size=(7, 10)):
                 if M < 2*case:  # Si M > 2*case entonces no se pudo resolver el modo
                     x = np.linspace(0, 1, case+1)
                     # vars para el desplazamiento y el angulo nodal, normalizados. 
-                    yn = MODES[l][case-1][0][::glstep, M]/MODES[l][case-1][0][-2, M]
-                    thetan = MODES[l][case-1][0][1::glstep, M]/MODES[l][case-1][0][-2, M]
+                    yn = MODES[l][case-1][0][::glstep, M]/MODES[l][case-1][0][-glstep, M]
+                    thetan = MODES[l][case-1][0][1::glstep, M]/MODES[l][case-1][0][-glstep, M]
                     pl.append(axM[l].plot(x, yn, 'o')[0])
                     caselabel.append('{}'.format(case+1))
                     # dos variables densas para la interpolación
-                    y = []
-                    xd = []
-                    # quiero que la interpolación me qude del mismo color que los puntos
+                    y, xd = interpolar(x, yn, modo)
                     modecolor = pl[-1].get_color()
-                    # ahora armo la interpolación
-                    for ii in range(len(x)-1):
-                        li = x[ii+1] - x[ii]
-                        xx = np.linspace(li/10, li, 10)
-                        # las funciones de nterpolacion son las de las 
-                        # vigas de mefmod
-                        y.append(
-                            NT1(xx, li)*yn[ii] +
-                            NT2(xx, li)*thetan[ii] +
-                            NT3(xx, li)*yn[ii+1] +
-                            NT4(xx, li)*thetan[ii+1]
-                        )
-                        xd.append(xx+x[ii])
-                    y = np.array(y).ravel() 
-                    xd = np.array(xd).ravel()
                     pi.append(axM[l].plot(xd, y, ':', color=modecolor))
             # finalmente agrego los titulos de los modos graficados
             axM[l].legend(labels=[], title=labels[l], loc='upper left')
