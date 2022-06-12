@@ -343,7 +343,7 @@ def NL1DA(x, L):
     NL1DA(0,L) = 1,
     NL1DA(L,L) = 0,
     """
-    return (1.-x)/L
+    return 1.-(x/L)
 
 
 def NL1DB(x, L):
