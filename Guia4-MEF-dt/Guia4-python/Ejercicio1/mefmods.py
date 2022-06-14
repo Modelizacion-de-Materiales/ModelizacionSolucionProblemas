@@ -385,6 +385,20 @@ def NT4(x, L):
     """
     return (1/L**3)*(L*x**3-L**2*x**2)
 
+def Eval1DInterpolators(x, le, interpolators):
+    return np.vstack([N(x,le) for N in interpolators])
+
+def Interpolate1DSolutions(X, D, interpolators = [NL1DA, NL1DB], glxn=1, nxx=10):
+    Les = np.diff(X)
+    yy=[]
+    xx = []
+    for e, le in enumerate(Les):
+        xx.append(np.linspace(X[e], X[e+1], nxx))
+        thisinterp = Eval1DInterpolators(xx[-1]-X[e], le, interpolators)
+        thisgl = np.hstack([np.linspace(n*glxn, (n+1)*glxn-1, glxn).astype(int) for n in [e, e+1]])
+        thisy = D[thisgl]
+        yy.append(np.dot(thisy, thisinterp))
+    return np.hstack(xx) , np.hstack(yy)
 
 # ## Graficar el mallado, inicial y final
 def plotmesh(MC, MN, MF, MD,  case, scale=100):

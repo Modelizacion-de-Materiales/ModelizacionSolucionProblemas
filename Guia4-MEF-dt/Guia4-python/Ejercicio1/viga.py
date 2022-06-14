@@ -108,5 +108,52 @@ class Viga(object):
             Vs[N].append(Vl[:, :imax])
         return ws, Vs
 
+    def InterpolateAllElements(self, ds, modes, _glxn=1, interpolators = [mef.NL1DA, mef.NL1DB]):
+        x = {}
+        y = {}
+        xx = {}
+        yy = {}
+        for nnodes in np.arange(3,10):
+            x[nnodes] = np.linspace(0,1,nnodes)
+            y[nnodes] = {}
+            xx[nnodes] = {}
+            yy[nnodes] = {}
+            for mode in modes:
+                if mode > ds[nnodes-2][0].shape[1]:
+                    continue
+                thismode = ds[nnodes-2][0][:,mode-1]
+                y[nnodes][mode] = thismode[::_glxn]
+                xx[nnodes][mode], yy[nnodes][mode] = mef.Interpolate1DSolutions(x[nnodes], thismode, interpolators=interpolators, glxn=_glxn)
+        return x, y, xx, yy
+
+
+    def plot_modes(self, modes, x,y,xx,yy):
+        from matplotlib import lines as mlines 
+        from itertools import cycle
+        markercycle = cycle(['o','s','d','^', 'P', 'X', 'h', '*'])
+        interpoline = mlines.Line2D([],[], linestyle = '--', color='k')
+        FIG, AX = [], []
+        for mode in modes:
+            ls = []
+            fig, ax = plt.subplots()
+            FIG.append(fig)
+            AX.append( ax )
+            solution_handles = []
+            for NNODES in np.arange(3,6): #,4]:
+                if mode > len(y[NNODES]):
+                    continue
+                thismarker = next(markercycle)
+                scatter = ax.scatter(x[NNODES],y[NNODES][mode]/y[NNODES][mode][-1], marker=thismarker, ec='k', s=200) #, ms=30/(NNODES-2)))
+                ls.append(ax.plot(xx[NNODES][mode], yy[NNODES][mode]/y[NNODES][mode][-1], '--', c = scatter.get_facecolor(), label=f'{NNODES} nodos'))
+                solution_handles.append(mlines.Line2D([],[], marker=thismarker, markerfacecolor=ls[-1][0].get_color(), markeredgecolor='k', ms=10))
+            solution_handles += [interpoline]
+            solution_labels = [l[0].get_label() for l in ls]+['interpolación']
+            ax.legend(handles = solution_handles, labels=solution_labels)
+            ax.set_ylabel('$y/y_{max}$')
+            ax.set_xlabel('$x (m)$')
+            fig.suptitle(f'modo {mode}')
+            fig.tight_layout()
+        return FIG, AX
+
 
 # V.solvemods
