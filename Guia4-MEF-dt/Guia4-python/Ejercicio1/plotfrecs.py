@@ -55,8 +55,8 @@ def allmodesplot(dv, name, fig_size=(5, 7), font_size=14, glstep=2):
             ncol=ds.shape[1])
     ax.set_xlabel('X')
     ax.set_ylabel(r'$\Delta y$')
-    plt.savefig(name+'allmodes.pdf')
-    return fig
+    fig.savefig(name+'allmodes.pdf')
+    return fig, ax
     #plt.close()
 
 
