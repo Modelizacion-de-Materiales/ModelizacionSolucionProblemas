@@ -2,6 +2,7 @@ import numpy as np
 import os
 import copy
 import pdb
+import pandas as pd
 
 def ising ( NSTEPS,N,Hext,kT,J ):
     k = 1
@@ -22,28 +23,25 @@ def ising ( NSTEPS,N,Hext,kT,J ):
     EMEAN = [] #np.array([]*len(kT))
     MMEAN = [] #np.array([]*len(kT))
     MabsMEAN = []
+    M2MEAN = []
     E2MEAN = []
     VARIANCE = []
     #guardo encabezado de archivo
-    with open(thisfile,'w') as f: 
-        f.write('# T EMEAN E2MEAN CV MMEAN  Mmean |M|mean siflips noflips \n')
-       #kT[t], EMEAN[t], E2MEAN[t], VARIANCE[t]/kT[t]^2, MMEAN[t], MabsMEAN[t],...
+    if os.path.exists(thisfile):
+        result =  pd.read_csv(thisfile, header=0, sep='\s+')
+        if result.shape[0] == len(kT):
+            return result
+#    with open(thisfile,'w') as f: 
+#        f.write('T   EMEAN    E2MEAN        CV           MMEAN   |M|mean   M2MEAN   siflips   noflips \n')
 
        # inicio la distribución de spins. de aca 
        #empieza todo.
     s = np.random.randint(2, size=(N,N))*2-1# sign(rand(N) - 0.5) 
-       # primero obtengo la suma de spines en los vecinos. 
-         # el enfriamiento.
-         # TERMALIZACION A T ALTA
-       #  i1 = ceil( rand(NSTEPS,1)*(N) ); 
-       #  i2 = ceil( rand(NSTEPS,1)*(N) ); 
+    # primero obtengo la suma de spines en los vecinos. 
+    # el enfriamiento.
     siflips=0; noflips=0
     for i in range(TRANSIENT):     # {
         E, dM, s , siflips, noflips = metropolising(J,beta[1],s,siflips,noflips )
-#      disp(['En termalizacion: flips = ',num2str(siflips),...
-#        ' rejects= ', num2str(noflips),...
-#        ' de ' , num2str(NSTEPS), ' intentos '])
-
        # la dinámica ocurre en enfriamiento!
        # recien ahora calculo la energía inicial del sistema
     sumOfNeighbours = getneigbours( s )
@@ -61,57 +59,45 @@ def ising ( NSTEPS,N,Hext,kT,J ):
          # en esta versión las coordenadas las elijo cuando ejecuto metropoliss.
          # cuento los flips para debug
         siflips=0;  noflips=0
-           #  for i = 1:TRANSIENT  % { %TRANSITORIO TRANSIENT_STEPS=NSTEPS/10
-           #    [ dE, dM, s , noflips, siflipls ] =  ...
-           #       metropolising(J,beta[t],s,noflips,siflips )
-           #  end % }
         cases= basename+'_kT_{:02d}'.format( t )
-#      fig = figure()
-           #  fig.Units='normalized'
-#      fig.Position=[0,0,25,10]
-#      subplot(1,2,1); colormap summer; grid on; image((s+1)*256);   xticks([]); yticks([]);  title('init')
-             # y calculo la energía inicial de la distribución:
-             # preparo metropolis
-             # en esta versión las coordenadas las genero en la funcion metropolis.
-             # cuento los flips para debug !
         sumOfNeighbours = getneigbours( s )
-        E = - ( J / 2 ) * sum ( sum( s*sumOfNeighbours )) + mu*Hext*sum(s); 
+        E = - ( J / 2 ) * sum ( sum( s*sumOfNeighbours )) + mu*Hext*sum(sum(s)); 
         M = sum(sum(s))
         siflips=0; noflips=0
          # luego del transitorio inicia los acumuladores parael caso.
-        E_ACUM = E;  M_ACUM = M; E2_ACUM = E**2 ;  Mabs_ACUM = M
-         # METROPOLIS
+        E_ACUM = E;  M_ACUM = M; E2_ACUM = E**2 ;  Mabs_ACUM = M; M2_ACUM = M**2;
         for i in range(NSTEPS): # i = 1:NSTEPS         # {  %%% loop temperatura
             dE,dM,s,siflips,noflips =  metropolising (J,beta[t],s,siflips,noflips)
-                 # el cambio de energía lo calculo con el spin propuesto.
-#     sumOfNeighbours = getneigbours( s )
-#     Etest = - ( J / 2 ) * sum ( sum( s.*sumOfNeighbours )) + mu*Hext*sum(s(:)); 
             E =E + dE ;  
             M = M + dM
-# en todos los casos, tengo que procesar la estadística.
-            E_ACUM = E_ACUM + E ; Mabs_ACUM=Mabs_ACUM+abs(M); M_ACUM = M_ACUM + M
-            E2_ACUM = E2_ACUM + (E)**2
-#      subplot(1,2,2); image((s+1)*256);  xticks([]); yticks([]);  title('end'); 
-#      title(fig.Children(end), ['kT = ', num2str(kT[t]) , ', size = ', num2str(N),'X', num2str(N)])
-             #saveas(fig, [cases,'.pdf'])
-#      print([cases,'.pdf'], '-dpdf','-bestfit')
-#      close
+            E_ACUM += E
+            Mabs_ACUM += abs(M)
+            M_ACUM += M
+            E2_ACUM += E**2
+            M2_ACUM += M**2
              # al final de metrópolis tengo que calcular toda la estadística.
-        EMEAN.append( E_ACUM/NSTEPS )  #;%   * NORM 
-        MMEAN.append(  M_ACUM/NSTEPS ) #;      #* NORM
-        MabsMEAN.append(Mabs_ACUM/NSTEPS)
-        E2MEAN.append(E2_ACUM/NSTEPS)# ;%  *NORM 
+        EMEAN.append( E_ACUM/NSTEPS/N**2 )
+        MMEAN.append( M_ACUM/NSTEPS/N**2 )
+        MabsMEAN.append(Mabs_ACUM/NSTEPS/N**2)
+        M2MEAN.append(M2_ACUM/NSTEPS/N**4)
+        E2MEAN.append(E2_ACUM/NSTEPS/N**4)
         VARIANCE.append((E2MEAN[t]-EMEAN[t]**2)/NSTEPS  )
         print(f'N = {N}, totalflips = {NSTEPS}, KT = {t}, flips = {siflips}, rejects = {noflips}')
 #        with open(thisfile, 'a') as f:
-#            f.write('{:15.4e} {:15.4e} {:15.4e} {:15.4e} {:15.4e} {:15.4e} {:d} {:d}\n',format( 
-#                  kT[t], EMEAN[t], E2MEAN[t], VARIANCE[t]/kT[t]**2, MMEAN[t], MabsMEAN[t] , siflips, noflips 
-#                  )
-#                  )
-#    system(['LD_PRELOAD="/usr/lib64/libstdc++.so.6" pdftk ',basename,'_kT* cat output ',basename,'.pdf'])
-#    system(['rm ',basename, '_kT*.pdf'])
-#function [ NNDN ,  NNUP,  NNLE, NNRI ] = getneigbours( s )
-    return s,  MMEAN,EMEAN,E2MEAN,MabsMEAN , VARIANCE
+#            f.write(f'{kT[t]:15.4e} {EMEAN[t]:15.4e} {E2MEAN[t]:15.4e} {VARIANCE[t]/kT[t]**2:15.4e} {MMEAN[t]:15.4e} {MabsMEAN[t]:15.4e} {M2MEAN[t]:15.4e}  siflips:d} {noflips:d}\n')
+    data = {'T': kT,
+            'EMEAN': EMEAN,
+            'E2MEAN': E2MEAN,
+            'CV': VARIANCE/kT**2,
+            'MMEAN': MMEAN, 
+            '|M|mean' :  MabsMEAN,
+            'M2MEAN' : M2MEAN
+           }
+    result = pd.DataFrame.from_dict(data, orient='index')
+    
+    result.to_csv(thisfile, sep=' ', index=False, )
+    
+    return result
 
 def getneigbours(s):
      #%% ojo porque el cricshift esta relentizando el programa ! 
@@ -127,49 +113,49 @@ def getneigbours(s):
    #  [dE,dM,s,siflips,noflips] =  ...
    #     metropolising (J,beta[t],s,siflips,noflips)
 def metropolising ( J,beta , olds, siflipin,noflipin):
-     # en esta funcion se aplica el algoritmo de metrópolis 
-     # i,j es el elemento de la distribucion de 
-     #spines que se va a cambiar. 
-     # sumOfThisNeigbours es la suma de vecinos correspondiente. 
-     # elijo al azar las coordenadas a cambiar, 
-    [N,M]=olds.shape # size(olds)
-    i = np.random.randint(N) #randi(N)
-    j = np.random.randint(M)
+    Nx,Ny = olds.shape # size(olds)
+    i = np.random.randint(Nx) #randi(N)
+    j = np.random.randint(Ny)
     sdot = -copy.copy( olds [ i, j ] )
-    iup=i-N #mod(i-1-1,size(olds,1))+1
-    idn=i-1#mod(i+1-1,size(olds,1))+1
-    jup=j-N#mod(j-1-1,size(olds,2))+1
-    jdn=j-1 #mod(j+1-1,size(olds,2))+1
+    iup=i-Nx
+    idn=i-1
+    jup=j-Ny
+    jdn=j-1
     # cambio de energía propuesta. 
     dEdot = -2*(sdot)*(J)*(olds[ iup,j ] + olds[ idn,j ] + olds[ i,jup ] + olds[ i,jdn ]  )
-    flip = False; 
+    flip = False
     siflipout = siflipin
-    noflipout = noflipin; 
-    # y ahora viene el cambio por metropolis.
-    # si el cambio de energía propuesto es menor que cero o
-    # si la proba de cambio
-    # es mayor que un número al azar : 
-    if dEdot < 0:    # {  en este caso confirmo el cambio de espin:
+    noflipout = noflipin
+    if dEdot < 0:    
         flip=True
-    else:   # otro caso cualquiera tengo que medir la probabilidad.
-          p = np.random.rand() 
-    if p < np.exp(-beta*dEdot):    # { si la proba es alta, 
-        flip = True
-         # en cualquier otro caso, dejo las cosas como estaban. 
-       # en principio copio la distribucion original.
+    else:   
+        if np.random.rand() < np.exp(-beta*dEdot):   
+            flip = True
     news=copy.copy(olds)
     if flip == True:     # { efectivamente hago el cambio.
         news [ i, j ] = copy.copy(sdot) 
         dE = copy.copy(dEdot)
         dM = 2*sdot
         siflipout=siflipout+1
-    else:    # si flip es False,
+    else:    
         dE = 0
         dM = 0
         noflipout=noflipout+1
-           # no cambio nada y dE = 0!
     return  dE, dM, news , siflipout, noflipout 
-
-
-
     
+def init():
+    Hext = 0;      # el campo externo 
+    J = 1;         # la constante de interacción. 
+    # rango y sampleo de temperaturas:
+    
+    kTmax=5
+    kTmin=kTmax/6#; dkT = (kTmax-kTmin)/51; 
+    kT=np.linspace(kTmax,kTmin,50);
+    return Hext,J,kT 
+
+if __name__ == '__main__':
+    [Hext,J,kT]=init()
+    #s0,MMEAN0,EMEAN0,E2MEAN0,MABSMEAN0, VARIANCE0 =ising(int(1e5), 2,Hext,kT,J);
+    for N in [2,4,8, 16]:
+        for MCsteps in [5e4, 1e5, 5e5]:
+             ising(int(MCsteps), N,Hext,kT,J)

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import matplotlib.pyplot as plt
-from tqdm.notebook import tqdm_notebook, tqdm
+from tqdm.auto import tqdm
 import numpy as np
 from copy import copy
 import pdb
@@ -54,7 +54,7 @@ for t, Beta in progress:
     DE = [0]
     Macum = np.abs(M); Eacum = sum(E) ; E2acum = sum(E2) ;
     VAR = sum(np.power(E,2)) - E2acum
-    VARacum = sum(VAR)
+    VARacum = VAR
     progress.set_description(f'Beta = {Beta}')
     flips.append(0)
     metroflips.append(0)
