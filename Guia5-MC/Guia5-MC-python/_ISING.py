@@ -26,38 +26,25 @@ def ising ( NSTEPS,N,Hext,kT,J ):
     M2MEAN = []
     E2MEAN = []
     VARIANCE = []
-    #guardo encabezado de archivo
+    SPINS = []
     if os.path.exists(thisfile):
         result =  pd.read_csv(thisfile, header=0, sep='\s+')
         if result.shape[0] == len(kT):
             return result
-#    with open(thisfile,'w') as f: 
-#        f.write('T   EMEAN    E2MEAN        CV           MMEAN   |M|mean   M2MEAN   siflips   noflips \n')
-
-       # inicio la distribución de spins. de aca 
-       #empieza todo.
     s = np.random.randint(2, size=(N,N))*2-1# sign(rand(N) - 0.5) 
     # primero obtengo la suma de spines en los vecinos. 
     # el enfriamiento.
     siflips=0; noflips=0
     for i in range(TRANSIENT):     # {
         E, dM, s , siflips, noflips = metropolising(J,beta[1],s,siflips,noflips )
-       # la dinámica ocurre en enfriamiento!
-       # recien ahora calculo la energía inicial del sistema
     sumOfNeighbours = getneigbours( s )
     E = - ( J / 2 ) * sum ( sum( s*sumOfNeighbours )) + mu*Hext*sum(s); 
     M = sum(sum(s))
-       #plotting params
     basename='N_{:02d}'.format(N)
 
     for t in range(len(kT)):
          #  inicio los acumuladores
-         # una diferencia con lo que hacen en el paper que me paso
-         # ruben es que hay una instancia de termalización para cada 
-         # temperatura, le llama "transient" como si fuera un estado transi
-         #torio. lo podemos implementar mas o menos fácil:
-         # en esta versión las coordenadas las elijo cuando ejecuto metropoliss.
-         # cuento los flips para debug
+         # no hay instancia de termalización
         siflips=0;  noflips=0
         cases= basename+'_kT_{:02d}'.format( t )
         sumOfNeighbours = getneigbours( s )
@@ -68,32 +55,33 @@ def ising ( NSTEPS,N,Hext,kT,J ):
         E_ACUM = E;  M_ACUM = M; E2_ACUM = E**2 ;  Mabs_ACUM = M; M2_ACUM = M**2;
         for i in range(NSTEPS): # i = 1:NSTEPS         # {  %%% loop temperatura
             dE,dM,s,siflips,noflips =  metropolising (J,beta[t],s,siflips,noflips)
-            E =E + dE ;  
-            M = M + dM
+            sumOfNeighbours = getneigbours( s )
+#            tE = - ( J / 2 ) * sum ( sum( s*sumOfNeighbours )) + mu*Hext*sum(sum(s)); 
+            E += dE  
+            M += dM
             E_ACUM += E
             Mabs_ACUM += abs(M)
             M_ACUM += M
             E2_ACUM += E**2
             M2_ACUM += M**2
-             # al final de metrópolis tengo que calcular toda la estadística.
-        EMEAN.append( E_ACUM/NSTEPS/N**2 )
-        MMEAN.append( M_ACUM/NSTEPS/N**2 )
-        MabsMEAN.append(Mabs_ACUM/NSTEPS/N**2)
-        M2MEAN.append(M2_ACUM/NSTEPS/N**4)
-        E2MEAN.append(E2_ACUM/NSTEPS/N**4)
+        EMEAN.append( E_ACUM/NSTEPS)
+        MMEAN.append( M_ACUM/NSTEPS)
+        MabsMEAN.append(Mabs_ACUM/NSTEPS)
+        M2MEAN.append(M2_ACUM/NSTEPS)
+        E2MEAN.append(E2_ACUM/NSTEPS)
         VARIANCE.append((E2MEAN[t]-EMEAN[t]**2)/NSTEPS  )
+        SPINS.append(s)
         print(f'N = {N}, totalflips = {NSTEPS}, KT = {t}, flips = {siflips}, rejects = {noflips}')
-#        with open(thisfile, 'a') as f:
-#            f.write(f'{kT[t]:15.4e} {EMEAN[t]:15.4e} {E2MEAN[t]:15.4e} {VARIANCE[t]/kT[t]**2:15.4e} {MMEAN[t]:15.4e} {MabsMEAN[t]:15.4e} {M2MEAN[t]:15.4e}  siflips:d} {noflips:d}\n')
     data = {'T': kT,
             'EMEAN': EMEAN,
             'E2MEAN': E2MEAN,
             'CV': VARIANCE/kT**2,
             'MMEAN': MMEAN, 
             '|M|mean' :  MabsMEAN,
-            'M2MEAN' : M2MEAN
+            'M2MEAN' : M2MEAN,
+            'SPINS' :  SPINS
            }
-    result = pd.DataFrame.from_dict(data, orient='index')
+    result = pd.DataFrame.from_dict(data, orient='columns')
     
     result.to_csv(thisfile, sep=' ', index=False, )
     
@@ -128,9 +116,8 @@ def metropolising ( J,beta , olds, siflipin,noflipin):
     noflipout = noflipin
     if dEdot < 0:    
         flip=True
-    else:   
-        if np.random.rand() < np.exp(-beta*dEdot):   
-            flip = True
+    elif np.random.rand() < np.exp(-beta*dEdot):   
+        flip = True
     news=copy.copy(olds)
     if flip == True:     # { efectivamente hago el cambio.
         news [ i, j ] = copy.copy(sdot) 
