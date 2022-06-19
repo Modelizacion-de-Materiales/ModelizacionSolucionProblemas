@@ -1,112 +1,138 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-import matplotlib.pyplot as plt
-from tqdm.auto import tqdm
 import numpy as np
-from copy import copy
-import pdb
-import pickle
+import pandas as pd
 
-# system size
-N = 10
+class Magnet:
 
-# steps and dimensions
-steps = int(1e5)
-KT = np.hstack([ 2.2+np.logspace(-2, np.log10(2), 10) , 2.2-np.logspace(-2, np.log10(2),10)])
-KT = KT[KT>0]
-KT.sort()
-KT = KT[::-1]
-beta = 1/KT
+    def __init__(self, s: np.ndarray = None,  Nx: int =2, Ny: int =2, J:float = 1.):
+
+        if s is None:
+            self.s = np.random.randint(0,1,size=[Nx, Ny])*2-1
+        else:
+            if type(s) is not np.ndarray:
+                self.s = np.array(s)
+            else:
+                self.s = s
+        self.Nx, self.Ny = self.s.shape
+        self.N = self.Nx*self.Ny
+        self.J = J
+
+    def get_magnetic_moment(self):
+        self.moment = self.s.sum()
+        return self.moment
+
+    def get_total_energy(self):
+        neigboursup = np.roll(self.s, [-1, 0])
+        neigboursri = np.roll(self.s, [0, -1])
+        neigboursdn = np.roll(self.s, [1, 0])
+        neigboursle = np.roll(self.s, [0, 1])
+        espin = -(self.J/2)*self.s*(neigboursup + neigboursdn + neigboursle+ neigboursri)
+        self.E = espin.sum()
+        return self.E        
+
+    def flipthespin(self, i, j):
+        self.s[i,j] *= -1
+
+    def get_total_echange_onflip(self, i, j):
+        sumofneighbours =  self.s[i-(self.Nx-1), j]  + self.s[i-1, j] + self.s[i, j - (self.Ny-1)]+ self.s[i, j -1]
+        de = (-self.J)*(-2*self.s[i, j])*sumofneighbours
+        return de
+
+    def get_mchange_onflip(self, i,j):
+        return -2*self.s[i,j]
 
 
-# all the randoms
-changes = np.random.randint(N, size=(steps, 2, len(beta)))
-# coins = np.random.rand(steps, len(beta))
+def get_randoms(nx: int, ny: int, lengths: int=1000):
+    """
+    Returns
+    =======
+    randoms, flipi, flipj
+    """
+    np.random.seed(16)
+    randoms = np.random.rand(lengths)
+    flipi = np.random.randint(nx, size=lengths) 
+    flipj = np.random.randint(ny, size=lengths) 
+    return randoms, flipi, flipj
 
-# acumulators and history
-S = []
-acumM = []
-acumE = []
-acumE2 = []
-acumVAR = []
-Mhist = []
-Ehist = []
-VARhist = []
-flips = []
-metroflips = []
-boltsfactors = []
 
-# fig, ax = plt.subplots(1,2)
-#MDF-COMMENT progress = tqdm_notebook(enumerate(beta), ncols = 80, total=len(beta), ascii=True)
-progress = tqdm(enumerate(beta), ncols = 80, total=len(beta), ascii=True)
-for t, Beta in progress:
+def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.series.Series:
+    """
+    Retruns
+    =======
+    magnet, results
+    """
+    Nx, Ny = magnet.Nx, magnet.Ny
+    randoms, flipi, flipj = get_randoms(Nx, Ny, lengths=nsteps)
+    nodirectflip = 0
+    sidirectflip = 0
+    siflip = 0
+    noflip = 0
+    e = magnet.get_total_energy()
+    m = magnet.get_magnetic_moment()
+    eacum = e
+    Mabsacum = abs(m)
+    Macum = m
+    e2acum = e**2
+    M2acum = m**2
+    for r, i, j in zip(randoms, flipi, flipj):
+        flip = False
+        de = magnet.get_total_echange_onflip(i,j)
+        dm = magnet.get_mchange_onflip(i, j)
+        if de < 0:
+            sidirectflip +=1
+            flip = True
+        elif r < np.exp(-de/T):
+            nodirectflip +=1
+            siflip +=1
+            flip = True
+        else:
+            nodirectflip += 1
+            noflip +=1
+        if flip == True:
+            magnet.flipthespin(i,j)
+            e += de
+            m += dm
+        eacum += e
+        e2acum += e**2
+        Macum += m
+        Mabsacum += abs(m)
+        M2acum += m**2
+    results = {
+            'T': T,
+            'Emean': eacum / nsteps /magnet.N, 
+            'E2mean': e2acum/nsteps/magnet.N,
+            'Mmean': Macum/nsteps/magnet.N,
+            'MabsMEAN': Mabsacum/nsteps/magnet.N, 
+            'M2acum': M2acum / nsteps / magnet.N, 
+            'CV' : ( e2acum/nsteps - ( eacum/nsteps )**2 )/T**2/magnet.N,
+            'X' : ( M2acum/nsteps - ( Macum/nsteps )**2 )/T/magnet.N,
+            }
+    return magnet, pd.Series(results) #eacum/nsteps, siflip, noflip, sidirectflip, nodirectflip
 
-    if len(S) > 0:
-        S.append(copy(S[-1]))
-    else:
-        S.append( np.random.randint(2, size=(N,N))*2-1)
-        
-    NEIG0 =np.roll(S, 1, 0)+np.roll(S[-1], -1, 0)+np.roll(S[-1], 1, 1)+np.roll(S[-1], -1, 1)
-    E = [-0.5*(S[-1]*NEIG0).sum()]
-    M = [S[-1].sum()]
-    E2 = [E[-1]**2]
-    DE = [0]
-    Macum = np.abs(M); Eacum = sum(E) ; E2acum = sum(E2) ;
-    VAR = sum(np.power(E,2)) - E2acum
-    VARacum = VAR
-    progress.set_description(f'Beta = {Beta}')
-    flips.append(0)
-    metroflips.append(0)
-    boltsfactors.append([])
-    for i, change in enumerate(changes[:,:,t]):
-        NEIG = S[-1][change[0]-N,change[1]] + \
-                S[-1][change[0]-1, change[1]] +\
-                S[-1][change[0],change[1]-N] +\
-                S[-1][change[0],change[1]-1] 
-        Saux = -copy(S[-1][change[0],change[1]])
-        DE_candidate = -2*Saux*NEIG
-        boltsfactors[-1].append(np.exp(-Beta*DE_candidate))
-        if (DE_candidate < 0): 
-            S[-1][change[0],change[1]] = copy(Saux)# copy(Saux)
-            DM = 2*copy(Saux)
-            DE = copy(DE_candidate)
-            flips[-1] += 1
-        elif np.random.rand() < boltsfactors[-1][-1]: # coins[i, t] < boltsfactors[-1][-1]:
-            S[-1][change[0],change[1]] = copy(Saux) #-1# copy(Saux)
-            DE = copy(DE_candidate)
-            DM = 2*copy(Saux)
-            DE = copy(DE_candidate)
-            metroflips[-1] += 1
-        else: 
-            DE = 0
-        M.append(M[-1]+ DM)
-        E.append((E[-1]+DE))
-        E2.append(E[-1]**2)
-#        VAR.append(E[-1]**2 - E2[-1])
-        Macum += np.abs(M[-1])
-        Eacum += E[-1]
-        E2acum += E2[-1]
-        VARacum += E2acum - sum(E)**2
+def main(sizes = [2], mcsteps = [1e4] ):
+    from tqdm.auto import tqdm
+    import pdb
+    import os
+    T = np.linspace(6, 0.5, 50)
+    beta = 1/T
+    results = {s: {} for s in sizes}
+    for nsteps in mcsteps:
+        for size, thisresult in results.items():
+            filename = f'results_{size}x{size}_{nsteps}.dat'
+            if os.path.exists(filename):
+                continue
+            else:
+                magnet = Magnet(Nx = size, Ny=size)
+                progress = tqdm(T)
+                for t in progress:
+                    progress.set_description(filename)
+                    magnet, resultdict = termalize(magnet, T = t, nsteps = int(nsteps))
+                    thisresult.update({t: resultdict})
+                result_df = pd.DataFrame.from_dict(thisresult, orient='index')
+                result_df.to_csv(filename, index=None)
 
-    Mhist.append(M[::5])
-    Ehist.append(E[::5])
-    VARhist.append(VAR[::5])
-    acumM.append(Macum)#/changes.shape[0]/N**2)
-    acumE.append(Eacum)#/changes.shape[0]/N**2)
-    acumE2.append(E2acum)#/changes.shape[0]/N**2)
-    acumVAR.append(VARacum)
-    
-output_pickle = f'{N}x{N}_{changes.shape[0]}-steps.pkl'
 
-with open(output_pickle, 'wb') as f:
-    pickle.dump(np.array(KT), f)
-    pickle.dump(np.array(changes), f)
-    pickle.dump(np.array(S), f)
-    pickle.dump(np.array(Mhist), f)
-    pickle.dump(np.array(Ehist), f)
-    pickle.dump(np.array(VARhist), f)
-    pickle.dump(np.array(acumM), f)
-    pickle.dump(np.array(acumE), f)
-    pickle.dump(np.array(acumE2), f)
-    pickle.dump(np.array(acumVAR), f)
+if __name__ == '__main__':
+    main()
+
+
+
