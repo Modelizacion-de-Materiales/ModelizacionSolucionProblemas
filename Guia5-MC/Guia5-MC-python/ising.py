@@ -40,6 +40,28 @@ class Magnet:
     def get_mchange_onflip(self, i,j):
         return -2*self.s[i,j]
 
+class SolucionTeorica2x2:
+
+    def __init__(self, beta, J):
+        self.N = 4
+        self.beta = beta
+        self.J = J
+        self.Z = 2*np.exp(8*self.beta*self.J) + 12 + 2*np.exp(-8*self.beta*self.J)
+
+    def emean(self):#, beta):
+        return (-1/self.Z) * (2*8*np.exp(8*self.beta)+2*(-8)*np.exp(-8*self.beta))/4
+    
+    def e2mean (self):
+        return (1/self.Z)*(2*64*np.exp(8*self.beta) + 2*64*np.exp(-8*self.beta))/4
+
+    def mmean (self):
+        return (1/self.Z) * (2*4*np.exp(8*self.beta) + 8*2)/4
+
+    def m2mean(self):
+        return (1/self.Z)*(2*16*np.exp(8*self.beta) + 8*4)/4
+
+
+
 
 def get_randoms(nx: int, ny: int, lengths: int=1000):
     """
@@ -47,7 +69,7 @@ def get_randoms(nx: int, ny: int, lengths: int=1000):
     =======
     randoms, flipi, flipj
     """
-    np.random.seed(16)
+    np.random.seed(20130307)
     randoms = np.random.rand(lengths)
     flipi = np.random.randint(nx, size=lengths) 
     flipj = np.random.randint(ny, size=lengths) 
@@ -62,10 +84,6 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.seri
     """
     Nx, Ny = magnet.Nx, magnet.Ny
     randoms, flipi, flipj = get_randoms(Nx, Ny, lengths=nsteps)
-    nodirectflip = 0
-    sidirectflip = 0
-    siflip = 0
-    noflip = 0
     e = magnet.get_total_energy()
     m = magnet.get_magnetic_moment()
     eacum = e
@@ -74,20 +92,9 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.seri
     e2acum = e**2
     M2acum = m**2
     for r, i, j in zip(randoms, flipi, flipj):
-        flip = False
         de = magnet.get_total_echange_onflip(i,j)
         dm = magnet.get_mchange_onflip(i, j)
-        if de < 0:
-            sidirectflip +=1
-            flip = True
-        elif r < np.exp(-de/T):
-            nodirectflip +=1
-            siflip +=1
-            flip = True
-        else:
-            nodirectflip += 1
-            noflip +=1
-        if flip == True:
+        if test_flip(de, T, p = r):
             magnet.flipthespin(i,j)
             e += de
             m += dm
@@ -105,8 +112,19 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.seri
             'M2acum': M2acum / nsteps / magnet.N, 
             'CV' : ( e2acum/nsteps - ( eacum/nsteps )**2 )/T**2/magnet.N,
             'X' : ( M2acum/nsteps - ( Macum/nsteps )**2 )/T/magnet.N,
+            'Xp' : ( M2acum/nsteps - ( Mabsacum/nsteps )**2 )/T/magnet.N,
             }
     return magnet, pd.Series(results) #eacum/nsteps, siflip, noflip, sidirectflip, nodirectflip
+
+def test_flip(de, T, p=None):
+    if p is None:
+        p = np.random.rand()
+    flip = False
+    if de < 0:
+        flip = True
+    elif p < np.exp(-de/T):
+        flip = True
+    return flip
 
 def main(sizes = [2], mcsteps = [1e4] ):
     from tqdm.auto import tqdm
