@@ -1,5 +1,5 @@
 import unittest
-import ising2 as mod
+import ising as mod
 import numpy as np
 
 
@@ -44,14 +44,13 @@ class TestMagnet(unittest.TestCase):
         magnet = mod.Magnet(-np.ones([ 2,2 ]))
         dm = magnet.get_mchange_onflip(0,0)
         self.assertEqual(dm, 2.)
-#
+
     def test_energy_after_flip(self):
         magnet = mod.Magnet(s=np.ones([2,2]))
         magnet.flipthespin(0,0)
         enew = magnet.get_total_energy()
         self.assertEqual(enew, 0)
-#
-#
+
     def test_echange_onflip(self):
         for thiss in [np.ones([2,2]), -1*np.ones( [2,2]), np.ones([8,8])]:
             magnet = mod.Magnet(s=thiss)
@@ -71,7 +70,6 @@ class TestMagnet(unittest.TestCase):
         detest = magnet.get_total_echange_onflip(0,0)
         self.assertEqual(detest , 8*magnet.J)
 
-#
     def test_randoms(self):
         randoms, flipi, flipj = mod.get_randoms(2,2, 1000)
         self.assertEqual(len(randoms),  1000)
@@ -81,7 +79,7 @@ class TestMagnet(unittest.TestCase):
         self.assertTrue(flipi.min() >= 0)
         self.assertTrue(flipj.max() <= 1)
         self.assertTrue(flipj.min() >= 0)
-#
+
     def test_e_at_inf(self):
         """
         test if after termalization, the energy is as expected at low temperature (i e close to minimal)
@@ -92,7 +90,7 @@ class TestMagnet(unittest.TestCase):
         ef = 0.
         nsteps = 1e4
         magnet, results = mod.termalize(magnet, nsteps = int(nsteps), T = 8)
-        self.assertAlmostEqual(ef/magnet.N, results['EMEAN']/magnet.N, delta=0.25)
+        self.assertAlmostEqual(ef/magnet.N, results['Emean']/magnet.N, delta=0.25)
 
     def test_M_at_inf(self):
         np.random.seed(42)
@@ -101,7 +99,7 @@ class TestMagnet(unittest.TestCase):
         mf = 0
         nsteps = 1e4
         magnet, results = mod.termalize(magnet, nsteps = int(nsteps), T = 10)
-        self.assertAlmostEqual(mf/magnet.N, results['MabsMEAN']/magnet.N, delta = 0.26)
+        self.assertAlmostEqual(mf, results['MabsMEAN'], delta = 0.26)
 
     def test_M_at_0(self):
         np.random.seed(42)
@@ -109,8 +107,39 @@ class TestMagnet(unittest.TestCase):
         magnet = mod.Magnet(s=thiss)
         mf = 1.
         magnet, results = mod.termalize(magnet, nsteps = int(1e4), T = 0.1)
-        self.assertAlmostEqual(mf, results['MabsMEAN']/magnet.N, delta = 2e-3)
+        self.assertAlmostEqual(mf, results['MabsMEAN'], delta = 2e-3)
 
+    def test_termalize_returns_averages(self):
+        magnet = mod.Magnet(Nx=2, Ny=2)
+        magnet, results = mod.termalize(magnet, nsteps=10)
+
+    def test_termalize_wont_return_averages(self):
+        magnet = mod.Magnet(Nx=2, Ny=2)
+        magnet = mod.termalize(magnet, nsteps=10, return_averages=False)
+        self.assertEqual(type(magnet), mod.Magnet)
+
+    def test_updates_properties(self):
+        magnet = mod.Magnet(Nx=2, Ny=2)
+        e = magnet.get_total_energy()
+        m = magnet.get_magnetic_moment()
+        de = magnet.get_total_echange_onflip(0,0)
+        dm = magnet.get_mchange_onflip(0,0)
+        magnet.update_energy(de)
+        magnet.update_mmoment(dm)
+        self.assertEqual(magnet.E, e+de)
+        self.assertEqual(magnet.moment , m +dm)
+
+    def test_updates_magnet(self):
+        magnet = mod.Magnet()
+        e = magnet.get_total_energy()
+        m = magnet.get_magnetic_moment()
+        de = magnet.get_total_echange_onflip(0,0)
+        dm = magnet.get_mchange_onflip(0,0)
+        magnet.update(de, dm, [0,0])
+        ne = magnet.get_total_energy()
+        nm = magnet.get_magnetic_moment()
+        self.assertEqual(ne, e+de)
+        self.assertEqual(nm, m+dm)
 
 if __name__ == '__main__':
     unittest.main()
