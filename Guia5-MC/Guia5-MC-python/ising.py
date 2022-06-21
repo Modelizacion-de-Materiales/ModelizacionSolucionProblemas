@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pdb
 
 class Magnet:
 
@@ -69,14 +70,14 @@ def get_randoms(nx: int, ny: int, lengths: int=1000):
     =======
     randoms, flipi, flipj
     """
-    np.random.seed(20130307)
+#    np.random.seed()
     randoms = np.random.rand(lengths)
     flipi = np.random.randint(nx, size=lengths) 
     flipj = np.random.randint(ny, size=lengths) 
     return randoms, flipi, flipj
 
 
-def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.series.Series:
+def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2, return_averages=True) -> pd.core.series.Series:
     """
     Retruns
     =======
@@ -86,11 +87,12 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.seri
     randoms, flipi, flipj = get_randoms(Nx, Ny, lengths=nsteps)
     e = magnet.get_total_energy()
     m = magnet.get_magnetic_moment()
-    eacum = e
-    Mabsacum = abs(m)
-    Macum = m
-    e2acum = e**2
-    M2acum = m**2
+    if return_averages:
+        eacum = e
+        Mabsacum = abs(m)
+        Macum = m
+        e2acum = e**2
+        M2acum = m**2
     for r, i, j in zip(randoms, flipi, flipj):
         de = magnet.get_total_echange_onflip(i,j)
         dm = magnet.get_mchange_onflip(i, j)
@@ -98,23 +100,27 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2) -> pd.core.seri
             magnet.flipthespin(i,j)
             e += de
             m += dm
-        eacum += e
-        e2acum += e**2
-        Macum += m
-        Mabsacum += abs(m)
-        M2acum += m**2
-    results = {
-            'T': T,
-            'Emean': eacum / nsteps /magnet.N, 
-            'E2mean': e2acum/nsteps/magnet.N,
-            'Mmean': Macum/nsteps/magnet.N,
-            'MabsMEAN': Mabsacum/nsteps/magnet.N, 
-            'M2acum': M2acum / nsteps / magnet.N, 
-            'CV' : ( e2acum/nsteps - ( eacum/nsteps )**2 )/T**2/magnet.N,
-            'X' : ( M2acum/nsteps - ( Macum/nsteps )**2 )/T/magnet.N,
-            'Xp' : ( M2acum/nsteps - ( Mabsacum/nsteps )**2 )/T/magnet.N,
-            }
-    return magnet, pd.Series(results) #eacum/nsteps, siflip, noflip, sidirectflip, nodirectflip
+        if return_averages:
+            eacum += e
+            e2acum += e**2
+            Macum += m
+            Mabsacum += abs(m)
+            M2acum += m**2
+    if return_averages:
+        results = {
+                'T': T,
+                'Emean': eacum / nsteps /magnet.N, 
+                'E2mean': e2acum/nsteps/magnet.N,
+                'Mmean': Macum/nsteps/magnet.N,
+                'MabsMEAN': Mabsacum/nsteps/magnet.N, 
+                'M2acum': M2acum / nsteps / magnet.N, 
+                'CV' : ( e2acum/nsteps - ( eacum/nsteps )**2 )/T**2/magnet.N,
+                'X' : ( M2acum/nsteps - ( Macum/nsteps )**2 )/T/magnet.N,
+                'Xp' : ( M2acum/nsteps - ( Mabsacum/nsteps )**2 )/T/magnet.N,
+                }
+        return magnet, pd.Series(results) #eacum/nsteps, siflip, noflip, sidirectflip, nodirectflip
+    else:
+        return magnet
 
 def test_flip(de, T, p=None):
     if p is None:
@@ -126,11 +132,11 @@ def test_flip(de, T, p=None):
         flip = True
     return flip
 
-def main(sizes = [2], mcsteps = [1e4] ):
+def main(sizes = [2], mcsteps = [1e4] , TF = 6, T0 = 1):
     from tqdm.auto import tqdm
     import pdb
     import os
-    T = np.linspace(6, 0.5, 50)
+    T = np.linspace(TF, 1, 50)
     beta = 1/T
     results = {s: {} for s in sizes}
     for nsteps in mcsteps:
@@ -143,6 +149,7 @@ def main(sizes = [2], mcsteps = [1e4] ):
                 progress = tqdm(T)
                 for t in progress:
                     progress.set_description(filename)
+                    magnet = termalize(magnet, T = t, nsteps=4000, return_averages=False)
                     magnet, resultdict = termalize(magnet, T = t, nsteps = int(nsteps))
                     thisresult.update({t: resultdict})
                 result_df = pd.DataFrame.from_dict(thisresult, orient='index')
