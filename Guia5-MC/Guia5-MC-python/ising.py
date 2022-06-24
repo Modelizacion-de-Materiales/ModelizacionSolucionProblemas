@@ -24,13 +24,11 @@ class Magnet(object):
         return self.moment
 
     def get_total_energy(self):
-        neigboursup = np.roll(self.s, [-1, 0])
-        neigboursri = np.roll(self.s, [0, -1])
-        neigboursdn = np.roll(self.s, [1, 0])
-        neigboursle = np.roll(self.s, [0, 1])
-        espin = -(self.J/2)*self.s*(neigboursup + neigboursdn + neigboursle+ neigboursri)
-        self.E = espin.sum()
-        return self.E        
+        E = 0
+        for i in range(self.Nx-1, -1, -1):
+            for j in range(self.Ny-1, -1, -1):
+                E += -(self.J)*self.s[i,j]*(self.s[i-1, j]+self.s[i, j-1])
+        return E
 
     def flipthespin(self, i, j):
         self.s[i,j] *= -1
