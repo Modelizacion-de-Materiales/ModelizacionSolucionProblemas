@@ -141,5 +141,11 @@ class TestMagnet(unittest.TestCase):
         self.assertEqual(ne, e+de)
         self.assertEqual(nm, m+dm)
 
+    def test_returns_dynamics(self):
+        magnet = mod.Magnet()
+        magnet, dynamics = mod.termalize(magnet, nsteps=10, T = 5, return_dynamics = True)
+        self.assertEqual(len(dynamics['E']), 11)
+
+
 if __name__ == '__main__':
     unittest.main()

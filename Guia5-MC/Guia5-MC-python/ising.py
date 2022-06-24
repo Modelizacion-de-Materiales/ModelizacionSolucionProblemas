@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pdb
+import copy
 
 class Magnet(object):
 
@@ -117,8 +118,24 @@ def get_randoms(nx: int, ny: int, lengths: int=1000):
     flipj = np.random.randint(ny, size=lengths) 
     return randoms, flipi, flipj
 
+class MagnetDynamics(object):
 
-def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2, return_averages=True) -> pd.core.series.Series:
+    def __init__(self, magnet: Magnet):
+
+        self.E = np.array([magnet.get_total_energy()])
+        self.M = np.array([magnet.get_magnetic_moment()])
+        self.s = [magnet.s]
+
+    def update(self, magnet: Magnet):
+        self.E = np.append(self.E, magnet.E)
+        self.M = np.append(self.E, magnet.E)
+        self.s.append(copy.copy(magnet.s))
+
+    def get_values(self):
+        return {'E': self.E, 'M': self.M, 's': self.s}
+
+
+def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2, return_averages=True, return_dynamics=False) -> pd.core.series.Series:
     """
     Retruns
     =======
@@ -128,6 +145,8 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2, return_averages
     randoms, flipi, flipj = get_randoms(Nx, Ny, lengths=nsteps)
     if return_averages:
         magnetstats = Magnet_Stats(magnet)
+    if return_dynamics:
+        dynamics = MagnetDynamics(magnet)
     for r, i, j in zip(randoms, flipi, flipj):
         de = magnet.get_total_echange_onflip(i,j)
         dm = magnet.get_mchange_onflip(i, j)
@@ -135,11 +154,14 @@ def termalize(magnet: Magnet, nsteps: int = 1000, T: float=1e-2, return_averages
             magnet.update(de, dm, [i, j])
         if return_averages:
             magnetstats.update(magnet)# 
+        if return_dynamics:
+            dynamics.update(magnet)
+    results = magnet
     if return_averages:
-        results = magnetstats.report_averages(magnet, nsteps, T)
-        return magnet, results 
-    else:
-        return magnet
+        results = results, magnetstats.report_averages(magnet, nsteps, T)
+    if return_dynamics:
+        results = results, dynamics.get_values()
+    return results
 
 def test_flip(de, T, p=None):
     if p is None:
