@@ -173,9 +173,50 @@ def test_flip(de, T, p=None):
         flip = True
     return flip
 
-def main(sizes = [2], mcsteps = [1e4] , TF = 6, T0 = 1):
+
+class animatedmagnet(object):
+
+
+    def __init__(self, dynamics):
+        import matplotlib.pyplot as plt
+
+        self.S = dynamics['s']
+        self.E = dynamics['E']
+        self.nsteps = len(self.E)
+        self.times = np.linspace(1, self.nsteps, self.nsteps).astype(int)
+
+#    def init_movie(self):
+        self.fig, self.ax = plt.subplots(1,2)
+        self.ax[0].set_xticks([])
+        self.ax[0].set_yticks([])
+        self.ax[0].set_xticklabels([])
+        self.ax[0].set_yticklabels([])
+        self.ax[0].grid('on')
+        self.ax[0].imshow(self.S[0])
+        self.ax[1].set_xlim([0, self.nsteps])
+        self.ax[1].set_ylim(np.min(dynamics['E'])/self.nsteps, np.max(dynamics['E'])/self.nsteps)
+        self.ax[1].set_ylabel('E')
+        self.ax[1].set_xlabel('time')
+        self.Line,  = self.ax[1].plot(self.times, self.E/self.nsteps,linewidth=5, c='k')
+        self.fig.tight_layout()
+#        return [im, self.Line]
+
+    def update(self, t:int):
+#        self.Line.set_data(self.times[:t-1], self.E[:t-1])
+        line,  = self.ax[1].plot(self.times[t-1], self.E[t-1]/self.nsteps,'o', markersize=10, color='r')
+        im = self.ax[0].imshow(self.S[t-1], cmap='Greys')
+        return [im, line]
+
+    def animate(self):
+        from matplotlib.animation import ArtistAnimation
+        ims = []
+        for t in self.times:
+            ims.append(self.update(t))
+        self.aniimation = ArtistAnimation(self.fig, ims,)
+
+
+def cooldown(sizes = [2], mcsteps = [1e4] , TF = 6, T0 = 1):
     from tqdm.auto import tqdm
-    import pdb
     import os
     T = np.linspace(TF, 1, 50)
     beta = 1/T
